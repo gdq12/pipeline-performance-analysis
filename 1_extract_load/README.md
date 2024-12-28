@@ -36,7 +36,7 @@
 
     + in the dashboard go to Cloud Storage --> Buckets 
 
-    + `+ CREATE` as name `yellow-taxi-data-extract`
+    + `+ CREATE` as name `taxi-data-extract`
 
     + for multi-region choose EU based
 

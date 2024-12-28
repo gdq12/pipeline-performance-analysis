@@ -2,7 +2,10 @@ blocks:
 - all_upstream_blocks_executed: true
   color: null
   configuration: {}
-  downstream_blocks: []
+  downstream_blocks:
+  - load_yellow_taxi_data_table_e9
+  - load_yellow_taxi_data_table_b1
+  - record_cleanup
   executor_config: null
   executor_type: local_python
   has_callback: false
@@ -14,6 +17,113 @@ blocks:
   type: data_loader
   upstream_blocks: []
   uuid: load_yellow_taxi_data
+- all_upstream_blocks_executed: true
+  color: null
+  configuration:
+    file_path: transformers/record_cleanup.py
+    file_source:
+      path: transformers/record_cleanup.py
+  downstream_blocks:
+  - dimension_name_cleanup
+  executor_config: null
+  executor_type: local_python
+  has_callback: false
+  language: python
+  name: record_cleanup
+  retry_config: null
+  status: executed
+  timeout: null
+  type: transformer
+  upstream_blocks:
+  - load_yellow_taxi_data
+  uuid: record_cleanup
+- all_upstream_blocks_executed: true
+  color: null
+  configuration: {}
+  downstream_blocks:
+  - datatype_update
+  executor_config: null
+  executor_type: local_python
+  has_callback: false
+  language: python
+  name: dimension_name_cleanup
+  retry_config: null
+  status: executed
+  timeout: null
+  type: transformer
+  upstream_blocks:
+  - record_cleanup
+  uuid: dimension_name_cleanup
+- all_upstream_blocks_executed: true
+  color: null
+  configuration: {}
+  downstream_blocks:
+  - data_2_gcp_cloud_storage
+  executor_config: null
+  executor_type: local_python
+  has_callback: false
+  language: python
+  name: datatype_update
+  retry_config: null
+  status: executed
+  timeout: null
+  type: transformer
+  upstream_blocks:
+  - dimension_name_cleanup
+  uuid: datatype_update
+- all_upstream_blocks_executed: true
+  color: null
+  configuration: {}
+  downstream_blocks:
+  - env_cleanup_logs_upload
+  - bucket_2_bigquery
+  executor_config: null
+  executor_type: local_python
+  has_callback: false
+  language: python
+  name: data_2_gcp_cloud_storage
+  retry_config: null
+  status: executed
+  timeout: null
+  type: data_exporter
+  upstream_blocks:
+  - datatype_update
+  uuid: data_2_gcp_cloud_storage
+- all_upstream_blocks_executed: true
+  color: teal
+  configuration:
+    file_path: custom/env_cleanup_logs_upload.py
+    file_source:
+      path: custom/env_cleanup_logs_upload.py
+  downstream_blocks: []
+  executor_config: null
+  executor_type: local_python
+  has_callback: false
+  language: python
+  name: env_cleanup_logs_upload
+  retry_config: null
+  status: executed
+  timeout: null
+  type: custom
+  upstream_blocks:
+  - data_2_gcp_cloud_storage
+  uuid: env_cleanup_logs_upload
+- all_upstream_blocks_executed: true
+  color: null
+  configuration: {}
+  downstream_blocks: []
+  executor_config: null
+  executor_type: local_python
+  has_callback: false
+  language: python
+  name: bucket_2_bigquery
+  retry_config: null
+  status: failed
+  timeout: null
+  type: data_loader
+  upstream_blocks:
+  - data_2_gcp_cloud_storage
+  uuid: bucket_2_bigquery
 cache_block_output_in_memory: false
 callbacks: []
 concurrency_config: {}
@@ -37,5 +147,51 @@ spark_config: {}
 tags: []
 type: python
 uuid: yellow_taxi_2_gcp_storage
-variables_dir: /home/src/mage_data/yellow_taxi_extract_load
-widgets: []
+variables:
+  GOOGLE_APPLICATION_CREDENTIALS: /home/src/pipeline-analysis-446021-e6b585f9b41d.json
+  bucket_name_data: taxi-data-extract
+  bucket_name_log: mage-run-logs
+  gcp_project_name: pipeline-analysis-446021
+  table_name: yellow_taxi_data
+variables_dir: /root/.mage_data/yellow_taxi_extract_load
+widgets:
+- all_upstream_blocks_executed: true
+  color: null
+  configuration:
+    chart_type: table
+    limit: 10
+    x: x
+    y: y
+  downstream_blocks: []
+  executor_config: null
+  executor_type: local_python
+  has_callback: false
+  language: python
+  name: load_yellow_taxi_data_table_e9
+  retry_config: null
+  status: failed
+  timeout: null
+  type: chart
+  upstream_blocks:
+  - load_yellow_taxi_data
+  uuid: load_yellow_taxi_data_table_e9
+- all_upstream_blocks_executed: true
+  color: null
+  configuration:
+    chart_type: table
+    limit: 10
+    x: x
+    y: y
+  downstream_blocks: []
+  executor_config: null
+  executor_type: local_python
+  has_callback: false
+  language: python
+  name: load_yellow_taxi_data_table_b1
+  retry_config: null
+  status: failed
+  timeout: null
+  type: chart
+  upstream_blocks:
+  - load_yellow_taxi_data
+  uuid: load_yellow_taxi_data_table_b1
