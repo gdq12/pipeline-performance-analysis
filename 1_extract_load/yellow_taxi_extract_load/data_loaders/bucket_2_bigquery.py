@@ -1,12 +1,11 @@
-from mage_ai.settings.repo import get_repo_path
-from mage_ai.io.bigquery import BigQuery
-from mage_ai.io.config import ConfigFileLoader
-from os import path
+import os 
+import re
+from google.cloud import bigquery
+from yellow_taxi_extract_load.utils.helpers.dict_helpers import sql_dict_yellow
 if 'data_loader' not in globals():
     from mage_ai.data_preparation.decorators import data_loader
 if 'test' not in globals():
     from mage_ai.data_preparation.decorators import test
-
 
 @data_loader
 def load_data_from_big_query(*args, **kwargs):
@@ -16,42 +15,64 @@ def load_data_from_big_query(*args, **kwargs):
 
     Docs: https://docs.mage.ai/design/data-loading#bigquery
     """
+    # cloud storage centric vars 
+    bucket_name = kwargs.get('bucket_name_data')
+    table_name = re.sub('.parquet', '', os.popen('ls *.parquet').read()).strip()
+    root_path = f"{bucket_name}/{kwargs.get('execution_date').date()}_{table_name}"
 
-    q1 = f"""create schema if not exists `{kwargs.get('gcp_project_name')}`.`nytaxi_raw`
+    # query centric vars 
+    db_name = kwargs.get('gcp_project_name')
+    tbl_name_substr = kwargs.get('table_name') 
+    col_param = ' '.join([key + ' ' + item + ',' for key, item in sql_dict_yellow.items()])[:-1]
+    col_names = ' '.join([key + ',' for key in sql_dict_yellow.keys()])[:-1]
+
+    q1a = f"""create schema if not exists `{db_name}`.`nytaxi_raw`
     options (location = 'EU')
     """
 
-    q2 = f"""create schema if not exists `{kwargs.get('gcp_project_name')}`.`nytaxi_transform`
+    q1b = f"""create schema if not exists `{db_name}`.`nytaxi_stage`
     options (location = 'EU')
     """
 
-    q3 = f"""create schema if not exists `{kwargs.get('gcp_project_name')}`.`nytaxi_prod`
+    q1c = f"""create schema if not exists `{db_name}`.`nytaxi_transform`
     options (location = 'EU')
     """
 
-    q4 = f"""create or replace external table {kwargs.get('gcp_project_name')}.nytaxi_raw.external_{kwargs.get('table_name')}
+    q1d = f"""create schema if not exists `{db_name}`.`nytaxi_prod`
+    options (location = 'EU')
+    """
+
+    q2 = f"""create or replace external table `{db_name}`.`nytaxi_raw.external_{tbl_name_substr}`
     options (
     format = 'PARQUET',
-    uris = ['gs://{kwargs.get('bucket_name_data')}/{kwargs.get('execution_date').date()}_yellow_taxi_data/*']
+    uris = ['gs://{root_path}/*']
     )
     """
 
-    q5 = f"""create if not exists {kwargs.get('gcp_project_name')}.nytaxi_raw.{kwargs.get('table_name')} 
-    (vendor_id string, passenger_count int64, trip_distance float64, ratecode_id string, store_and_fwd_flag string, pu_location_id string, do_location_id string, payment_type string, fare_amount float64, extra float64, mta_tax float64, tip_amount float64, tolls_amount float64, improvement_surcharge float64, total_amount float64, congestion_surcharge float64, airport_fee float64)
+    q3a = f"""create table if not exists `{db_name}`.`nytaxi_stage`.`{tbl_name_substr}`
+    ({col_param})
     """
 
-    q6 = f"""insert into {kwargs.get('gcp_project_name')}.nytaxi_raw.{kwargs.get('table_name')} 
-    select * from {kwargs.get('gcp_project_name')}.nytaxi_raw.external_{kwargs.get('table_name')}
+    q3b = f"""insert into `{db_name}`.`nytaxi_stage`.`{tbl_name_substr}`
+    ({col_names})
+    select * from `{db_name}.nytaxi_raw.external_{tbl_name_substr}`
     """
 
-    config_path = path.join(get_repo_path(), 'io_config.yaml')
-    config_profile = 'default'
+    # get BigQuery connection 
+    client = bigquery.Client()
 
-    BigQuery.with_config(ConfigFileLoader(config_path, config_profile)).load(q1)
-    BigQuery.with_config(ConfigFileLoader(config_path, config_profile)).load(q2)
-    BigQuery.with_config(ConfigFileLoader(config_path, config_profile)).load(q3)
-    BigQuery.with_config(ConfigFileLoader(config_path, config_profile)).load(q4)
-    BigQuery.with_config(ConfigFileLoader(config_path, config_profile)).load(q5)
-    BigQuery.with_config(ConfigFileLoader(config_path, config_profile)).load(q6)
+    # execute queries 
+    print('creating if not already present schemas')
+    client.query(q1a)
+    client.query(q1b)
+    client.query(q1c)
+    client.query(q1d)
 
-    # return BigQuery.with_config(ConfigFileLoader(config_path, config_profile)).load(query)
+    print('creating external table')
+    client.query(q2)
+
+    print('populating stage table')
+    client.query(q3a)
+    client.query(q3b)
+
+    print('loading data to stage complete')
