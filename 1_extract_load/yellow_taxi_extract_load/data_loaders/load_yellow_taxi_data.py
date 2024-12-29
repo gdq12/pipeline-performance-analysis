@@ -25,11 +25,11 @@ def load_data_from_file(*args, **kwargs):
     # year_month = kwargs.get('execution_date').date().strftime('%Y-%m')
     year_month = '2021-07'
 
-    url = f'https://d37ci6vzurychx.cloudfront.net/trip-data/yellow_tripdata_{year_month}.parquet'
+    filename = f"{kwargs.get('table_name')}_{year_month}.parquet"
+
+    url = f'https://d37ci6vzurychx.cloudfront.net/trip-data/{filename}'
     
     os.system(f'curl -O {url}')
-
-    filename = f'yellow_tripdata_{year_month}.parquet'
     
     df = pd.read_parquet(filename)
 
