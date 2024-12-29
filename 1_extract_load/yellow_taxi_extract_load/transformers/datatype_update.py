@@ -1,8 +1,8 @@
 import os 
+import re
 import psutil
 import pandas as pd
 from datetime import datetime
-from yellow_taxi_extract_load.utils.helpers.yellow_data_schema import schema_yellow
 
 if 'transformer' not in globals():
     from mage_ai.data_preparation.decorators import transformer
@@ -27,16 +27,13 @@ def transform(data, *args, **kwargs):
     """
     start_time = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
 
-    # verify that datetime columns are in the correct format 
-    datetime_cols = data.columns[data.columns.str.contains('datetime', regex = True)]
-
-    for i in range(len(datetime_cols)):
-        col_name = datetime_cols[i]
-        print(f"converting {col_name} to datetime format")
-        data[col_name] = pd.to_datetime(data[col_name], format = '%Y-%m-%d %H:%M:%S')
-
-    # change the rest of the rest of the columns to other pre-assigned data types 
-    df = data.astype(schema_yellow)
+    # create new column for partitioning in next step 
+    pickup_col = data.columns[data.columns.str.contains('pickup', regex = True)][0]
+    col_name = re.sub('time', '', pickup_col)
+    data[col_name] = data[pickup_col].dt.date
+    
+    # convert everything to string for better loading to BigQuery tables 
+    df = data.astype(str)
 
     end_time = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
 
@@ -51,6 +48,6 @@ def transform(data, *args, **kwargs):
                 'cpu_percent': [psutil.virtual_memory().percent],
                 'used_memory': [psutil.virtual_memory().used],
                 'free_memory': [psutil.virtual_memory().free]
-                }).to_csv('log_script4.csv', index = False)
+                }).to_csv('log_script3.csv', index = False)
 
     return df
