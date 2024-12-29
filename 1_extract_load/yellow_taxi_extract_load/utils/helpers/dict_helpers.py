@@ -1,0 +1,41 @@
+# python_dict_yellow = {
+#     'vendor_id': str,
+#     'passenger_count': int, 
+#     'trip_distance': float, 
+#     'ratecode_id': str,
+#     'store_and_fwd_flag': str,
+#     'pu_location_id': str,
+#     'do_location_id': str,
+#     'payment_type': str,
+#     'fare_amount': float, 
+#     'extra': float, 
+#     'mta_tax': float, 
+#     'tip_amount': float, 
+#     'tolls_amount': float, 
+#     'improvement_surcharge': float, 
+#     'total_amount': float, 
+#     'congestion_surcharge': float, 
+#     'airport_fee': float
+# }
+
+sql_dict_yellow = {
+    'vendor_id' : 'string', 
+    'tpep_pickup_datetime' : 'string',
+    'tpep_dropoff_datetime' : 'string',
+    'passenger_count': 'string', 
+    'trip_distance ' : 'string', 
+    'ratecode_id' : 'string', 
+    'store_and_fwd_flag ' : 'string', 
+    'pu_location_id' : 'string', 
+    'do_location_id' : 'string', 
+    'payment_type' : 'string', 
+    'fare_amount' : 'string', 
+    'extra' : 'string', 
+    'mta_tax' : 'string', 
+    'tip_amount' : 'string', 
+    'tolls_amount' : 'string', 
+    'improvement_surcharge' : 'string', 
+    'total_amount' : 'string', 
+    'congestion_surcharge' : 'string', 
+    'airport_fee' : 'string'
+}
