@@ -46,7 +46,7 @@ def transform(data, *args, **kwargs):
                 'cpu_percent': [psutil.virtual_memory().percent],
                 'used_memory': [psutil.virtual_memory().used],
                 'free_memory': [psutil.virtual_memory().free]
-                }).to_csv('log_script3.csv', index = False)
+                }).to_csv('log_script2.csv', index = False)
 
     print(f"exporting a df with {data.shape[0]} records, with the following dimension names: {', '.join(data.columns)}")
     
