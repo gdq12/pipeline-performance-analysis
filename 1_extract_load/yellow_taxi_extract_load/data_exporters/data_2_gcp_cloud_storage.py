@@ -19,12 +19,10 @@ def export_data(data, *args, **kwargs):
 
     bucket_name = kwargs.get('bucket_name_data')
 
-    table_name = kwargs.get('table_name')
-    
-    # partition the data 
-    pickup_col = data.columns[data.columns.str.contains('pickup', regex = True)][0]
-    col_name = re.sub('time', '', pickup_col)
-    data[col_name] = data[pickup_col].dt.date
+    table_name = re.sub('.parquet', '', os.popen('ls *.parquet').read()).strip()
+
+    # column that is used for partitioning data
+    col_name = data.columns[data.columns.str.contains('pickup_date$', regex = True)][0]
 
     print(f"will be pushing the data into GCP with {data[col_name].nunique()} partitions")
 
@@ -56,4 +54,4 @@ def export_data(data, *args, **kwargs):
                 'cpu_percent': [psutil.virtual_memory().percent],
                 'used_memory': [psutil.virtual_memory().used],
                 'free_memory': [psutil.virtual_memory().free]
-                }).to_csv('log_script5.csv', index = False)
+                }).to_csv('log_script4.csv', index = False)
