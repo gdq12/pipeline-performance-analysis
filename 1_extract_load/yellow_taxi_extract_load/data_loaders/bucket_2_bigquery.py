@@ -1,5 +1,8 @@
 import os 
 import re
+import psutil
+from datetime import datetime
+from google.oauth2 import service_account
 from google.cloud import bigquery
 from yellow_taxi_extract_load.utils.helpers.dict_helpers import sql_dict_yellow
 if 'data_loader' not in globals():
@@ -15,10 +18,16 @@ def load_data_from_big_query(*args, **kwargs):
 
     Docs: https://docs.mage.ai/design/data-loading#bigquery
     """
+    kwarg_logger = kwargs.get('logger')
+
+    # connecting to bigquery 
+    credentials = service_account.Credentials.from_service_account_file(kwargs.get('GOOGLE_APPLICATION_CREDENTIALS'))
+    project_id = kwargs.get('gcp_project_name')
+
     # cloud storage centric vars 
     bucket_name = kwargs.get('bucket_name_data')
     table_name = re.sub('.parquet', '', os.popen('ls *.parquet').read()).strip()
-    root_path = f"{bucket_name}/{kwargs.get('execution_date').date()}_{table_name}"
+    root_path = f"{bucket_name}/{datetime.now().strftime('%Y-%m-%d')}_{table_name}"
 
     # query centric vars 
     db_name = kwargs.get('gcp_project_name')
@@ -59,20 +68,27 @@ def load_data_from_big_query(*args, **kwargs):
     """
 
     # get BigQuery connection 
-    client = bigquery.Client()
+    client = bigquery.Client(credentials = credentials, project = project_id)
 
     # execute queries 
-    print('creating if not already present schemas')
+    kwarg_logger.info('creating if not already present schemas')
     client.query(q1a)
     client.query(q1b)
     client.query(q1c)
     client.query(q1d)
 
-    print('creating external table')
+    kwarg_logger.info('creating external table')
     client.query(q2)
 
-    print('populating stage table')
+    kwarg_logger.info('populating stage table')
     client.query(q3a)
     client.query(q3b)
 
-    print('loading data to stage complete')
+    kwarg_logger.info('loading data to stage complete')
+
+    # cleanup env for next run 
+    os.system('rm -r *.parquet')
+
+    kwarg_logger.info('cleanuped up env for next run')
+
+    kwarg_logger.info(f"env memory stats: {psutil.virtual_memory().total} (total memory), {psutil.virtual_memory().available} (available), {psutil.virtual_memory().percent} (percent), {psutil.virtual_memory().used} (used), {psutil.virtual_memory().free} (free)")

@@ -1,5 +1,3 @@
-import re
-import os 
 import psutil
 import pandas as pd
 from datetime import datetime
@@ -24,31 +22,18 @@ def transform(data, *args, **kwargs):
     Returns:
         df: pandas df with correct column names 
     """
-    start_time = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+    kwarg_logger = kwargs.get('logger')
 
     # change all col names to snake syntax
-    print(f"need to change the following columns to snake case: {', '.join(data.columns[data.columns.str.contains('(?<=[a-z])(?=[A-Z])|(?<=[A-Z])(?=[A-Z]{1}[a-z])', regex = True)])}")
+    kwarg_logger.info(f"need to change the following columns to snake case: {', '.join(data.columns[data.columns.str.contains('(?<=[a-z])(?=[A-Z])|(?<=[A-Z])(?=[A-Z]{1}[a-z])', regex = True)])}")
 
     data.columns = data.columns\
                 .str.replace('(?<=[a-z])(?=[A-Z])|(?<=[A-Z])(?=[A-Z]{1}[a-z])', '_', regex=True)\
                 .str.lower()
 
-    end_time = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+    kwarg_logger.info(f"env memory stats: {psutil.virtual_memory().total} (total memory), {psutil.virtual_memory().available} (available), {psutil.virtual_memory().percent} (percent), {psutil.virtual_memory().used} (used), {psutil.virtual_memory().free} (free)")
 
-    pd.DataFrame({'filename': [''],
-                'log_date': kwargs.get('execution_date').date(),
-                'script_name': [kwargs.get('block_uuid')],
-                'start_time': [start_time],
-                'end_time': [end_time], 
-                'file_size': [''],
-                'total_memory': [psutil.virtual_memory().total],
-                'available_memory': [psutil.virtual_memory().available],
-                'cpu_percent': [psutil.virtual_memory().percent],
-                'used_memory': [psutil.virtual_memory().used],
-                'free_memory': [psutil.virtual_memory().free]
-                }).to_csv('log_script2.csv', index = False)
-
-    print(f"exporting a df with {data.shape[0]} records, with the following dimension names: {', '.join(data.columns)}")
+    kwarg_logger.info(f"exporting a df with {data.shape[0]} records, with the following dimension names: {', '.join(data.columns)}")
     
     return data
 

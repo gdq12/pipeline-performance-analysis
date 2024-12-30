@@ -12,7 +12,7 @@ if 'data_exporter' not in globals():
 @data_exporter
 def export_data(data, *args, **kwargs):
 
-    start_time = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+    kwarg_logger = kwargs.get('logger')
 
     # get the needed GCP cloud storage vars 
     os.environ['GOOGLE_APPLICATION_CREDENTIALS'] = kwargs.get('GOOGLE_APPLICATION_CREDENTIALS')
@@ -24,15 +24,15 @@ def export_data(data, *args, **kwargs):
     # column that is used for partitioning data
     col_name = data.columns[data.columns.str.contains('pickup_date$', regex = True)][0]
 
-    print(f"will be pushing the data into GCP with {data[col_name].nunique()} partitions")
+    kwarg_logger.info(f"will be pushing the data into GCP with {data[col_name].nunique()} partitions")
 
     table = pa.Table.from_pandas(data)
 
     gcs = pa.fs.GcsFileSystem()
 
-    root_path = f"{bucket_name}/{kwargs.get('execution_date').date()}_{table_name}"
+    root_path = f"{bucket_name}/{datetime.now().strftime('%Y-%m-%d')}_{table_name}"
 
-    print(f'loading parquets to {root_path}')
+    kwarg_logger.info(f'loading parquets to {root_path}')
 
     pq.write_to_dataset(
         table, 
@@ -41,17 +41,4 @@ def export_data(data, *args, **kwargs):
         filesystem = gcs
     )
 
-    end_time = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
-
-    pd.DataFrame({'filename': [''],
-                'log_date': kwargs.get('execution_date').date(),
-                'script_name': [kwargs.get('block_uuid')],
-                'start_time': [start_time],
-                'end_time': [end_time], 
-                'file_size': [''],
-                'total_memory': [psutil.virtual_memory().total],
-                'available_memory': [psutil.virtual_memory().available],
-                'cpu_percent': [psutil.virtual_memory().percent],
-                'used_memory': [psutil.virtual_memory().used],
-                'free_memory': [psutil.virtual_memory().free]
-                }).to_csv('log_script4.csv', index = False)
+    kwarg_logger.info(f"env memory stats: {psutil.virtual_memory().total} (total memory), {psutil.virtual_memory().available} (available), {psutil.virtual_memory().percent} (percent), {psutil.virtual_memory().used} (used), {psutil.virtual_memory().free} (free)")

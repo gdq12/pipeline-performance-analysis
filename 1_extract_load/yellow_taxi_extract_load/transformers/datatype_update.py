@@ -1,9 +1,7 @@
-import os 
 import re
 import psutil
 import pandas as pd
 from datetime import datetime
-
 if 'transformer' not in globals():
     from mage_ai.data_preparation.decorators import transformer
 if 'test' not in globals():
@@ -25,7 +23,7 @@ def transform(data, *args, **kwargs):
     Returns:
         df: pandas df with the data types that are specified in utils.helper files
     """
-    start_time = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+    kwarg_logger = kwargs.get('logger')
 
     # create new column for partitioning in next step 
     pickup_col = data.columns[data.columns.str.contains('pickup', regex = True)][0]
@@ -35,19 +33,7 @@ def transform(data, *args, **kwargs):
     # convert everything to string for better loading to BigQuery tables 
     df = data.astype(str)
 
-    end_time = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
-
-    pd.DataFrame({'filename': [''],
-                'log_date': kwargs.get('execution_date').date(),
-                'script_name': [kwargs.get('block_uuid')],
-                'start_time': [start_time],
-                'end_time': [end_time], 
-                'file_size': [''],
-                'total_memory': [psutil.virtual_memory().total],
-                'available_memory': [psutil.virtual_memory().available],
-                'cpu_percent': [psutil.virtual_memory().percent],
-                'used_memory': [psutil.virtual_memory().used],
-                'free_memory': [psutil.virtual_memory().free]
-                }).to_csv('log_script3.csv', index = False)
+    kwarg_logger.info(f"env memory stats: {psutil.virtual_memory().total} (total memory), {psutil.virtual_memory().available} (available), {psutil.virtual_memory().percent} (percent), {psutil.virtual_memory().used} (used), {psutil.virtual_memory().free} (free)")
+    kwarg_logger.info("updates data types as all string")
 
     return df
