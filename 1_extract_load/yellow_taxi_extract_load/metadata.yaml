@@ -53,3 +53,11 @@ notification_config:
   teams_config:
     webhook_url: "{{ env_var('MAGE_TEAMS_WEBHOOK_URL') }}"
 project_uuid: f72857c71bfd43e9b2cbac4e0251a915
+
+logging_config:
+  type: gcs
+  level: INFO
+  destination_config:
+    path_to_credentials: /home/src/pipeline-analysis-446021-e6b585f9b41d.json
+    bucket: mage-run-logs
+    prefix: "{{ env_var('PIPELINE_NAME') }}"
