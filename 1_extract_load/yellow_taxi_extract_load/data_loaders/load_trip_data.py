@@ -21,12 +21,12 @@ def load_data_from_file(*args, **kwargs):
     """
     kwarg_logger = kwargs.get('logger')
 
-    # year_month = kwargs.get('execution_date').date().strftime('%Y-%m')
-    year_month = '2019-10'
+    year_month = kwargs.get('execution_date').date().strftime('%Y-%m')
+    # year_month = '2019-10'
 
     filename = f"{kwargs.get('table_name')}_{year_month}.parquet"
 
-    url = f'https://d37ci6vzurychx.cloudfront.net/trip-data/{filename}'
+    url = f"https://d37ci6vzurychx.cloudfront.net/trip-data/{filename}"
 
     kwarg_logger.info(f"fetching {filename} from {url}")
     
