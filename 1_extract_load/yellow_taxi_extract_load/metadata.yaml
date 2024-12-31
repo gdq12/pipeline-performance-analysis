@@ -60,4 +60,4 @@ logging_config:
   destination_config:
     path_to_credentials: /home/src/pipeline-analysis-446021-e6b585f9b41d.json
     bucket: mage-run-logs
-    prefix: "{{ env_var('PIPELINE_NAME') }}"
+    prefix: extract-load
