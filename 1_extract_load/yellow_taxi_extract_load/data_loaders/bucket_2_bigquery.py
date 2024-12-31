@@ -1,10 +1,11 @@
 import os 
 import re
 import psutil
+import time 
 from datetime import datetime
 from google.oauth2 import service_account
 from google.cloud import bigquery
-from yellow_taxi_extract_load.utils.helpers.dict_helpers import sql_dict_yellow
+from yellow_taxi_extract_load.utils.helpers.dict_helpers import schema_dict
 if 'data_loader' not in globals():
     from mage_ai.data_preparation.decorators import data_loader
 if 'test' not in globals():
@@ -32,8 +33,8 @@ def load_data_from_big_query(*args, **kwargs):
     # query centric vars 
     db_name = kwargs.get('gcp_project_name')
     tbl_name_substr = kwargs.get('table_name') 
-    col_param = ' '.join([key + ' ' + item + ',' for key, item in sql_dict_yellow.items()])[:-1]
-    col_names = ' '.join([key + ',' for key in sql_dict_yellow.keys()])[:-1]
+    col_param = ' '.join([key + ' ' + item + ',' for key, item in schema_dict.items()])[:-1]
+    col_names = ' '.join([key + ',' for key in schema_dict.keys()])[:-1]
 
     q1a = f"""create schema if not exists `{db_name}`.`nytaxi_raw`
     options (location = 'EU')
@@ -78,10 +79,13 @@ def load_data_from_big_query(*args, **kwargs):
     client.query(q1d)
 
     kwarg_logger.info('creating external table')
+    time.sleep(10)
     client.query(q2)
 
     kwarg_logger.info('populating stage table')
+    time.sleep(10)
     client.query(q3a)
+    time.sleep(10)
     client.query(q3b)
 
     kwarg_logger.info('loading data to stage complete')
