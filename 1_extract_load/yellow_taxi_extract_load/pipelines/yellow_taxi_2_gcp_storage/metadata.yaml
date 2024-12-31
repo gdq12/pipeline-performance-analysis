@@ -16,16 +16,16 @@ blocks:
   language: python
   name: load_trip_data
   retry_config: null
-  status: executed
+  status: updated
   timeout: null
   type: data_loader
   upstream_blocks: []
   uuid: load_trip_data
-- all_upstream_blocks_executed: true
+- all_upstream_blocks_executed: false
   color: null
   configuration: {}
   downstream_blocks:
-  - datatype_update
+  - data_2_gcp_cloud_storage
   executor_config: null
   executor_type: local_python
   has_callback: false
@@ -42,23 +42,6 @@ blocks:
   color: null
   configuration: {}
   downstream_blocks:
-  - data_2_gcp_cloud_storage
-  executor_config: null
-  executor_type: local_python
-  has_callback: false
-  language: python
-  name: datatype_update
-  retry_config: null
-  status: updated
-  timeout: null
-  type: transformer
-  upstream_blocks:
-  - dimension_name_cleanup
-  uuid: datatype_update
-- all_upstream_blocks_executed: false
-  color: null
-  configuration: {}
-  downstream_blocks:
   - bucket_2_bigquery
   executor_config: null
   executor_type: local_python
@@ -66,11 +49,11 @@ blocks:
   language: python
   name: data_2_gcp_cloud_storage
   retry_config: null
-  status: updated
+  status: executed
   timeout: null
   type: data_exporter
   upstream_blocks:
-  - datatype_update
+  - dimension_name_cleanup
   uuid: data_2_gcp_cloud_storage
 - all_upstream_blocks_executed: false
   color: null
@@ -88,7 +71,7 @@ blocks:
   upstream_blocks:
   - data_2_gcp_cloud_storage
   uuid: bucket_2_bigquery
-- all_upstream_blocks_executed: true
+- all_upstream_blocks_executed: false
   color: teal
   configuration: {}
   downstream_blocks: []
@@ -167,7 +150,7 @@ variables:
   table_name: yellow_tripdata
 variables_dir: /root/.mage_data/yellow_taxi_extract_load
 widgets:
-- all_upstream_blocks_executed: true
+- all_upstream_blocks_executed: false
   color: null
   configuration:
     chart_type: table
@@ -187,7 +170,7 @@ widgets:
   upstream_blocks:
   - load_trip_data
   uuid: load_yellow_taxi_data_table_e9
-- all_upstream_blocks_executed: true
+- all_upstream_blocks_executed: false
   color: null
   configuration:
     chart_type: table

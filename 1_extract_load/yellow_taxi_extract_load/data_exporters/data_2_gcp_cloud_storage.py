@@ -21,8 +21,10 @@ def export_data(data, *args, **kwargs):
 
     table_name = re.sub('.parquet', '', os.popen('ls *.parquet').read()).strip()
 
-    # column that is used for partitioning data
-    col_name = data.columns[data.columns.str.contains('pickup_date$', regex = True)][0]
+    # create new column for partitioning 
+    pickup_col = data.columns[data.columns.str.contains('pickup', regex = True)][0]
+    col_name = re.sub('time', '', pickup_col)
+    data[col_name] = data[pickup_col].dt.date
 
     kwarg_logger.info(f"will be pushing the data into GCP with {data[col_name].nunique()} partitions")
 
