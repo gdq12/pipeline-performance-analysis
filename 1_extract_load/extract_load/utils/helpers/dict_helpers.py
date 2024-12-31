@@ -1,5 +1,5 @@
 # for yellow tripdata sql 
-schema_dict = {
+schema_yellow_dict = {
     'vendor_id' : 'int64', 
     'tpep_pickup_datetime' : 'int64',
     'tpep_dropoff_datetime' : 'int64',

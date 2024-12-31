@@ -1,6 +1,6 @@
 FROM mageai/mageai:latest
 
-ARG USER_CODE_PATH=/home/src/${PROJECT_NAME}
+ARG USER_CODE_PATH=/home/src/extract_load
 
 # Note: this overwrites the requirements.txt file in your new project on first run. 
 # You can delete this line for the second run :) 
