@@ -38,7 +38,7 @@ def load_data_from_file(*args, **kwargs):
         kwarg_logger.info(f"env memory stats: {psutil.virtual_memory().total} (total memory), {psutil.virtual_memory().available} (available), {psutil.virtual_memory().percent} (percent), {psutil.virtual_memory().used} (used), {psutil.virtual_memory().free} (free)")
         return df#.iloc[:100000]
     except Exception as e:
-        os.system('rm -r *.parquet')
+        os.system(f"rm -r {kwargs.get('table_name')}*.parquet")
         kwarg_logger.info(f"there was an error with the {filename}: {e}, ABORTED PIPELINE!!!!")
         kwarg_logger.info(f"env memory stats: {psutil.virtual_memory().total} (total memory), {psutil.virtual_memory().available} (available), {psutil.virtual_memory().percent} (percent), {psutil.virtual_memory().used} (used), {psutil.virtual_memory().free} (free)")
         return f'there was an error with the {filename}: {e}, ABORTED PIPELINE!!!!'

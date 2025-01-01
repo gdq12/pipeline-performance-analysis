@@ -19,7 +19,7 @@ def export_data(data, *args, **kwargs):
 
     bucket_name = kwargs.get('bucket_name_data')
 
-    table_name = re.sub('.parquet', '', os.popen('ls *.parquet').read()).strip()
+    table_name = re.sub('.parquet', '', os.popen(f"ls {kwargs.get('table_name')}*.parquet").read()).strip()
 
     # create new column for partitioning 
     pickup_col = data.columns[data.columns.str.contains('pickup', regex = True)][0]

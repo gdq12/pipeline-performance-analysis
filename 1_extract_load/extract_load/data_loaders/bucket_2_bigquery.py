@@ -27,7 +27,7 @@ def load_data_from_big_query(*args, **kwargs):
 
     # cloud storage centric vars 
     bucket_name = kwargs.get('bucket_name_data')
-    table_name = re.sub('.parquet', '', os.popen('ls *.parquet').read()).strip()
+    table_name = re.sub('.parquet', '', os.popen(f"ls {kwargs.get('table_name')}*.parquet").read()).strip()
     root_path = f"{bucket_name}/{datetime.now().strftime('%Y-%m-%d')}_{table_name}"
 
     # query centric vars 
@@ -65,7 +65,7 @@ def load_data_from_big_query(*args, **kwargs):
 
     q3b = f"""insert into `{db_name}`.`nytaxi_stage`.`{tbl_name_substr}`
     ({col_names})
-    select * from `{db_name}.nytaxi_raw.external_{tbl_name_substr}`
+    select *, current_timestamp() from `{db_name}.nytaxi_raw.external_{tbl_name_substr}`
     """
 
     # get BigQuery connection 
