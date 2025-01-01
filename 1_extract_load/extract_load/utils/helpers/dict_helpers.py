@@ -18,5 +18,6 @@ schema_yellow_dict = {
     'improvement_surcharge' : 'float64', 
     'total_amount' : 'float64', 
     'congestion_surcharge' : 'float64', 
-    'airport_fee' : 'int64'
+    'airport_fee' : 'int64',
+    'creation_dt': 'timestamp'
 }
