@@ -5,7 +5,7 @@ import time
 from datetime import datetime
 from google.oauth2 import service_account
 from google.cloud import bigquery
-from extract_load.utils.helpers.dict_helpers import schema_yellow_dict, schema_green_dict
+from extract_load.utils.helpers.dict_helpers import schema_yellow_dict, schema_green_dict, schema_fhv_dict, schema_fhvhv_dict
 if 'data_loader' not in globals():
     from mage_ai.data_preparation.decorators import data_loader
 if 'test' not in globals():
@@ -40,9 +40,14 @@ def load_data_from_big_query(*args, **kwargs):
     elif 'green' in tbl_name_substr:
         col_param = ' '.join([key + ' ' + item + ',' for key, item in schema_green_dict.items()])[:-1]
         col_names = ' '.join([key + ',' for key in schema_green_dict.keys()])[:-1]
+    elif 'fhv' in tbl_name_substr:
+        col_param = ' '.join([key + ' ' + item + ',' for key, item in schema_fhv_dict.items()])[:-1]
+        col_names = ' '.join([key + ',' for key in schema_fhv_dict.keys()])[:-1]
+    elif 'fhvhv' in tbl_name_substr:
+        col_param = ' '.join([key + ' ' + item + ',' for key, item in schema_fhvhv_dict.items()])[:-1]
+        col_names = ' '.join([key + ',' for key in schema_fhvhv_dict.keys()])[:-1]
     else:
         pass
-    col_names = ' '.join([key + ',' for key in schema_yellow_dict.keys()])[:-1]
 
     q1a = f"""create schema if not exists `{db_name}`.`nytaxi_raw`
     options (location = 'EU')

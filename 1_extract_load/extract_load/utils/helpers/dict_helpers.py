@@ -1,4 +1,3 @@
-# for yellow tripdata sql 
 schema_yellow_dict = {
     'vendor_id' : 'int64', 
     'tpep_pickup_datetime' : 'int64',
@@ -43,5 +42,44 @@ schema_green_dict = {
     'payment_type': 'float64', 
     'trip_type': 'float64', 
     'congestion_surcharge': 'float64', 
+    'creation_dt': 'timestamp'
+}
+
+schema_fhv_dict = {
+    'dispatching_base_num': 'string', 
+    'pickup_datetime': 'int64', 
+    'drop_off_datetime': 'int64',
+    'p_ulocation_id': 'float64', 
+    'd_olocation_id': 'float64', 
+    'sr_flag': 'int64',
+    'affiliated_base_number': 'string',
+    'creation_dt': 'timestamp'
+}
+
+schema_fhvhv_dict = {
+    'hvfhs_license_num': 'string', 
+    'dispatching_base_num': 'string', 
+    'originating_base_num': 'string', 
+    'request_datetime': 'int64', 
+    'on_scene_datetime': 'int64', 
+    'pickup_datetime': 'int64', 
+    'dropoff_datetime': 'int64', 
+    'pu_location_id': 'int64', 
+    'do_location_id': 'int64', 
+    'trip_miles': 'float64', 
+    'trip_time': 'int64', 
+    'base_passenger_fare': 'float64', 
+    'tolls': 'float64', 
+    'bcf': 'float64', 
+    'sales_tax': 'float64', 
+    'congestion_surcharge': 'float64', 
+    'airport_fee': 'float64', 
+    'tips': 'float64', 
+    'driver_pay': 'float64', 
+    'shared_request_flag': 'string', 
+    'shared_match_flag': 'string', 
+    'access_a_ride_flag': 'string', 
+    'wav_request_flag': 'string', 
+    'wav_match_flag': 'string',
     'creation_dt': 'timestamp'
 }

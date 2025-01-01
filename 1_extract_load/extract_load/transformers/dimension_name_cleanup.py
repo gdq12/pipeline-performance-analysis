@@ -37,7 +37,6 @@ def transform(data, *args, **kwargs):
     
     return data
 
-
 @test
 def test_output(output, *args) -> None:
     """
