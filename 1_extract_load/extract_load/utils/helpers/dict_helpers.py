@@ -21,3 +21,27 @@ schema_yellow_dict = {
     'airport_fee' : 'int64',
     'creation_dt': 'timestamp'
 }
+
+schema_green_dict = {
+    'vendor_id': 'int64', 
+    'lpep_pickup_datetime': 'int64', 
+    'lpep_dropoff_datetime': 'int64',
+    'store_and_fwd_flag': 'string', 
+    'ratecode_id': 'float64', 
+    'pu_location_id': 'int64', 
+    'do_location_id': 'int64',
+    'passenger_count': 'float64', 
+    'trip_distance': 'float64', 
+    'fare_amount': 'float64', 
+    'extra': 'float64', 
+    'mta_tax': 'float64',
+    'tip_amount': 'float64', 
+    'tolls_amount': 'float64', 
+    'ehail_fee': 'int64', 
+    'improvement_surcharge': 'float64',
+    'total_amount': 'float64', 
+    'payment_type': 'float64', 
+    'trip_type': 'float64', 
+    'congestion_surcharge': 'float64', 
+    'creation_dt': 'timestamp'
+}
