@@ -21,7 +21,12 @@ def load_data_from_file(*args, **kwargs):
     """
     kwarg_logger = kwargs.get('logger')
 
-    year_month = kwargs.get('execution_date').date().strftime('%Y-%m')
+    if 'yellow' not in kwargs['pipeline_uuid']:
+        exec_date = datetime.strptime(kwargs['execution_date_trigger'], "%Y-%m-%dT%H:%M:%S")
+    else:
+        exec_date = kwargs.get('execution_date')
+
+    year_month = exec_date.date().strftime('%Y-%m')
     # year_month = '2019-10'
 
     filename = f"{kwargs.get('table_name')}_{year_month}.parquet"
