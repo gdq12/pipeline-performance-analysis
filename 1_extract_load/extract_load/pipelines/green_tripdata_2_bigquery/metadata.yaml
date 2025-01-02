@@ -44,7 +44,7 @@ blocks:
   language: python
   name: data_2_gcp_cloud_storage
   retry_config: null
-  status: not_executed
+  status: updated
   timeout: null
   type: data_exporter
   upstream_blocks:
@@ -84,7 +84,11 @@ blocks:
   uuid: abort_pipeline
 cache_block_output_in_memory: false
 callbacks: []
-concurrency_config: {}
+concurrency_config:
+  block_run_limit: 2
+  on_pipeline_run_limit_reached: wait
+  pipeline_run_limit: 4
+  pipeline_run_limit_all_triggers: 4
 conditionals:
 - all_upstream_blocks_executed: false
   color: null

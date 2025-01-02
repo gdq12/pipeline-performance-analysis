@@ -16,7 +16,7 @@ blocks:
   type: data_loader
   upstream_blocks: []
   uuid: load_trip_data
-- all_upstream_blocks_executed: true
+- all_upstream_blocks_executed: false
   color: null
   configuration: {}
   downstream_blocks:
@@ -33,7 +33,7 @@ blocks:
   upstream_blocks:
   - load_trip_data
   uuid: dimension_name_cleanup
-- all_upstream_blocks_executed: true
+- all_upstream_blocks_executed: false
   color: null
   configuration: {}
   downstream_blocks:
@@ -50,7 +50,7 @@ blocks:
   upstream_blocks:
   - dimension_name_cleanup
   uuid: data_2_gcp_cloud_storage
-- all_upstream_blocks_executed: true
+- all_upstream_blocks_executed: false
   color: null
   configuration: {}
   downstream_blocks: []
@@ -66,7 +66,7 @@ blocks:
   upstream_blocks:
   - data_2_gcp_cloud_storage
   uuid: bucket_2_bigquery
-- all_upstream_blocks_executed: true
+- all_upstream_blocks_executed: false
   color: null
   configuration: {}
   downstream_blocks: []
@@ -84,7 +84,11 @@ blocks:
   uuid: abort_pipeline
 cache_block_output_in_memory: false
 callbacks: []
-concurrency_config: {}
+concurrency_config:
+  block_run_limit: 2
+  on_pipeline_run_limit_reached: wait
+  pipeline_run_limit: 4
+  pipeline_run_limit_all_triggers: 4
 conditionals:
 - all_upstream_blocks_executed: false
   color: null
@@ -102,7 +106,7 @@ conditionals:
   upstream_blocks:
   - abort_pipeline
   uuid: parquet_not_downloaded
-- all_upstream_blocks_executed: true
+- all_upstream_blocks_executed: false
   color: null
   configuration: {}
   downstream_blocks: []
