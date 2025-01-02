@@ -61,3 +61,6 @@ logging_config:
     path_to_credentials: /home/src/pipeline-analysis-446021-e6b585f9b41d.json
     bucket: mage-run-logs
     prefix: extract-load
+features:
+  automatic_kernel_cleanup: true
+pipelines:
