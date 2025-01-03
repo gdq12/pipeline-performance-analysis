@@ -83,3 +83,38 @@
 * repo setup [guide](https://docs.mage.ai/production/ci-cd/local-cloud/repository-setup)
 
 * quickstart [guide](https://docs.mage.ai/getting-started/setup) for project setup 
+
+g://taxi-data-extract/spark-scripts/extract-load-2-cloud-storage.py
+
+```
+# login and authenticate gcp creds (follow links and provide authentication codes when prompted)
+gcloud auth login
+gcloud auth application-default login
+
+# cp command
+gsutil cp extract-load-2-cloud-storage.py g://taxi-data-extract/spark-scripts/extract-load-2-cloud-storage.py
+```
+
+```{bash}
+gcloud projects add-iam-policy-binding pipeline-analysis-446021 \
+    --member=serviceAccount:1023261528910-compute@developer.gserviceaccount.com \
+    --role="roles/bigquery.jobUser"
+
+```
+
+``` {bash}
+gcloud dataproc jobs submit pyspark \
+    --cluster=extract-load-spark \
+    --region=europe-west10 \
+    --jars gs://spark-lib/bigquery/spark-3.4-bigquery-0.37.0.jar  \
+    g://taxi-data-extract/spark-scripts/extract-load-2-cloud-storage.py \
+    -- \
+    --table_name=yellow_tripdata \
+    --start_date=2009-01-01 \
+    --end_date=2009-01-01
+```
+
+python3 extract-load-2-cloud-storage.py \
+    --table_name yellow_tripdata \
+    --start_date 2009-01-01 \
+    --end_date 2009-01-01
