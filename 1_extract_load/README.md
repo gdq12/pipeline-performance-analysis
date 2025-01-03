@@ -28,6 +28,8 @@
 
     + grant permissions: Artifact Registry Read, Artifact Registry Writer, Cloud Run Developer, Cloud SQL, Service Account Token Creator
 
+        - gcloud syntax: roles/artifactregistry.reader, roles/artifactregistry.writer, roles/cloudsql.admin, roles/iam.serviceAccountTokenCreator, roles/run.developer, roles/secretmanager.secretAccessor, roles/storage.admin, roles/bigquery.dataOwner, roles/iam.serviceAccountAdmin
+
     + `ADD KEY` from service account --> dowload
 
     + copy json key to `~/git_repoos/pipeline-performance-analysis/1_extract_load`
@@ -45,6 +47,36 @@
 ### Repo configurations 
 
 * update variable `GOOGLE_SERVICE_ACC_KEY_FILEPATH` in `PROJECT_NAME/io_config.yml` with docker path of the json file 
+
+### GCLOUD commands good to knows 
+
+* getting the roles current assigned to the service account
+
+    ```
+    sudo gcloud projects get-iam-policy pipeline-analysis-446021 \
+    --flatten="bindings[].members" \
+    --format='table(bindings.role)' \
+    --filter="bindings.members:mage-extract-load@pipeline-analysis-446021.iam.gserviceaccount.com"
+    ```
+
+* current enabled API for project 
+
+    ```
+    sudo gcloud services list --enabled --project pipeline-analysis-446021
+    ```
+
+* current IAM policies for all accounts in project 
+
+    ```
+    sudo gcloud projects get-iam-policy pipeline-analysis-446021
+    ```
+
+* get list of service accounts 
+
+    ```
+    sudo gcloud iam service-accounts list
+    ```
+
 
 ### Helpful links
 

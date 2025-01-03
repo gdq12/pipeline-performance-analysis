@@ -7,13 +7,13 @@ variable "project_id" {
 variable "region" {
   type        = string
   description = "The default compute region"
-  default     = "eu-west10"
+  default     = "europe-west1"
 }
 
 variable "zone" {
   type        = string
   description = "The default compute zone"
-  default     = "eu-west10-a"
+  default     = "europe-west1-b"
 }
 
 variable "location" {

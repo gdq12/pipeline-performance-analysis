@@ -74,7 +74,7 @@ resource "google_project_service" "cloudrun" {
   disable_on_destroy = true
 }
 
-# Create the Cloud Run service
+# Create the Cloud Run service (for mage docker container)
 resource "google_cloud_run_service" "run_service" {
   name     = var.app_name
   location = var.region
