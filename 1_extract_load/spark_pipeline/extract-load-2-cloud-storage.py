@@ -10,6 +10,21 @@ from dateutil.relativedelta import relativedelta
 from pyspark.sql import SparkSession, functions
 from py4j.protocol import Py4JJavaError
 
+def parquet_downloaded(data):
+    if type(data) != str:
+        return True
+    else:
+        return False 
+        
+def parquet_not_downloaded(data):
+    if data == None:
+        return True
+    else: 
+        return False
+
+def abort_pipeline():
+    print("faulty parquet file downloaded, iteration run aborted")
+
 def load_trip_data(spark, url, filename):
     
     # down load parquet
@@ -25,7 +40,8 @@ def load_trip_data(spark, url, filename):
         return df
     except Py4JJavaError as e:
         os.system(f"rm -r {filename}")
-        raise Exception(f"{filename} not a valid parquet file, aborted pipeline!!!!") from None
+        print(f"aborted pipeline for {filename} due to error")
+        return None
 
 def dimension_name_cleanup(df):
     print(f"Spark DF currently has the following columns: {', '.join(df.columns)}")
@@ -69,7 +85,8 @@ def data_2_gcp_cloud_storage(df, table_name, year_month, root_path, filename):
     # remove parquets locally to make sure pull from gcp worked
     os.system(f'rm -r {table_name}_{year_month}')
     os.system(f'rm {filename}')
-    
+
+ 
 if __name__ == '__main__':
     print('parsing input arguments')
     parser = argparse.ArgumentParser()
@@ -88,7 +105,7 @@ if __name__ == '__main__':
     # var that stays the same through out run 
     table_name = args.table_name
     bucket_name = 'taxi-data-extract'
-
+    
     print(f"wil be fetching parquest for {table_name}, from {start_dt} - {end_dt}")
     
     # start spark session 
@@ -98,7 +115,7 @@ if __name__ == '__main__':
         .appName('extract-load-spark') \
         .getOrCreate()
     
-    while args.start_date <= args.end_date:
+    while start_dt <= end_dt:
     
         # vars for fetching parquet
         year_month = start_dt.strftime("%Y-%m")
@@ -106,14 +123,23 @@ if __name__ == '__main__':
         url = f"https://d37ci6vzurychx.cloudfront.net/trip-data/{filename}"
         
         print(f'starting iteration for {table_name}, {year_month}')
-    
+        
         # vars for gcp 
         root_path = f"{bucket_name}/{datetime.now().strftime('%Y-%m-%d_%H:%M:%S')}_{table_name}_{year_month}"
-    
+        
         # running throught the ETL pipeline
         df = load_trip_data(spark, url, filename)
-        df = dimension_name_cleanup(df)
-        data_2_gcp_cloud_storage(df, table_name, year_month, root_path, filename)
-
-        # close spark session
-        spark.stop()
+        if parquet_not_downloaded(df):
+            abort_pipeline
+            pass
+        elif parquet_downloaded(df):
+            df = dimension_name_cleanup(df)
+            data_2_gcp_cloud_storage(df, table_name, year_month, root_path, filename)
+        else:
+            print('another issue encountered not yet considered, halting iterations')
+            break
+    
+        start_dt += delta
+    
+    # close spark session
+    spark.stop()
