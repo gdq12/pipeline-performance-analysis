@@ -48,8 +48,3 @@ ENV SPARK_HOME="${HOME}/spark-3.5.1-bin-hadoop3"
 
 # command to run when container launched
 CMD jupyter lab --ip=0.0.0.0 --port=8888 --no-browser --allow-root --NotebookApp.token=
-
-# docker build command 
-# docker build -t extract-load-spark:latest .
-# docker run command 
-# docker run -it -p 8888:8888 -e ROOT=TRUE extract-load-spark
