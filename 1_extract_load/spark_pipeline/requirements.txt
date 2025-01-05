@@ -8,6 +8,7 @@ Babel==2.14.0
 backcall==0.2.0
 beautifulsoup4==4.12.3
 bleach==6.1.0
+cachetools==5.5.0
 certifi==2024.2.2
 cffi==1.16.0
 charset-normalizer==3.3.2
@@ -18,6 +19,16 @@ defusedxml==0.7.1
 exceptiongroup==1.2.1
 executing==2.0.1
 fastjsonschema==2.19.1
+google-api-core==2.24.0
+google-auth==2.37.0
+google-cloud==0.34.0
+google-cloud-bigquery==3.27.0
+google-cloud-core==2.4.1
+google-crc32c==1.5.0
+google-resumable-media==2.7.2
+googleapis-common-protos==1.66.0
+grpcio==1.69.0
+grpcio-status==1.69.0
 h11==0.14.0
 httpcore==1.0.5
 httplib2==0.22.0
@@ -62,6 +73,7 @@ pkgutil-resolve-name==1.3.10
 platformdirs==4.2.0
 prometheus-client==0.20.0
 prompt-toolkit==3.0.43
+proto-plus==1.25.0
 protobuf==5.27.0rc1
 psutil==5.9.8
 ptyprocess==0.7.0

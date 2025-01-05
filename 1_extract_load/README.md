@@ -146,9 +146,9 @@
         --jars gs://spark-lib/bigquery/spark-3.4-bigquery-0.37.0.jar  \
         gs://taxi-data-extract/spark-scripts/extract-load-2-cloud-storage-4-dataproc.py \
         -- \
-        --table_name=yellow_tripdata \
-        --start_date=2008-12-01 \
-        --end_date=2009-01-01
+        --table_name=fhvhv_tripdata \
+        --start_date=2019-02-01 \
+        --end_date=2024-10-01
     ```
 * steps to execute `extract-load-2-cloud-storage-4-local.py` in docker: 
 
@@ -168,6 +168,18 @@
         --end_date 2009-01-01
 
     ```
+
+### Copying the data over to stage
+
+
+1. remove `_SUCCESS` files from each of subfolders so there are only `.parquet` files 
+
+    ```
+    sudo gsutil rm -r gs://taxi-data-extract/*/_SUCCESS
+    ```
+
+
+
 
 ## GCLOUD commands good to knows 
 
@@ -198,6 +210,19 @@
     sudo gcloud iam service-accounts list
     ```
 
+* list files in cloud storage with specific syntax
+
+    ```
+    sudo gcloud storage ls --recursive gs://taxi-data-extract/*/_SUCCESS
+    ```
+
+* to remove files with specific pattern
+
+    ```
+    sudo gsutil rm -r gs://taxi-data-extract/*/_SUCCESS
+    ```
+
+--properties dataproc:dataproc.monitoring.stackdriver.enable=true
 
 ### Helpful links
 
@@ -214,5 +239,3 @@
 * helpful queries that helped with loading data to Bigquery: [sql script](https://github.com/gdq12/data-engineering-zoomcamp-2024/blob/main/week4/4_1a_data_2_gcs/gcs_2_bigquery.sql)
 
 * notes that helped with local and dataproc spark dev: [5_11](https://github.com/gdq12/data-engineering-zoomcamp-2024/tree/main/week5/5_11_create_local_cluster), [5_12](https://github.com/gdq12/data-engineering-zoomcamp-2024/tree/main/week5/5_12_spark_cluster_gcp) and [5_13](https://github.com/gdq12/data-engineering-zoomcamp-2024/tree/main/week5/5_13_spark_dataproc_bigquery)
-
-
