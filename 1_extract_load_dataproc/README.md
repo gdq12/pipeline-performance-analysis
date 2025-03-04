@@ -1,88 +1,4 @@
-## Method1: Using MAGE.AI
-
-* signitificant dev time went into this one. Encountered issues with data volume with pyarrow and parquets with ~2 million rows or more, require to integrate spark instead of using pandas. This is a to do for the future
-
-### Starting with the project 
-
-1. setup `Dockerfile`, `docker-compose.yml`, `.env` as suggested by the referenced links below 
-
-2. build docker container and spin them up 
-
-    ```
-    cd ~/git_repos/pipeline-performance-analysis
-
-    docker compose build
-
-    docker compose up
-    ```
-
-3. go to `http://localhost:6789/` to start using mage UI
-
-### Setting up GCP configurations 
-
-1. create project `pipeline-analysis`
-
-2. create a service account 
-
-    + go to IAM & Admin page --> service accounts 
-
-    + `+ CREATE SERVICE ACCOUNT`
-
-    + assign name `mage-extract-load` and add optional description 
-
-    + grant permissions: Artifact Registry Read, Artifact Registry Writer, Cloud Run Developer, Cloud SQL, Service Account Token Creator
-
-        - gcloud syntax: roles/artifactregistry.reader, roles/artifactregistry.writer, roles/cloudsql.admin, roles/iam.serviceAccountTokenCreator, roles/run.developer, roles/secretmanager.secretAccessor, roles/storage.admin, roles/bigquery.dataOwner, roles/iam.serviceAccountAdmin
-
-    + `ADD KEY` from service account --> dowload
-
-    + copy json key to `~/git_repoos/pipeline-performance-analysis/1_extract_load`
-
-3. create storage bucket 
-
-    + in the dashboard go to Cloud Storage --> Buckets 
-
-    + `+ CREATE` as name `taxi-data-extract`
-
-    + for multi-region choose EU based
-
-    + everything else leave as default 
-
-4. same instructions as step 3 for creating `mage-run-logs` bucket
-
-### Repo configurations 
-
-* update variable `GOOGLE_SERVICE_ACC_KEY_FILEPATH` in `PROJECT_NAME/io_config.yml` with docker path of the json file 
-
-### Terraform imlementation with Mage
-
-* terraform files reside in [gcp/](gcp/)
-
-* **very** loosly based on `*.tf` files provided by [Mage template repo](https://github.com/mage-ai/mage-ai-terraform-templates), have been slowly building the files from scratch to see what is and is not necessary for the configurations 
-
-* have not been successfully able to create resources yet since there seems to be a permission error, this will be revisited in the future
-
-* commands for terraform to create resources in GCP:
-
-    ```
-    # login and authenticate gcp creds (follow links and provide authentication codes when prompted)
-    gcloud auth login
-    gcloud auth application-default login
-
-    # to initiate terraform 
-    terraform init
-
-    # to see what new resources will be buit
-    terraform plan
-
-    # to deploy resource creation
-    terraform apply
-
-    # to tear down resources when no longer needed 
-    terraform destroy
-    ```
-
-## Method2: Using Spark Cluster from GCP DataProc
+## Current Notes
 
 * this is an intermediate solution to dev and test out spark syntax for loading parquets
 
@@ -119,8 +35,6 @@
   + from that dashboard can also see where all log info is stored within cloud storage
 
 ### Steps to execute script in DataProd cluster
-
-* all dev work can be found in [spark_pipeline/](spark_pipeline/)
 
 * the scripts `extract-load-2-cloud-storage*.py` mimic the same concepts as the Mage pipelines but with spark syntax. There is also a while loop to mimic the backfill mechanism that Mage performs under the hood 
 
@@ -177,10 +91,7 @@
     ```
     sudo gsutil rm -r gs://taxi-data-extract/*/_SUCCESS
     ```
-
-
-
-
+    
 ## GCLOUD commands good to knows 
 
 * getting the roles current assigned to the service account
