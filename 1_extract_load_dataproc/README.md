@@ -1,9 +1,91 @@
-## Current Notes
+## Background
 
-* this is an intermediate solution to dev and test out spark syntax for loading parquets
+This part of the project is to fullfill the E (extract) and L (load) of ELT of the NYC taxi data into Bigquery. Apache Spark clusters via GCP Dataproc are used for the efficient large data transfers. The DRY (dont repeat yourself) method is carried out here and is the foundational code to be used for spark implementation in Mage in the future. 
 
-* the syntax here will be integrated in Mage blocks in the future 
+### Google Cloud Platform Setup
 
+* GCP centric identifiers have been save in `.envrc` file:
+
+    ```{bash}
+    export PROJECT_NAME=""
+    export PROJECT_NUMBER=""
+    export PROJECT_ID=""
+    export PROJECT_KEY_PATH=""
+    export CLUSTER_REGION=""
+    export PROJECT_EMAIL=""
+    export SPARK_SERVICE_ACCOUNT=""
+    ```
+
+1. create project: `PROJECT_NAME`
+
+2. create a service account 
+
+    + go to IAM & Admin page --> service accounts 
+
+    + `+ CREATE SERVICE ACCOUNT`
+
+    + assign name `mage-extract-load` and add optional description 
+
+    + grant permissions: owner
+
+    + `ADD KEY` from service account --> dowload
+
+    + save json key to `~/Documents/` and `~/git_repos/pipeline-performance-analysis/1_extract_load_dataproc`
+
+3. create storage bucket 
+
+    + in the dashboard go to Cloud Storage --> Buckets 
+
+    + `+ CREATE` as name: 
+        
+        - `spark-scripts-extract-load`
+
+        - `original-parquet-url`
+
+        - `yellow-taxi-data-extract-load`
+
+        - `green-taxi-data-extract-load`
+
+        - `fhv-taxi-data-extract-load`
+
+        - `fhvhv-taxi-data-extract-load`
+
+    + for multi-region choose EU based
+
+    + everything else leave as default 
+
+### Docker for local development 
+
+create local docker image from docker hub `spark:3.5.1-scala2.12-java11-python3-ubuntu` for local testing prior to pushing to dataproc. Commands can be found below 
+
+```
+# docker build command 
+docker build -t extract-load-spark:latest .
+
+# docker run command 
+docker run --rm -it \
+    -p 8888:8888 \
+    -e ROOT=TRUE \
+    -e GOOGLE_APPLICATION_CREDENTIALS="/home/ubuntu/${PROJECT_KEY_PATH}" \
+    -v ~/git_repos/pipeline-performance-analysis/1_extract_load_dataproc/${PROJECT_KEY_PATH}:/home/ubuntu/${PROJECT_KEY_PATH} \
+    -v ~/git_repos/pipeline-performance-analysis/1_extract_load_dataproc/extract-load-2-cloud-storage.py:/home/ubuntu/extract-load-2-cloud-storage.py \
+    -v ~/git_repos/pipeline-performance-analysis/1_extract_load_dataproc/dict_query_helpers.py:/home/ubuntu/dict_query_helpers.py \
+    extract-load-spark:latest
+
+# go to jupyter notebook UI
+localhost:8888
+
+# command for local run
+python3 extract-load-2-cloud-storage.py \
+    --table_name yellow_tripdata \
+    --start_date 2019-01-01 \
+    --end_date 2019-07-01 \
+    --project_id ${PROJECT_ID }\
+    --trip_name yellow
+
+```
+
+-- to be continued
 ### Google Cloud Platforms Dataproc w/Spark
 
 1. in GCP dashboard search for dataproc API --> enable it
@@ -64,24 +146,6 @@
         --start_date=2019-02-01 \
         --end_date=2024-10-01
     ```
-* steps to execute `extract-load-2-cloud-storage-4-local.py` in docker: 
-
-    ```
-    # docker build command 
-    docker build -t extract-load-spark:latest .
-    # docker run command 
-    docker run --rm -it -p 8888:8888 -e ROOT=TRUE extract-load-spark
-
-    # go to jupyter notebook UI
-    localhost:8888
-
-    # update the input parameters accordingly
-    python3 extract-load-2-cloud-storage-4-local.py \
-        --table_name yellow_tripdata \
-        --start_date 2008-12-01 \
-        --end_date 2009-01-01
-
-    ```
 
 ### Copying the data over to stage
 
@@ -91,7 +155,7 @@
     ```
     sudo gsutil rm -r gs://taxi-data-extract/*/_SUCCESS
     ```
-    
+
 ## GCLOUD commands good to knows 
 
 * getting the roles current assigned to the service account
@@ -106,13 +170,13 @@
 * current enabled API for project 
 
     ```
-    sudo gcloud services list --enabled --project pipeline-analysis-446021
+    sudo gcloud services list --enabled --project ${PROJECT_ID}
     ```
 
 * current IAM policies for all accounts in project 
 
     ```
-    sudo gcloud projects get-iam-policy pipeline-analysis-446021
+    sudo gcloud projects get-iam-policy ${PROJECT_ID}
     ```
 
 * get list of service accounts 

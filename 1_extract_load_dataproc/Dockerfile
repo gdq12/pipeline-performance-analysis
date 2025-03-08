@@ -24,7 +24,7 @@ ENV PATH="$PATH:/home/${USERNAME}/.local/bin"
 EXPOSE 8501
 
 # pip install all other libraries
-COPY --chown=${USERNAME}:sparkgroup . /home/${USERNAME}/
+COPY --chown=${USERNAME}:sparkgroup requirements.txt /home/${USERNAME}/
 RUN cd /home/${USERNAME} && \
     pip install --no-cache-dir -r requirements.txt
 
@@ -42,7 +42,6 @@ ENV PATH="${SPARK_HOME}/bin:${PATH}"
 
 # env variables needed to be defined
 ENV HOME=/home/${USERNAME}
-ENV GOOGLE_APPLICATION_CREDENTIALS=$HOME/pipeline-analysis-446021-e6b585f9b41d.json
 ENV HADOOP_COMMON_LIB_JARS_DIR=$HADOOP_CLASSPATH:$HOME/gcs-connector-hadoop3-latest.jar
 ENV SPARK_HOME="${HOME}/spark-3.5.1-bin-hadoop3"
 
