@@ -225,7 +225,7 @@ python3 extract-load-2-cloud-storage.py \
 
     - yellow: 2009-01-01
 
-    - green: 2013-08-01
+    - green: 2013-08-01 (but seems like parquet file isnt an actual size till 2014-01-01)
      
     - fhv: 2015-01-01
 

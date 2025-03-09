@@ -31,7 +31,7 @@ schema_yellow_dict2010 = {
     'pickup_longitude': 'float64',
     'pickup_latitude': 'float64',
     'ratecode_id' : 'string', 
-    'store_and_fwd_flag ' : 'string', 
+    'store_and_fwd_flag' : 'string', 
     'dropoff_longitude': 'float64',
     'dropoff_latitude': 'float64',
     'payment_type' : 'string', 

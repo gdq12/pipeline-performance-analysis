@@ -192,6 +192,14 @@ def update_log_tbl(schema_log_dict, data_schema_dict, schema, where_substr, tabl
     print('logging extract - load')
     client.query(q1)
 
+    # columns that cant calc avg on
+    str_cols = ['time', 'date', 
+                'vendor_name', 'vendor_id', 
+                'store_and_fwd_flag', 
+                'dispatching_base_num', 'affiliated_base_number',
+                'hvfhs_license_num', 'dispatching_base_num', 'originating_base_num',
+                'shared_request_flag', 'shared_match_flag', 'access_a_ride_flag', 'wav_request_flag', 'wav_match_flag']
+
     for key in data_schema_dict.keys():
         print(f'fetching stats for column {key}')
         tbl_schema = f"`{project_id}`.`{schema}`"
@@ -199,17 +207,8 @@ def update_log_tbl(schema_log_dict, data_schema_dict, schema, where_substr, tabl
         if key in ('creation_dt', 'data_source'):
             print(f"no need to collect stats on column, moving on")
             pass
-        elif 'time' in key:
+        elif re.findall("|".join(str_cols), key):
             mean_col = 'null' 
-            q_log = q_log_skeleton.format(project_id, col_names,
-                                        tbl_schema, where_substr, 
-                                         col_name, col_name, project_id, schema, table_name, where1, col_name, 
-                                         root_path, project_id, schema, table_name,
-                                         col_name, col_name, col_name, col_name, mean_col, col_name, 
-                                         project_id, schema, table_name, col_name,
-                                         where2)
-        elif 'date' in key:
-            mean_col = 'null'
             q_log = q_log_skeleton.format(project_id, col_names,
                                         tbl_schema, where_substr, 
                                          col_name, col_name, project_id, schema, table_name, where1, col_name, 
