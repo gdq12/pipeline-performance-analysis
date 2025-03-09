@@ -14,6 +14,7 @@ This part of the project is to fullfill the E (extract) and L (load) of ELT of t
     export CLUSTER_REGION=""
     export PROJECT_EMAIL=""
     export SPARK_SERVICE_ACCOUNT=""
+    export COMPUTE_ENGINE_ACCOUNT=""
     ```
 
 1. create project: `PROJECT_NAME`
@@ -24,7 +25,7 @@ This part of the project is to fullfill the E (extract) and L (load) of ELT of t
 
     + `+ CREATE SERVICE ACCOUNT`
 
-    + assign name `mage-extract-load` and add optional description 
+    + assign name `extract-load-spark` and add optional description 
 
     + grant permissions: owner
 
@@ -56,7 +57,7 @@ This part of the project is to fullfill the E (extract) and L (load) of ELT of t
 
 ### Docker for local development 
 
-create local docker image from docker hub `spark:3.5.1-scala2.12-java11-python3-ubuntu` for local testing prior to pushing to dataproc. Commands can be found below 
+Created local docker image from docker hub `spark:3.5.1-scala2.12-java11-python3-ubuntu` for local testing prior to pushing to dataproc. Commands can be found below 
 
 ```
 # docker build command 
@@ -80,13 +81,16 @@ python3 extract-load-2-cloud-storage.py \
     --table_name yellow_tripdata \
     --start_date 2019-01-01 \
     --end_date 2019-07-01 \
-    --project_id ${PROJECT_ID }\
+    --project_id ${PROJECT_ID}\
     --trip_name yellow
 
 ```
 
--- to be continued
 ### Google Cloud Platforms Dataproc w/Spark
+
+#### Method I: Via GCP concole UI
+
+**Method a bit easier but didnt seem to offer the option to enable job logging**
 
 1. in GCP dashboard search for dataproc API --> enable it
 
@@ -102,7 +106,7 @@ python3 extract-load-2-cloud-storage.py \
 
       - Name: `extract-load-spark`
 
-      - Region: `europe-west10` (same region as bucket)
+      - Region: `${CLUSTER_REGION}` (same region as bucket)
 
       - Cluster type: Single Node (use this when working with a small amount of data)
 
@@ -116,55 +120,126 @@ python3 extract-load-2-cloud-storage.py \
 
   + from that dashboard can also see where all log info is stored within cloud storage
 
-### Steps to execute script in DataProd cluster
+#### Method II: Via command line
 
-* the scripts `extract-load-2-cloud-storage*.py` mimic the same concepts as the Mage pipelines but with spark syntax. There is also a while loop to mimic the backfill mechanism that Mage performs under the hood 
+**Command below was compiled from Method I, where it provides the "Equivalent in command line" option prior to execution**
 
-* steps to execute `extract-load-2-cloud-storage-4-dataproc.py` in GCP:
+1. enable `Cloud Resource Manager API` in [api library page](https://console.cloud.google.com/apis/library)
+
+2. apply permissions needed for the cloud cluster service account 
 
     ```
-    # login and authenticate gcp creds (follow links and provide authentication codes when prompted)
-    gcloud auth login
-    gcloud auth application-default login
-
-    # cp command pythong script to cloud storage
-    gsutil cp extract-load-2-cloud-storage-4-dataproc.py gs://taxi-data-extract/spark-scripts/extract-load-2-cloud-storage-4-dataproc.py
-
-    # grant permissions for cmd line execution
-    gcloud projects add-iam-policy-binding pipeline-analysis-446021 \
-        --member=serviceAccount:1023261528910-compute@developer.gserviceaccount.com \
+    sudo gcloud projects add-iam-policy-binding ${PROJECT_ID} \
+        --member=serviceAccount:${COMPUTE_ENGINE_ACCOUNT} \
         --role="roles/bigquery.jobUser"
 
-    # update last 3 lines accordingly
-    gcloud dataproc jobs submit pyspark \
+    sudo gcloud projects add-iam-policy-binding ${PROJECT_ID} \
+        --member=serviceAccount:${COMPUTE_ENGINE_ACCOUNT} \
+        --role="roles/roles/storage.admin"
+    ```
+
+3. create cluster via GCP UI power shell (there was a zone configuartion issue when attempted to sudo execute the command locally)
+
+    ```
+    gcloud dataproc clusters create extract-load-spark \
+        --properties dataproc:dataproc.monitoring.stackdriver.enable=true \
+        --enable-component-gateway \
+        --region=${CLUSTER_REGION} \
+        --single-node \
+        --master-machine-type n2-standard-4 \
+        --master-boot-disk-type pd-balanced \
+        --master-boot-disk-size 100 \
+        --image-version 2.2-debian12 \
+        --optional-components JUPYTER,DOCKER \
+        --project ${PROJECT_ID}
+    ```
+
+### Execute scripts in Dataproc
+
+1. copy python scripts to script bucket 
+
+    ```
+    sudo gsutil cp extract-load-2-cloud-storage.py gs://spark-scripts-extract-load/extract-load-2-cloud-storage.py
+
+    sudo gsutil cp dict_query_helpers.py gs://spark-scripts-extract-load/dict_query_helpers.py
+
+    sudo gsutil cp ${PROJECT_KEY_PATH} gs://spark-scripts-extract-load/${PROJECT_KEY_PATH}
+    ```
+
+2. trigger job per needed paramters
+
+    ```
+    sudo gcloud dataproc jobs submit pyspark \
         --cluster=extract-load-spark \
-        --region=europe-west10 \
+        --region=${CLUSTER_REGION} \
         --jars gs://spark-lib/bigquery/spark-3.4-bigquery-0.37.0.jar  \
-        gs://taxi-data-extract/spark-scripts/extract-load-2-cloud-storage-4-dataproc.py \
-        -- \
-        --table_name=fhvhv_tripdata \
-        --start_date=2019-02-01 \
-        --end_date=2024-10-01
+        --py-files gs://spark-scripts-extract-load/dict_query_helpers.py \
+        --files ${PROJECT_KEY_PATH} \
+        gs://spark-scripts-extract-load/extract-load-2-cloud-storage.py \
+        -- --gcp_id=${PROJECT_ID} \
+        --trip_name=yellow \
+        --start_date=2009-01-01 \
+        --end_date=2009-02-01 \
+        --gcp_file_cred=${PROJECT_KEY_PATH}
     ```
 
-### Copying the data over to stage
+### Work arounds
 
+* had issues with downloading parquets to VM in dataproc: `curl: (28) Failed to connect to d37ci6vzurychx.cloudfront.net port 443 after 300714 ms: Timeout was reached`
 
-1. remove `_SUCCESS` files from each of subfolders so there are only `.parquet` files 
+* bit of googling arund led to believe that it was a firewall issue [stackoverflow post](https://stackoverflow.com/questions/44876177/port-443-is-close-in-google-cloud-instance), [another post](https://scrapfly.io/blog/what-is-the-curl-28-error/)
 
+* in the end this could not easily be resolved and chose not to invest more time into ammending this issue, therefore just added the parquets to the bucket locally via the following python script:
+
+    ```{python}
+    import os
+    import argparse
+    import time
+    from datetime import datetime
+    from dateutil.relativedelta import relativedelta
+
+    bucket_url = f'gs://original-parquet-url'
+    table_name = f'{green}_tripdata'
+    start_dt = datetime.strptime('2009-01-01','%Y-%m-%d')
+    end_dt = datetime.strptime('2024-12-01','%Y-%m-%d')
+    delta = relativedelta(months=1)
+
+    while start_dt <= end_dt:
+        year_month = start_dt.strftime("%Y-%m")
+        filename = f"{table_name}_{year_month}.parquet"
+        url = f"https://d37ci6vzurychx.cloudfront.net/trip-data/{filename}"
+
+        print(f'fetching {filename} from {url}')
+        os.system(f'curl -O {url}') 
+
+        print(f'pushing {filename} to {bucket_url}')
+        os.system(f'gsutil -m cp {filename} {bucket_url}')
+
+        print(f'cleaning up env, removing {filename} locally')
+        os.system(f'rm {filename}')
+
+        start_dt += delta
     ```
-    sudo gsutil rm -r gs://taxi-data-extract/*/_SUCCESS
-    ```
+
+* notes for availble data by start date:
+
+    - yellow: 2009-01-01
+
+    - green: 2013-08-01
+     
+    - fhv: 2015-01-01
+
+    - fhvhv: 2019-02-01
 
 ## GCLOUD commands good to knows 
 
 * getting the roles current assigned to the service account
 
     ```
-    sudo gcloud projects get-iam-policy pipeline-analysis-446021 \
+    sudo gcloud projects get-iam-policy ${PROJECT_ID} \
     --flatten="bindings[].members" \
     --format='table(bindings.role)' \
-    --filter="bindings.members:mage-extract-load@pipeline-analysis-446021.iam.gserviceaccount.com"
+    --filter="bindings.members:${COMPUTE_ENGINE_ACCOUNT}"
     ```
 
 * current enabled API for project 
@@ -197,20 +272,51 @@ python3 extract-load-2-cloud-storage.py \
     sudo gsutil rm -r gs://taxi-data-extract/*/_SUCCESS
     ```
 
---properties dataproc:dataproc.monitoring.stackdriver.enable=true
+* to remove old account from gcloud config
+
+    ```
+    gcloud auth revoke old.main.account@gmail.com
+    ```
+
+* list projects in account
+
+    ```
+    gcloud projects list
+    ```
+
+* update project setting for gcloud
+
+    ```
+    sudo gcloud config set project ${PROJECT_ID}
+    ```
+
+* login to use gcloud command line
+
+    ```
+    gcloud auth login --no-launch-browser
+    gcloud auth login
+    gcloud auth application-default login
+
+    ```
+
+* to make sure that working with right user in command line 
+
+    ```
+    sudo gcloud config set account ${PROJECT_EMAIL}
+    ```
 
 ### Helpful links
-
-* repo setup [guide](https://docs.mage.ai/production/ci-cd/local-cloud/repository-setup)
-
-* quickstart [guide](https://docs.mage.ai/getting-started/setup) for project setup 
-
-* gcp + terraform [guid](https://docs.mage.ai/production/deploying-to-cloud/gcp/setup)
-
-* repo notes that helped a bit with terraform basics: [terraform basics](https://github.com/gdq12/data-engineering-zoomcamp-2024/tree/main/week1/1_2_gcp_terraform/3_terraform_basics), [terraform variables](https://github.com/gdq12/data-engineering-zoomcamp-2024/tree/main/week1/1_2_gcp_terraform/4_terraform_variables)
 
 * while loop concept for getting parquet to cloud storage: [parquets to gcp](https://github.com/gdq12/data-engineering-zoomcamp-2024/blob/main/week4/4_1a_data_2_gcs/url_2_gcs.py)
 
 * helpful queries that helped with loading data to Bigquery: [sql script](https://github.com/gdq12/data-engineering-zoomcamp-2024/blob/main/week4/4_1a_data_2_gcs/gcs_2_bigquery.sql)
 
 * notes that helped with local and dataproc spark dev: [5_11](https://github.com/gdq12/data-engineering-zoomcamp-2024/tree/main/week5/5_11_create_local_cluster), [5_12](https://github.com/gdq12/data-engineering-zoomcamp-2024/tree/main/week5/5_12_spark_cluster_gcp) and [5_13](https://github.com/gdq12/data-engineering-zoomcamp-2024/tree/main/week5/5_13_spark_dataproc_bigquery)
+
+* [quick start guide](https://cloud.google.com/dataproc/docs/quickstarts/create-cluster-gcloud) to dataproc
+
+* documentation on dataproc [job output logs](https://cloud.google.com/dataproc/docs/guides/dataproc-job-output#console)
+
+* spark background info on [metrics](https://spark.apache.org/docs/latest/monitoring.html#metrics)
+
+* documentation background on dataproc [metric](https://cloud.google.com/dataproc/docs/guides/dataproc-metrics#enable_custom_metric_collection) customization

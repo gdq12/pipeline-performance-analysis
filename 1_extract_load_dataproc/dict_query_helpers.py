@@ -201,7 +201,7 @@ q_log_skeleton = """insert into `{}`.`nytaxi_raw`.`extract_load_log`
     group by t1.column_name, t1.data_type, t1.ordinal_position, t2.mode_var, t2.mode_value
 """
 
-q_history = """insert into `{}.nytaxi_raw.query_history_extract_load_spark`
+q_history = """insert into `{}.nytaxi_monitoring.query_history_extract_load_spark`
 select 
 creation_time, project_id, project_number, user_email, job_id, job_type, statement_type, priority, start_time, end_time, query, state, reservation_id, total_bytes_processed, total_slot_ms, error_result, cache_hit, destination_table, referenced_tables, labels, timeline, job_stages, total_bytes_billed, transaction_id, parent_job_id, session_info, dml_statistics, total_modified_partitions, bi_engine_statistics, query_info, transferred_bytes, materialized_view_statistics, edition, job_creation_reason, metadata_cache_statistics
 , '{}' data_source
