@@ -79,7 +79,7 @@ def dimension_name_cleanup(df):
     return df
     
 ##########################################local############################################################################
-# def data_2_gcp_cloud_storage(df, table_name, year_month, root_path, filename):
+# def data_2_gcp_cloud_storage(df, parq_sybstr, year_month, root_path, filename):
 #     # repartition df for export 
 #     pickup_col = [col for col in df.columns if 'pickup' in col][0]
 #     col_name = [re.sub('datetime|date_time', 'date', col) for col in df.columns if 'pickup' in col][0]
@@ -92,12 +92,12 @@ def dimension_name_cleanup(df):
 #     print(f"number of unique partitions for DF: {df.select(col_name).distinct().count()}")
 
 #     # repartition and save locally 
-#     os.system(f'mkdir {table_name}_{year_month}')
+#     os.system(f'mkdir {parq_sybstr}_{year_month}')
 
-#     print(f"saving partitions in {table_name}_{year_month}")
+#     print(f"saving partitions in {parq_sybstr}_{year_month}")
     
 #     df.repartition(col_name) \
-#         .write.parquet(f'{table_name}_{year_month}', mode = 'overwrite') 
+#         .write.parquet(f'{parq_sybstr}_{year_month}', mode = 'overwrite') 
 
 #     # authenticate connex to cloud storage
 #     os.system('gcloud auth activate-service-account --key-file $GOOGLE_APPLICATION_CREDENTIALS')
@@ -105,11 +105,11 @@ def dimension_name_cleanup(df):
 #     print(f"loading parquets to {root_path}")
     
 #     # copy parquets to cloud storage
-#     os.system(f'gsutil -m cp -r {table_name}_{year_month}/*.parquet {root_path}')
+#     os.system(f'gsutil -m cp -r {parq_sybstr}_{year_month}/*.parquet {root_path}')
     
 #     print('cleaning up environment for next run')
 #     # remove parquets locally to make sure pull from gcp worked
-#     os.system(f'rm -r {table_name}_{year_month}')
+#     os.system(f'rm -r {parq_sybstr}_{year_month}')
 #     os.system(f'rm {filename}')
     
 ##########################################dataproc#########################################################################
@@ -142,7 +142,7 @@ def data_2_gcp_cloud_storage(df, root_path):
     
 ###########################################################################################################################
 
-def bucket_2_ext_tbl(project_id, table_name, root_path, client):
+def bucket_2_ext_tbl(project_id, ext_table_name, root_path, client):
     
     q1a = f"""create schema if not exists `{project_id}`.`nytaxi_raw`
     options (location = 'EU')
@@ -160,7 +160,7 @@ def bucket_2_ext_tbl(project_id, table_name, root_path, client):
     options (location = 'EU')
     """
 
-    q2 = f"""create or replace external table `{project_id}`.`nytaxi_raw.external_{table_name}`
+    q2 = f"""create or replace external table `{project_id}`.`nytaxi_raw.{ext_table_name}`
     options (
     format = 'PARQUET',
     uris = ['{root_path}/*']
@@ -169,9 +169,13 @@ def bucket_2_ext_tbl(project_id, table_name, root_path, client):
     
     # execute queries 
     print('creating if not already present schemas')
+    time.sleep(10)
     client.query(q1a)
+    time.sleep(10)
     client.query(q1b)
+    time.sleep(10)
     client.query(q1c)
+    time.sleep(10)
     client.query(q1d)
 
     print('creating external table')
@@ -190,10 +194,11 @@ def update_log_tbl(schema_log_dict, data_schema_dict, schema, where_substr, tabl
     """
 
     print('logging extract - load')
+    time.sleep(10)
     client.query(q1)
 
     # columns that cant calc avg on
-    str_cols = ['time', 'date', 
+    str_cols = ['time', 'date', 'payment_type',
                 'vendor_name', 'vendor_id', 
                 'store_and_fwd_flag', 
                 'dispatching_base_num', 'affiliated_base_number',
@@ -225,11 +230,12 @@ def update_log_tbl(schema_log_dict, data_schema_dict, schema, where_substr, tabl
                                          col_name, col_name, col_name, col_name, mean_col, col_name, 
                                          project_id, schema, table_name, col_name,
                                          where2)
+        time.sleep(10)
         client.query(q_log)
 
-    print('loading log table for extrnal tables complete')
+    print('loading log table for external tables complete')
     
-def bucket_2_bigquery(data_schema_dict, project_id, table_name, root_path, client):
+def bucket_2_bigquery(data_schema_dict, project_id, table_name, ext_table_name, root_path, client):
     
     col_param = ' '.join([key + ' ' + item + ',' for key, item in data_schema_dict.items()])[:-1]
     col_names = ' '.join([key + ',' for key in data_schema_dict.keys()])[:-1]
@@ -239,7 +245,7 @@ def bucket_2_bigquery(data_schema_dict, project_id, table_name, root_path, clien
     """
     q2 = f"""insert into `{project_id}`.`nytaxi_stage`.`{table_name}`
     ({col_names})
-    select *, '{root_path}', current_timestamp() from `{project_id}.nytaxi_raw.external_{table_name}`
+    select *, '{root_path}', current_timestamp() from `{project_id}.nytaxi_raw.{ext_table_name}`
     """
 
     print('populating stage table')
@@ -271,14 +277,14 @@ if __name__ == '__main__':
     delta = relativedelta(months=1)
     
     # var that stays the same through out run
-    table_name = f'{trip_substr}_tripdata'
+    parq_sybstr= f'{trip_substr}_tripdata'
     time_substr = datetime.now().strftime('%Y-%m-%d_%H:%M:%S')
     q_history_time = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
     bucket_url = f'gs://original-parquet-url'
     bucket_data = f'{trip_substr}-taxi-data-extract-load'
     project_id = args.gcp_id
     
-    print(f"will be fetching parquest for {table_name}, from {start_dt} - {end_dt}")
+    print(f"will be fetching parquest for {parq_sybstr}, from {start_dt} - {end_dt}")
     
     #########################################local#############################################################################
     # os.system('gcloud auth activate-service-account --key-file $GOOGLE_APPLICATION_CREDENTIALS')
@@ -301,13 +307,13 @@ if __name__ == '__main__':
     
         # vars for fetching parquet
         year_month = start_dt.strftime("%Y-%m")
-        filename = f"{table_name}_{year_month}.parquet"
+        filename = f"{parq_sybstr}_{year_month}.parquet"
         url = f"https://d37ci6vzurychx.cloudfront.net/trip-data/{filename}"
         
-        print(f'starting iteration for {table_name}, {year_month}')
+        print(f'starting iteration for {parq_sybstr}, {year_month}')
         
         # vars for gcp/bucket
-        root_path = f"gs://{bucket_data}/{time_substr}_{table_name}_{year_month}"
+        root_path = f"gs://{bucket_data}/{time_substr}_{parq_sybstr}_{year_month}"
         
         ###############################################local run###################################################################
         # df = load_trip_data(spark, url, filename)
@@ -323,45 +329,45 @@ if __name__ == '__main__':
 
             # push parquets to bucket
             #################################################local run#################################################################
-            # data_2_gcp_cloud_storage(df, table_name, year_month, root_path, filename)
+            # data_2_gcp_cloud_storage(df, parq_sybstr, year_month, root_path, filename)
             ############################################dataproc run###################################################################
             data_2_gcp_cloud_storage(df, root_path)
             ###########################################################################################################################
 
             # customize variables a bit 
             if 'yellow_tripdata_2009' in root_path:
-                table_name_q1 = f'external_{table_name}' #external tbl
-                table_name_q2 = f'{table_name}_2009' #stage tbl
+                ext_table_name = f'external_{parq_sybstr}_2009' #external tbl
+                table_name = f'{parq_sybstr}_2009' #stage tbl
                 data_schema_dict = schema_yellow_dict2009
             elif 'yellow_tripdata_2010' in root_path:
-                table_name_q1 = f'external_{table_name}'
-                table_name_q2 = f'{table_name}_2010'
+                ext_table_name = f'external_{parq_sybstr}_2010'
+                table_name = f'{parq_sybstr}_2010'
                 data_schema_dict = schema_yellow_dict2010
             elif 'yellow_tripdata' in root_path:
-                table_name_q1 = f'external_{table_name}'
-                table_name_q2 = f'{table_name}'
+                ext_table_name = f'external_{parq_sybstr}'
+                table_name = f'{parq_sybstr}'
                 data_schema_dict = schema_yellow_dict
             elif 'green' in root_path:
-                table_name_q1 = f'external_{table_name}'
-                table_name_q2 = f'{table_name}'
+                ext_table_name = f'external_{parq_sybstr}'
+                table_name = f'{parq_sybstr}'
                 data_schema_dict = schema_green_dict
             elif 'fhv' in root_path:
-                table_name_q1 = f'external_{table_name}'
-                table_name_q2 = f'{table_name}'
+                ext_table_name = f'external_{parq_sybstr}'
+                table_name = f'{parq_sybstr}'
                 data_schema_dict = schema_fhv_dict
             elif 'fhvhv' in root_path:
-                table_name_q1 = f'external_{table_name}'
-                table_name_q2 = f'{table_name}'
+                ext_table_name = f'external_{parq_sybstr}'
+                table_name = f'{parq_sybstr}'
                 data_schema_dict = schema_fhvhv_dict 
 
             # stageing data load
-            bucket_2_ext_tbl(project_id, table_name, root_path, client)
+            bucket_2_ext_tbl(project_id, ext_table_name, root_path, client)
             # logging stats
-            update_log_tbl(schema_log_dict, data_schema_dict, 'nytaxi_raw', table_name_q1, table_name_q1, client, q_log_skeleton, project_id, '', '')   
+            update_log_tbl(schema_log_dict, data_schema_dict, 'nytaxi_raw', ext_table_name, ext_table_name, client, q_log_skeleton, project_id, '', '')   
             # copying data to a stage schema 
-            bucket_2_bigquery(data_schema_dict, project_id, table_name, root_path, client)
+            bucket_2_bigquery(data_schema_dict, project_id, table_name, ext_table_name, root_path, client)
             # logging stats
-            update_log_tbl(schema_log_dict, data_schema_dict, 'nytaxi_stage', table_name_q2, table_name_q2, client, q_log_skeleton, project_id, f"where data_source = '{root_path}'", f"where tbl.data_source = '{root_path}'") 
+            update_log_tbl(schema_log_dict, data_schema_dict, 'nytaxi_stage', table_name, table_name, client, q_log_skeleton, project_id, f"where data_source = '{root_path}'", f"where tbl.data_source = '{root_path}'") 
             #save info in qhistory table 
             client.query(q_history.format(project_id, root_path, q_history_time))
         else:
