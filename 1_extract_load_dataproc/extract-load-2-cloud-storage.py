@@ -43,8 +43,6 @@ parq_subset= f'{trip_subset}_tripdata'
 ext_table_name = f'external_{parq_subset}'
 schema_raw = 'nytaxi_raw'
 schema_stage = 'nytaxi_stage'
-time_subset = datetime.now().strftime('%Y-%m-%d_%H:%M:%S')
-q_history_time = time_subset.replace('_', ' ')
 bucket_url = f'gs://original-parquet-url'
 bucket_data = f'{trip_subset}-taxi-data-extract-load'
 project_id = args.gcp_id#os.getenv('GCP_ID')
@@ -72,6 +70,8 @@ while start_dt <= end_dt:
 
     # vars for fetching parquet
     year_month = start_dt.strftime("%Y-%m")
+    time_subset = datetime.now().strftime('%Y-%m-%d_%H:%M:%S')
+    q_history_time = time_subset.replace('_', ' ')
     filename = f"{parq_subset}_{year_month}.parquet"
     url = f"https://d37ci6vzurychx.cloudfront.net/trip-data/{filename}"
     
@@ -103,6 +103,7 @@ while start_dt <= end_dt:
     bucket_2_bigquery(client, project_id, ext_table_name, schema_raw, schema_stage, parq_subset, filename)
     
     #save info in qhistory table 
+    time.sleep(3)
     client.query(q_history.format(project_id, root_path, q_history_time))
         
     start_dt += delta
