@@ -68,8 +68,10 @@ docker run --rm -it \
     -p 8888:8888 \
     -e ROOT=TRUE \
     -e GOOGLE_APPLICATION_CREDENTIALS="/home/ubuntu/${PROJECT_KEY_PATH}" \
+    -e PROJECT_ID=${PROJECT_ID} \
     -v ~/git_repos/pipeline-performance-analysis/1_extract_load_dataproc/${PROJECT_KEY_PATH}:/home/ubuntu/${PROJECT_KEY_PATH} \
     -v ~/git_repos/pipeline-performance-analysis/1_extract_load_dataproc/extract-load-2-cloud-storage.py:/home/ubuntu/extract-load-2-cloud-storage.py \
+    -v ~/git_repos/pipeline-performance-analysis/1_extract_load_dataproc/helper_funcs.py:/home/ubuntu/helper_funcs.py \
     -v ~/git_repos/pipeline-performance-analysis/1_extract_load_dataproc/dict_query_helpers.py:/home/ubuntu/dict_query_helpers.py \
     extract-load-spark:latest
 
@@ -78,12 +80,11 @@ localhost:8888
 
 # command for local run
 python3 extract-load-2-cloud-storage.py \
-    --table_name yellow_tripdata \
-    --start_date 2019-01-01 \
-    --end_date 2019-07-01 \
-    --project_id ${PROJECT_ID}\
-    --trip_name yellow
-
+    --trip_name yellow_tripdata \
+    --start_date 2010-12-01 \
+    --end_date 2011-02-01 \
+    --gcp_id ${PROJECT_ID}\
+    --trip_name yellow 
 ```
 
 ### Google Cloud Platforms Dataproc w/Spark
@@ -161,6 +162,8 @@ python3 extract-load-2-cloud-storage.py \
     ```
     sudo gsutil cp extract-load-2-cloud-storage.py gs://spark-scripts-extract-load/extract-load-2-cloud-storage.py
 
+    sudo gsutil cp helper_funcs.py gs://spark-scripts-extract-load/helper_funcs.py
+
     sudo gsutil cp dict_query_helpers.py gs://spark-scripts-extract-load/dict_query_helpers.py
 
     sudo gsutil cp ${PROJECT_KEY_PATH} gs://spark-scripts-extract-load/${PROJECT_KEY_PATH}
@@ -173,13 +176,13 @@ python3 extract-load-2-cloud-storage.py \
         --cluster=extract-load-spark \
         --region=${CLUSTER_REGION} \
         --jars gs://spark-lib/bigquery/spark-3.4-bigquery-0.37.0.jar  \
-        --py-files gs://spark-scripts-extract-load/dict_query_helpers.py \
+        --py-files gs://spark-scripts-extract-load/dict_query_helpers.py,gs://spark-scripts-extract-load/helper_funcs.py \
         --files ${PROJECT_KEY_PATH} \
         gs://spark-scripts-extract-load/extract-load-2-cloud-storage.py \
         -- --gcp_id=${PROJECT_ID} \
         --trip_name=yellow \
         --start_date=2009-01-01 \
-        --end_date=2024-12-01 \
+        --end_date=2009-03-01 \
         --gcp_file_cred=${PROJECT_KEY_PATH}
     ```
 

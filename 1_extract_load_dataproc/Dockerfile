@@ -42,7 +42,7 @@ ENV PATH="${SPARK_HOME}/bin:${PATH}"
 
 # env variables needed to be defined
 ENV HOME=/home/${USERNAME}
-ENV HADOOP_COMMON_LIB_JARS_DIR=$HADOOP_CLASSPATH:$HOME/gcs-connector-hadoop3-latest.jar
+# ENV HADOOP_COMMON_LIB_JARS_DIR=$HADOOP_CLASSPATH:$HOME/gcs-connector-hadoop3-latest.jar
 ENV SPARK_HOME="${HOME}/spark-3.5.1-bin-hadoop3"
 
 # command to run when container launched
