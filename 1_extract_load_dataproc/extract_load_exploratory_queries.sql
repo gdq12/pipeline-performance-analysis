@@ -27,6 +27,23 @@ from pipeline-analysis-452722.nytaxi_stage.__TABLES__
 order by size_bytes desc
 ;
 
+-- how much volume in total was transfered to bigquery
+select 
+  sum(row_count) row_count
+  , sum(size_bytes)/pow(10,9) size_gb
+from pipeline-analysis-452722.nytaxi_stage.__TABLES__
+;
+
+-- see volume processing size per iteration
+SELECT 
+  min(total_bytes_processed)/pow(10,9) min_gb_processed
+  , max(total_bytes_processed)/pow(10,9) max_gb_processed
+  , avg(total_bytes_processed)/pow(10,9) avg_gb_processed
+FROM pipeline-analysis-452722.nytaxi_monitoring.query_history_extract_load_spark
+where statement_type in ('INSERT', 'CREATE_TABLE_AS_SELECT')
+and regexp_substr(query, 'insert into `pipeline-analysis-452722.nytaxi_monitoring.query_history_extract_load_spark`') is null
+;
+
 -- verify that all tables in stage are clustered
 select * 
 from pipeline-analysis-452722.nytaxi_stage.INFORMATION_SCHEMA.TABLES
