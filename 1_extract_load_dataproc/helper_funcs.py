@@ -9,7 +9,10 @@ from pyspark.sql.functions import lit
 from py4j.protocol import Py4JJavaError
 
 def load_trip_data_local(spark, url, filename):
-    
+    '''
+    Fetches the parquet file from the url and reads it into pyspark DF. 
+    '''
+
     # down load parquet
     logging.info(f'fetching {filename} from {url}')
     os.system(f'curl -O {url}') 
@@ -27,7 +30,13 @@ def load_trip_data_local(spark, url, filename):
         return None
 
 def load_trip_data_dataproc(spark, url, filename, bucket_url):
-    
+    '''
+    Fetches the parquet file from the url and reads it into pyspark DF. 
+    Since there is currently a firewall issue in created Dataprod cluser, 
+    the parquets are read into pyspark DF directly from a cloud bucket 
+    where they were previously uploaded.
+    '''
+
     # down load parquet
     logging.info(f'fetching {filename} from {url}')
     # os.system(f'curl -O {url}') 
@@ -45,6 +54,10 @@ def load_trip_data_dataproc(spark, url, filename, bucket_url):
         return None
 
 def dimension_name_cleanup(df):
+    '''
+    Evaluates the column names of the imported parquet and transforms 
+    them to lower case snake format if they werent previously.
+    '''
     
     logging.info(f"Spark DF currently has the following columns: {', '.join(df.columns)}")
     
@@ -59,6 +72,13 @@ def dimension_name_cleanup(df):
     return df
     
 def data_2_gcp_cloud_storage_local(df, parq_sybstr, year_month, root_path, filename):
+    '''
+    Exports the pyspark DF to a target cloud bucket folder.
+    Prior to the export, it adds 2 columns to the file (pickup_date and data_source) 
+    and partitions the extract to the newly created pikcup date column.
+    It also cleanups up the local environment of the runs parquet data 
+    to keep memory allocated for the next run.
+    '''
     
     # repartition df for export and add column
     pickup_col = [col for col in df.columns if 'pickup' in col][0]
@@ -94,6 +114,14 @@ def data_2_gcp_cloud_storage_local(df, parq_sybstr, year_month, root_path, filen
     os.system(f'rm {filename}')
     
 def data_2_gcp_cloud_storage_dataproc(df, root_path):
+    '''
+    Exports the pyspark DF to a target cloud bucket folder.
+    Prior to the export, it adds 2 columns to the file (pickup_date and data_source) 
+    and partitions the extract to the newly created pikcup date column.
+    It also cleanups up the local environment of the runs parquet data 
+    to keep memory allocated for the next run.
+    It also removes unnecessary files from the export target localtion, _SUCCESS.
+    '''
     
     # repartition df for export and add columns 
     pickup_col = [col for col in df.columns if 'pickup' in col][0]
@@ -123,6 +151,11 @@ def data_2_gcp_cloud_storage_dataproc(df, root_path):
     logging.info('cleaning up environment for next run')
     
 def bucket_2_ext_tbl(project_id, ext_table_name, root_path, client):
+    '''
+    Creates the needed schemas in Bogquery if they are not already present,
+    creates the external table in nytaxi_raw schema to stage the parquet 
+    data exported to cloud storage during the current run.
+    '''
     
     q1a = f"""create schema if not exists `{project_id}`.`nytaxi_raw`
     options (location = 'EU')
@@ -169,6 +202,22 @@ def bucket_2_ext_tbl(project_id, ext_table_name, root_path, client):
     logging.info('loading external table complete')
     
 def bucket_2_bigquery(client, project_id, ext_table_name, schema_raw, schema_stage, parq_subset, filename):
+    '''
+    Copies the data over to nytaxi_stage from the external table in 
+    nystaxi_raw via the following steps:
+    1. Compares the column_name, data_type and ordinal position of the 
+        external table compared to a respective stage table (that with 
+        the same tripdata substring in the table name)
+    2. Collects the column name and data types of the external table 
+        metadata and stores the info into dictionary objects to then 
+        later be used in query compilation.
+    3. If there are no differences found between the two tables, then it 
+        simply inserts the data from the external table into an already 
+        existing stage table. If this is not the case, then a new table 
+        in nytaxi_stage is created.
+    4. The syntax of a newly created stage table is always: 
+        <<datasetType>>_tripdata_<<year-month>>
+    '''
 
     logging.info(f'determining how {ext_table_name} can be loaded to stage')
           
