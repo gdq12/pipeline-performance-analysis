@@ -189,7 +189,7 @@ mage_data/
 secrets/
 
 # service account secrets
-**.json**
+**pipeline-analysis*.json**
 
 #######################################terraform################################
 # Local .terraform directories
@@ -199,6 +199,9 @@ secrets/
 # terraform .tfstate files
 *.tfstate
 *.tfstate.*
+
+######################################mage######################################
+**.ssh_tunnel**
 
 ####################################dbt#########################################
 # # you shouldn't commit these into source control
