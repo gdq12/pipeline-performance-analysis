@@ -1,0 +1,14 @@
+dbt-bq-dtc:
+  outputs:
+    dev:
+      type: bigquery
+      method: service-account
+      project: "{{ env_var('PROJECT_ID') }}"
+      location: "{{ env_var('BQ_REGION') }}"
+      dataset: "{{ env_var('BQ_SCHEMA') }}"
+      threads: 4 # Must be a value of 1 or greater
+      keyfile: "{{ env_var('PROJECT_KEY') }}"
+      timeout_seconds: 300
+      fixed_retries: 1
+      priority: interactive
+  target: dev

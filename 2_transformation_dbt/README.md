@@ -1,28 +1,15 @@
 Welcome to your new dbt project!
 ### Setup steps 
 
-1. Copy over skeleton project from this [archived repo](https://github.com/dbt-labs/dbt-starter-project)
-
-    ```{bash}
-    git clone https://github.com/dbt-labs/dbt-starter-project.git
-
-    cp -r dbt-starter-project/ pipeline-performance-analysis/2_transformation_dbt/.
-    ```
-
-2. Try out dbt pre built docker image for bigquery 
+1. Build and run Docker image 
 
     ```
-    # pull image to local 
-    docker pull ghcr.io/dbt-labs/dbt-bigquery:1.9.latest
+    # build docker image
+    docker build -t pipeline-analysis-transform-dbt .
 
-    # initiate a container 
-    docker run \
-    --network=host \
-    --mount type=bind,source=${LOCAL_WORKING_DIRECTORY},target=/usr/app \
-    --mount type=bind,source=${LOCAL_WORKING_DIRECTORY}/profiles.yml,target=/root/.dbt/profiles.yml \
-    ghcr.io/dbt-labs/dbt-bigquery:1.9.latest \
-    ls
-
+    # launch with VS code 
+    source .envrc
+    code .
     ```
 
 3. create DBT service account in GCP 
@@ -39,6 +26,13 @@ Welcome to your new dbt project!
 
     + save json key to `~/Documents/` and `~/git_repos/pipeline-performance-analysis/2_transformation_dbt`
     
+### Good to know DBT commands
+
+* testing dbt connection/installation
+
+    ```
+    dbt debug
+    ```
 
 ### Helpful Links 
 
@@ -51,6 +45,8 @@ Welcome to your new dbt project!
 * repo on the different dbt [adaptors](https://github.com/dbt-labs/dbt-adapters?tab=readme-ov-file)
 
 * documentation on [bigquery setup](https://docs.getdbt.com/docs/core/connect-data-platform/bigquery-setup) with dbt
+
+* quick-start [dbt core bigquery](https://docs.getdbt.com/guides/manual-install?step=1)
 
 ### Notes from the original README
 

@@ -209,3 +209,5 @@ secrets/
 
 # # legacy -- renamed to dbt_packages in v1
 # dbt_modules/
+**/devcontainer.env
+**.user.yml
