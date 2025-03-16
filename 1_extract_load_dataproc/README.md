@@ -43,6 +43,8 @@ This part of the project is to fullfill the E (extract) and L (load) of ELT of t
 
         - `original-parquet-url`
 
+        - `helper-data`
+
         - `yellow-taxi-data-extract-load`
 
         - `green-taxi-data-extract-load`
