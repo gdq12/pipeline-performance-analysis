@@ -236,6 +236,14 @@ python3 extract-load-2-cloud-storage.py \
 
     - fhvhv: 2019-02-01
 
+### Adding supplimentary tables to Bigquery 
+
+1. load csv files in [mapping_tbl_csv](mapping_tbl_csv) to the `helper-data` bucket 
+
+    *can be done either by gutil are drag and drop in UI*
+
+2. execute queries in [extract-load-mapping-tables.sql](extract-load-mapping-tables.sql) to load them in the desrired schema
+
 ## GCLOUD commands good to knows 
 
 * getting the roles current assigned to the service account
