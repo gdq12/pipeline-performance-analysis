@@ -161,17 +161,17 @@ def bucket_2_ext_tbl(project_id, ext_table_name, root_path, client):
     options (location = 'EU')
     """
 
-    q1b = f"""create schema if not exists `{project_id}`.`nytaxi_stage`
-    options (location = 'EU')
-    """
+    # q1b = f"""create schema if not exists `{project_id}`.`nytaxi_stage`
+    # options (location = 'EU')
+    # """
 
-    q1c = f"""create schema if not exists `{project_id}`.`nytaxi_transform`
-    options (location = 'EU')
-    """
+    # q1c = f"""create schema if not exists `{project_id}`.`nytaxi_transform`
+    # options (location = 'EU')
+    # """
 
-    q1d = f"""create schema if not exists `{project_id}`.`nytaxi_prod`
-    options (location = 'EU')
-    """
+    # q1d = f"""create schema if not exists `{project_id}`.`nytaxi_prod`
+    # options (location = 'EU')
+    # """
 
     q1e = f"""create schema if not exists `{project_id}`.`nytaxi_monitoring`
     options (location = 'EU')
@@ -188,12 +188,12 @@ def bucket_2_ext_tbl(project_id, ext_table_name, root_path, client):
     logging.info('creating if not already present schemas')
     time.sleep(3)
     client.query(q1a)
-    time.sleep(3)
-    client.query(q1b)
-    time.sleep(3)
-    client.query(q1c)
-    time.sleep(3)
-    client.query(q1d)
+    # time.sleep(3)
+    # client.query(q1b)
+    # time.sleep(3)
+    # client.query(q1c)
+    # time.sleep(3)
+    # client.query(q1d)
 
     logging.info('creating external table')
     time.sleep(3)
@@ -283,24 +283,24 @@ def bucket_2_bigquery(client, project_id, ext_table_name, schema_raw, schema_sta
         time.sleep(3)
         table_name = client.query(q3a.format(project_id, schema_stage, parq_subset)).to_dataframe()['table_name'][0]
         # insert records into table                        
-        q3b = """insert into `{}`.`nytaxi_stage`.`{}`
+        q3b = """insert into `{}`.`{}`.`{}`
         ({})
-        select *, current_timestamp() from `{}.nytaxi_raw.{}`
+        select *, current_timestamp() from `{}.{}.{}`
         """
         
         time.sleep(3)
-        client.query(q3b.format(project_id, table_name, col_names, project_id, ext_table_name))
+        client.query(q3b.format(project_id, schema_stage, table_name, col_names, project_id, schema_raw, ext_table_name))
     else:
         table_name = filename.replace('.parquet', '')
         cluster_col = 'data_source'
         logging.info(f'there is a change in col_name/data_type/oridinal_position, {table_name} in stage will be created')
         # create new table in stage 
-        q3a = """create table if not exists `{}`.`nytaxi_stage`.`{}`
+        q3a = """create table if not exists `{}`.`{}`.`{}`
         ({})
         cluster by {} as 
-        select *, current_timestamp() from `{}.nytaxi_raw.{}`
+        select *, current_timestamp() from `{}.{}.{}`
         """
         time.sleep(3)
-        client.query(q3a.format(project_id, table_name, col_params, cluster_col, project_id, ext_table_name))
+        client.query(q3a.format(project_id, schema_stage, table_name, col_params, cluster_col, project_id, schema_raw, ext_table_name))
 
     logging.info(f'data load to stage complete')

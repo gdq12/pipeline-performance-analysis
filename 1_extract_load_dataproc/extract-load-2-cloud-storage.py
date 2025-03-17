@@ -42,7 +42,7 @@ delta = relativedelta(months=1)
 parq_subset= f'{trip_subset}_tripdata'
 ext_table_name = f'external_{parq_subset}'
 schema_raw = 'nytaxi_raw'
-schema_stage = 'nytaxi_stage'
+schema_stage = 'nytaxi_raw'
 bucket_url = f'gs://original-parquet-url'
 bucket_data = f'{trip_subset}-taxi-data-extract-load'
 project_id = args.gcp_id#os.getenv('GCP_ID')
