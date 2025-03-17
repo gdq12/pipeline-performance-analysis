@@ -36,7 +36,5 @@ clean-targets:         # directories to be removed by `dbt clean`
 # using the `{{ config(...) }}` macro.
 
 models:
-  pipeline-analysis:
-    # Applies to all files under models/example/
-    stage:
-      +materialized: table
+  pipeline_analysis_trasform:
+    raw:

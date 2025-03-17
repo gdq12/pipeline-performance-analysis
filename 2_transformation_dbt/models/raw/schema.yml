@@ -1,0 +1,40 @@
+version: 2
+
+sources:
+  - name: stage
+    database: "{{ env_var('PROJECT_ID') }}"
+    schema: nytaxi_stage
+
+    tables: 
+      - name: INFORMATION_SCHEMA.COLUMNS
+      - name: yellow_tripdata_2009-01
+      - name: yellow_tripdata_2010-01
+      - name: yellow_tripdata_2010-02
+      - name: yellow_tripdata_2010-04
+      - name: yellow_tripdata_2011-01
+      - name: yellow_tripdata_2011-02
+      - name: yellow_tripdata_2011-03
+      - name: yellow_tripdata_2011-04
+      - name: yellow_tripdata_2012-12
+      - name: yellow_tripdata_2013-01
+      - name: yellow_tripdata_2013-05
+      - name: yellow_tripdata_2013-06
+      - name: yellow_tripdata_2014-01
+      - name: yellow_tripdata_2014-02
+      - name: yellow_tripdata_2014-08
+      - name: yellow_tripdata_2014-09
+      - name: yellow_tripdata_2018-01
+      - name: yellow_tripdata_2018-02
+      - name: yellow_tripdata_2018-06
+      - name: yellow_tripdata_2018-07
+      - name: yellow_tripdata_2018-09
+      - name: yellow_tripdata_2018-10
+
+  - name: mapping
+    database: "{{ env_var('PROJECT_ID') }}"
+    schema: mapping
+
+    tables: 
+      - name: hvlv_base_numbers
+      - name: taxi_zone_geom
+      - name: taxi_zone_lookup

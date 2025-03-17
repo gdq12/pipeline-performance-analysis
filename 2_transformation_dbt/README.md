@@ -28,11 +28,19 @@ Welcome to your new dbt project!
     
 ### Good to know DBT commands
 
-* testing dbt connection/installation
+```
+# testing dbt connection/installation
+dbt debug
 
-    ```
-    dbt debug
-    ```
+# compile the query before sending it to Bigquery 
+dbt compile --select "modelName"
+
+# install dbt dependencies in packages.yml file 
+dbt deps 
+
+# to build a single table/model
+dbt build --select modelName
+```
 
 ### Helpful Links 
 
@@ -47,6 +55,10 @@ Welcome to your new dbt project!
 * documentation on [bigquery setup](https://docs.getdbt.com/docs/core/connect-data-platform/bigquery-setup) with dbt
 
 * quick-start [dbt core bigquery](https://docs.getdbt.com/guides/manual-install?step=1)
+
+* taxidataset [data cleaning](https://medium.com/@linniartan/nyc-taxi-data-analysis-part-1-clean-and-transform-data-in-bigquery-2cb1142c6b8b), which also includes how to convert geospatial coordinates to zone_id
+
+* [dbt package hub](https://hub.getdbt.com/)
 
 ### Notes from the original README
 
