@@ -75,3 +75,51 @@ where (
   (end_date < parse_datetime('%Y-%m-%d %H:%M:%S', trip_dropoff_date_time))
 ) 
 ;
+
+-- example queries to cleanup data 
+select 
+  case 
+    when trp.vendor_name = 'CMT' then 1
+    when trp.vendor_name = 'VTS' then 3
+    when trp.vendor_name = 'DDS' then 4
+    end vendor_id
+  , trp.trip_pickup_date_time pickup_datetime
+  , trp.trip_dropoff_date_time dropoff_date_time
+  , trp.passenger_count
+  , trp.trip_distance
+  , pu.zone_id pu_location_id
+  , trp.rate_code rate_code_id
+  , case 
+      when coalesce(trp.store_and_forward, 0) = 0 then 'N'
+      when trp.store_and_forward = 1 then 'Y'
+      end store_and_fwd_flag
+  , du.zone_id do_location_id
+  , case 
+      when lower(trp.payment_type) = 'cash' then 2
+      when lower(trp.payment_type) = 'dispute' then 4
+      when lower(trp.payment_type) = 'no charge' then 3
+      when lower(trp.payment_type) = 'credit' then 1
+      else null 
+      end payment_type
+  , trp.fare_amt fare_amount
+  , trp.surcharge
+  , trp.mta_tax
+  , trp.tip_amt tip_amount
+  , trp.tolls_amt tolls_amount
+  , trp.total_amt total_amount
+  , trp.trip_pickup_date pickup_date
+  , regexp_substr(trp.data_source, '[0-9]{4}-[0-9]{2}$') trip_type
+  , parse_datetime('%Y-%m-%d', regexp_substr(trp.data_source, '[0-9]{4}-[0-9]{2}$')||'-01') data_start_date
+  , last_day(parse_date('%Y-%m-%d', regexp_substr(trp.data_source, '[0-9]{4}-[0-9]{2}$')||'-01'), month) data_end_date
+  , trp.data_source
+  , trp.creation_dt
+from `pipeline-analysis-452722.nytaxi_stage.yellow_tripdata_2009-01` trp
+join `pipeline-analysis-452722.mapping.taxi_zone_geom` pu on (ST_DWithin(pu.zone_geom,ST_GeogPoint(trp.start_lon, trp.start_lat), 0))
+join `pipeline-analysis-452722.mapping.taxi_zone_geom` du on (ST_DWithin(du.zone_geom,ST_GeogPoint(trp.end_lon, trp.end_lat), 0))
+where trp.data_source = 'gs://yellow-taxi-data-extract-load/2025-03-11_10:46:29_yellow_tripdata_2009-01'
+and trp.start_lon between -90 and 90 
+and trp.start_lat between -90 and 90
+and trp.end_lon between -90 and 90 
+and trp.end_lat between -90 and 90
+limit 10
+;
