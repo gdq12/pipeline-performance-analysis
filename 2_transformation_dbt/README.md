@@ -60,6 +60,12 @@ dbt build --select modelName
 
 * [dbt package hub](https://hub.getdbt.com/)
 
+* [medium article](https://blog.det.life/5-useful-loop-patterns-in-dbt-f1d959ab38b9) on implementing for-loops with jinja
+
+* [stackoverflow post](https://stackoverflow.com/questions/73157834/change-column-name-dynamically-using-mapping-table-dbt) helped develop for-loop column name concept
+
+* run_query macro [documentation](https://docs.getdbt.com/reference/dbt-jinja-functions/run_query)
+
 ### Notes from the original README
 
 1. Using the starter project

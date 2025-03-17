@@ -1,9 +1,9 @@
 version: 2
 
 sources:
-  - name: stage
+  - name: raw
     database: "{{ env_var('PROJECT_ID') }}"
-    schema: nytaxi_stage
+    schema: "{{ env_var('BQ_SCHEMA') }}"
 
     tables: 
       - name: INFORMATION_SCHEMA.COLUMNS

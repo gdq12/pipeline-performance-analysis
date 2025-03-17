@@ -10,6 +10,7 @@ select
       when column_name in ('end_lat', 'dropoff_latitude') then 'dropoff_latitide'
       when column_name = 'store_and_forward' then 'store_and_fwd_flag'
       when column_name = 'vendor_name' then 'vendor_id'
+      when column_name = 'extra' then 'extra_amount'
       when regexp_substr(column_name, 'do_') is not null then regexp_replace(column_name, 'do_', 'dropoff_')
       when regexp_substr(column_name, 'pu_') is not null then regexp_replace(column_name, 'pu_', 'pickup_')
       when regexp_substr(column_name, 'amt') is not null then regexp_replace(column_name, 'amt', 'amount')
@@ -19,7 +20,7 @@ select
         then regexp_replace(regexp_replace(column_name, 'trip_', ''), 'date_time$', 'datetime')
       else column_name end new_column_name
   , ordinal_position
-from {{ source('stage','INFORMATION_SCHEMA.COLUMNS')}}
+from {{ source('raw','INFORMATION_SCHEMA.COLUMNS')}}
 where column_name != '__index_level_0__'
 and table_name != 'column_name_data_type_mapping'
 order by 1, 4
