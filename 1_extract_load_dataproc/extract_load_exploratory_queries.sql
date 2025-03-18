@@ -123,3 +123,66 @@ and trp.end_lon between -90 and 90
 and trp.end_lat between -90 and 90
 limit 10
 ;
+
+-- determine where there are conflicting data types amoungst all the yellow_tripdata tables 
+select new_column_name, count(distinct data_type)
+from `pipeline-analysis-452722.nytaxi_stage.vw_column_name_mapping`
+where regexp_substr(table_name, 'vw_') is null  
+and regexp_substr(table_name, '2009|2010') is not null 
+group by new_column_name
+order by 2 desc
+;
+
+-- to see the different variations of the field for later data cleanup 
+select distinct vendor_id, ratecode_id, store_and_fwd_flag, payment_type
+from `pipeline-analysis-452722.nytaxi_stage.vw_yellow_tripdata_2009_2010`
+order by 1, 2, 3, 4
+;
+
+-- column cleamup notes 
+
+ratecode_id cast as integer
+
+case 
+    when vendor_id = '1' then 1::int64
+    when vendor_id = 'CMT' then 1::int64
+    when vendor_id = 'VTS' then 3::int64
+    when vendor_id = 'DDS' then 4::int64
+    else null 
+    end vendor_id
+
+case 
+    when trim(store_an_fwd_flag) in ('0', '0.0', 'N') then 'N'
+    when trim(store_an_fwd_flag) in ('1', '1.0', 'Y') then 'Y'
+    else null 
+    end store_an_fwd_flag
+
+case 
+    when trim(lower(payment_type)) in ('cash', 'csh', 'cas') then 2::int64
+    when trim(lower(payment_type)) in ('credit', 'cre', 'crd') then 1::int64
+    when trim(lower(payment_type)) in ('dispute', 'dis') then 4::int64
+    when trim(lower(payment_type)) in ('no', 'no charge', 'noc') then 3::int64
+    when trim(lower(payment_type)) in ('na') then 5::int64
+    else null 
+    end payment_type
+
+-- try to pinpoint some faulty lines 
+select count(1)
+from `pipeline-analysis-452722.nytaxi_stage.vw_yellow_tripdata_2009_2010`
+-- where pickup_datetime >= dropoff_datetime
+-- where pickup_datetime = dropoff_datetime --and trip_distance = 0
+-- where vendor_id is null 
+;
+
+-- examine data uniqueness
+select 
+  vendor_id, pickup_datetime, dropoff_datetime, pickup_location_id, dropoff_location_id
+  , ratecode_id, payment_type
+  , count(1) row_count
+from `pipeline-analysis-452722.nytaxi_stage.vw_yellow_tripdata_2009_2010`
+where pickup_datetime < dropoff_datetime
+group by vendor_id, pickup_datetime, dropoff_datetime, pickup_location_id, dropoff_location_id
+        , ratecode_id, payment_type
+having count(1) > 1
+order by 8 desc
+;
