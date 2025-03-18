@@ -5,7 +5,7 @@ with t1 as
   select distinct table_name
   from {{ ref('vw_column_name_mapping') }}
   where regexp_substr(table_name, '2009|2010') is not null
-  and regexp_substr(table_name, 'vw_') is null
+  and regexp_substr(table_name, 'yellow_tripdata') is not null
   order by 1
 {% endset %}
 
