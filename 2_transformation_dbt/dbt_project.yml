@@ -39,3 +39,5 @@ models:
   pipeline_analysis_trasform:
     raw:
       +enabled: true
+    stage: 
+      +enabled: true 
