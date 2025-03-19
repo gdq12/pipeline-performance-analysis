@@ -4,7 +4,7 @@ This part of the project is to fullfill the E (extract) and L (load) of ELT of t
 
 ## Step I: Google Cloud Platform Setup
 
-* GCP centric identifiers have been save in `.envrc` file:
+* source GCP centric identifiers have been save in `.envrc` file (via command `source .envrc`):
 
     ```{bash}
     export LOCAL_WORKING_DIRECTORY=""
