@@ -26,21 +26,30 @@ Welcome to your new dbt project!
 
     + save json key to `~/Documents/` and `~/git_repos/pipeline-performance-analysis/2_transformation_dbt`
     
-### Good to know DBT commands
+### Good to know DBT commands and more
 
-```
-# testing dbt connection/installation
-dbt debug
+* commands 
 
-# compile the query before sending it to Bigquery 
-dbt compile --select "modelName"
+    ```
+    # testing dbt connection/installation
+    dbt debug
 
-# install dbt dependencies in packages.yml file 
-dbt deps 
+    # compile the query before sending it to Bigquery 
+    dbt compile --select "modelName"
 
-# to build a single table/model
-dbt build --select modelName
-```
+    # install dbt dependencies in packages.yml file 
+    dbt deps 
+
+    # to build a single table/model
+    dbt build --select modelName
+
+    # in dbt Cloud only: to auto create the query configuration macro 
+    __config
+    ```
+
+* other
+
+    + post `dbt compile --select "modelName"` can see the compiled sql script in folder: `target/projectName/models/schemaName/`
 
 ### Helpful Links 
 
@@ -62,9 +71,23 @@ dbt build --select modelName
 
 * [medium article](https://blog.det.life/5-useful-loop-patterns-in-dbt-f1d959ab38b9) on implementing for-loops with jinja
 
+* interesting approach to possibly implement RLS in dbt in this [medium article](https://medium.com/@azart0308/dbt-dynamic-column-selection-macros-4df5faaee42d) 
+
 * [stackoverflow post](https://stackoverflow.com/questions/73157834/change-column-name-dynamically-using-mapping-table-dbt) helped develop for-loop column name concept
 
 * run_query macro [documentation](https://docs.getdbt.com/reference/dbt-jinja-functions/run_query)
+
+* [jinja cheat sheet](https://datacoves.com/post/dbt-jinja-cheat-sheet)
+
+* about [dbt compile](https://docs.getdbt.com/reference/commands/compile)
+
+* [dbt-utls repo](https://github.com/dbt-labs/dbt-utils?tab=readme-ov-file#get_column_values-source), helpful on seeing how to implement macros into project
+
+* [macro use-cases](https://www.getorchestra.io/guides/best-dbt-core-macros-examples-and-use-cases)
+
+* good [post](https://discourse.getdbt.com/t/can-i-create-an-auto-incrementing-id-in-dbt/579/3) about auti-incremental ID col implementation in dbt
+
+* dbt [schema creation](https://docs.getdbt.com/docs/build/custom-schemas) documentation
 
 ### Notes from the original README
 
