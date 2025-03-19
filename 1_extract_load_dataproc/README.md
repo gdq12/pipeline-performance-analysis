@@ -321,6 +321,8 @@ python3 extract-load-2-cloud-storage.py \
 
 ### Helpful links
 
+* where the parquet file [links](https://www.nyc.gov/site/tlc/about/tlc-trip-record-data.page) came from 
+
 * while loop concept for getting parquet to cloud storage: [parquets to gcp](https://github.com/gdq12/data-engineering-zoomcamp-2024/blob/main/week4/4_1a_data_2_gcs/url_2_gcs.py)
 
 * helpful queries that helped with loading data to Bigquery: [sql script](https://github.com/gdq12/data-engineering-zoomcamp-2024/blob/main/week4/4_1a_data_2_gcs/gcs_2_bigquery.sql)
