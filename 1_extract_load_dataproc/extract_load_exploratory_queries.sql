@@ -152,8 +152,8 @@ case
     end vendor_id
 
 case 
-    when trim(store_an_fwd_flag) in ('0', '0.0', 'N') then 'N'
-    when trim(store_an_fwd_flag) in ('1', '1.0', 'Y') then 'Y'
+    when trim(store_and_fwd_flag) in ('0', '0.0', 'N') then 'N'
+    when trim(store_and_fwd_flag) in ('1', '1.0', 'Y') then 'Y'
     else null 
     end store_an_fwd_flag
 
