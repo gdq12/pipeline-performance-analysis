@@ -2,11 +2,12 @@
 
 This part of the project is to fullfill the E (extract) and L (load) of ELT of the NYC taxi data into Bigquery. Apache Spark clusters via GCP Dataproc are used for the efficient large data transfers. The DRY (dont repeat yourself) method is carried out here and is the foundational code to be used for spark implementation in Mage in the future. 
 
-### Google Cloud Platform Setup
+## Step I: Google Cloud Platform Setup
 
 * GCP centric identifiers have been save in `.envrc` file:
 
     ```{bash}
+    export LOCAL_WORKING_DIRECTORY=""
     export PROJECT_NAME=""
     export PROJECT_NUMBER=""
     export PROJECT_ID=""
@@ -31,7 +32,7 @@ This part of the project is to fullfill the E (extract) and L (load) of ELT of t
 
     + `ADD KEY` from service account --> dowload
 
-    + save json key to `~/Documents/` and `~/git_repos/pipeline-performance-analysis/1_extract_load_dataproc`
+    + save json key to `~/Documents/` and `${LOCAL_WORKING_DIRECTORY}/`
 
 3. create storage bucket 
 
@@ -57,7 +58,7 @@ This part of the project is to fullfill the E (extract) and L (load) of ELT of t
 
     + everything else leave as default 
 
-### Docker for local development 
+## Step 2a: Docker for local development 
 
 Created local docker image from docker hub `spark:3.5.1-scala2.12-java11-python3-ubuntu` for local testing prior to pushing to dataproc. Commands can be found below 
 
@@ -71,10 +72,10 @@ docker run --rm -it \
     -e ROOT=TRUE \
     -e GOOGLE_APPLICATION_CREDENTIALS="/home/ubuntu/${PROJECT_KEY_PATH}" \
     -e PROJECT_ID=${PROJECT_ID} \
-    -v ~/git_repos/pipeline-performance-analysis/1_extract_load_dataproc/${PROJECT_KEY_PATH}:/home/ubuntu/${PROJECT_KEY_PATH} \
-    -v ~/git_repos/pipeline-performance-analysis/1_extract_load_dataproc/extract-load-2-cloud-storage.py:/home/ubuntu/extract-load-2-cloud-storage.py \
-    -v ~/git_repos/pipeline-performance-analysis/1_extract_load_dataproc/helper_funcs.py:/home/ubuntu/helper_funcs.py \
-    -v ~/git_repos/pipeline-performance-analysis/1_extract_load_dataproc/dict_query_helpers.py:/home/ubuntu/dict_query_helpers.py \
+    -v ${LOCAL_WORKING_DIRECTORY}/${PROJECT_KEY_PATH}:/home/ubuntu/${PROJECT_KEY_PATH} \
+    -v ${LOCAL_WORKING_DIRECTORY}/extract-load-2-cloud-storage.py:/home/ubuntu/extract-load-2-cloud-storage.py \
+    -v ${LOCAL_WORKING_DIRECTORY}/helper_funcs.py:/home/ubuntu/helper_funcs.py \
+    -v ${LOCAL_WORKING_DIRECTORY}/dict_query_helpers.py:/home/ubuntu/dict_query_helpers.py \
     extract-load-spark:latest
 
 # go to jupyter notebook UI
@@ -89,9 +90,9 @@ python3 extract-load-2-cloud-storage.py \
     --trip_name yellow 
 ```
 
-### Google Cloud Platforms Dataproc w/Spark
+## Step 2b: Google Cloud Platforms Dataproc w/Spark
 
-#### Method I: Via GCP concole UI
+### Method I: Via GCP concole UI
 
 **Method a bit easier but didnt seem to offer the option to enable job logging**
 
@@ -123,7 +124,7 @@ python3 extract-load-2-cloud-storage.py \
 
   + from that dashboard can also see where all log info is stored within cloud storage
 
-#### Method II: Via command line
+### Method II: Via command line
 
 **Command below was compiled from Method I, where it provides the "Equivalent in command line" option prior to execution**
 
@@ -157,38 +158,7 @@ python3 extract-load-2-cloud-storage.py \
         --project ${PROJECT_ID}
     ```
 
-### Execute scripts in Dataproc
-
-1. copy python scripts to script bucket 
-
-    ```
-    sudo gsutil cp extract-load-2-cloud-storage.py gs://spark-scripts-extract-load/extract-load-2-cloud-storage.py
-
-    sudo gsutil cp helper_funcs.py gs://spark-scripts-extract-load/helper_funcs.py
-
-    sudo gsutil cp dict_query_helpers.py gs://spark-scripts-extract-load/dict_query_helpers.py
-
-    sudo gsutil cp ${PROJECT_KEY_PATH} gs://spark-scripts-extract-load/${PROJECT_KEY_PATH}
-    ```
-
-2. trigger job per needed paramters
-
-    ```
-    sudo gcloud dataproc jobs submit pyspark \
-        --cluster=extract-load-spark \
-        --region=${CLUSTER_REGION} \
-        --jars gs://spark-lib/bigquery/spark-3.4-bigquery-0.37.0.jar  \
-        --py-files gs://spark-scripts-extract-load/dict_query_helpers.py,gs://spark-scripts-extract-load/helper_funcs.py \
-        --files ${PROJECT_KEY_PATH} \
-        gs://spark-scripts-extract-load/extract-load-2-cloud-storage.py \
-        -- --gcp_id=${PROJECT_ID} \
-        --trip_name=yellow \
-        --start_date=2009-01-01 \
-        --end_date=2024-12-01 \
-        --gcp_file_cred=${PROJECT_KEY_PATH}
-    ```
-
-### Work arounds
+4. Work arounds
 
 * had issues with downloading parquets to VM in dataproc: `curl: (28) Failed to connect to d37ci6vzurychx.cloudfront.net port 443 after 300714 ms: Timeout was reached`
 
@@ -236,7 +206,38 @@ python3 extract-load-2-cloud-storage.py \
 
     - fhvhv: 2019-02-01
 
-### Adding supplimentary tables to Bigquery 
+5. Execute scripts in Dataproc
+
+* copy python scripts to script bucket 
+
+    ```
+    sudo gsutil cp extract-load-2-cloud-storage.py gs://spark-scripts-extract-load/extract-load-2-cloud-storage.py
+
+    sudo gsutil cp helper_funcs.py gs://spark-scripts-extract-load/helper_funcs.py
+
+    sudo gsutil cp dict_query_helpers.py gs://spark-scripts-extract-load/dict_query_helpers.py
+
+    sudo gsutil cp ${PROJECT_KEY_PATH} gs://spark-scripts-extract-load/${PROJECT_KEY_PATH}
+    ```
+
+* trigger job per needed paramters
+
+    ```
+    sudo gcloud dataproc jobs submit pyspark \
+        --cluster=extract-load-spark \
+        --region=${CLUSTER_REGION} \
+        --jars gs://spark-lib/bigquery/spark-3.4-bigquery-0.37.0.jar  \
+        --py-files gs://spark-scripts-extract-load/dict_query_helpers.py,gs://spark-scripts-extract-load/helper_funcs.py \
+        --files ${PROJECT_KEY_PATH} \
+        gs://spark-scripts-extract-load/extract-load-2-cloud-storage.py \
+        -- --gcp_id=${PROJECT_ID} \
+        --trip_name=yellow \
+        --start_date=2009-01-01 \
+        --end_date=2024-12-01 \
+        --gcp_file_cred=${PROJECT_KEY_PATH}
+    ```
+
+## Step 3: Adding supplimentary tables to Bigquery 
 
 1. load csv files in [mapping_tbl_csv](mapping_tbl_csv) to the `helper-data` bucket 
 
