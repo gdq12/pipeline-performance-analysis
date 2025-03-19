@@ -401,7 +401,7 @@ select
   , trp.total_amount
   , trp.congestion_surcharge
   , trp.pickup_date
-  , regexp_substr(trp.data_source, '[0-9]{4}-[0-9]{2}$') trip_type
+  , regexp_replace(regexp_substr(trp.data_source, '[a-z]{1,6}_tripdata'), '_tripdata', '') trip_type
   , parse_datetime('%Y-%m-%d', regexp_substr(trp.data_source, '[0-9]{4}-[0-9]{2}$')||'-01') data_start_date
   , last_day(parse_date('%Y-%m-%d', regexp_substr(trp.data_source, '[0-9]{4}-[0-9]{2}$')||'-01'), month) data_end_date
   , trp.data_source
