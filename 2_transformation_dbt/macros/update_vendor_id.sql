@@ -10,7 +10,7 @@
         when '2' then 2
         when 'VTS' then 3
         when 'DDS' then 4
-        else 0
+        else null
     end
 
 {%- endmacro %}
