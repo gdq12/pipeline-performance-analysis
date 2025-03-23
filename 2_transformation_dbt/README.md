@@ -68,6 +68,12 @@
     # in dbt Cloud only: to auto create the query configuration macro 
     __config
 
+    # to build models in only certain sub folders and thei dependents
+    dbt build --select folder1Name.subfolderName+
+
+    # sourcing data in queries when in subfolders
+    source('folder1Name', 'subfolderName', 'tblName')
+
     dbt run 
 
     dbt test
@@ -97,15 +103,25 @@
 
 * dbt [schema creation](https://docs.getdbt.com/docs/build/custom-schemas) documentation
 
+* documentation on [incremental models](https://docs.getdbt.com/docs/build/incremental-models)
+
+* doc explaining [jinja](https://docs.getdbt.com/docs/build/jinja-macros) and best practices to apply it 
+
 * [dbt-utls repo](https://github.com/dbt-labs/dbt-utils?tab=readme-ov-file#get_column_values-source), helpful on seeing how to implement macros into project
 
 * [dbt package hub](https://hub.getdbt.com/)
+
+* documentation on [codegen](https://github.com/dbt-labs/dbt-codegen)
 
 * run_query macro [documentation](https://docs.getdbt.com/reference/dbt-jinja-functions/run_query)
 
 * about [dbt compile](https://docs.getdbt.com/reference/commands/compile)
 
 * good [post](https://discourse.getdbt.com/t/can-i-create-an-auto-incrementing-id-in-dbt/579/3) about **auto-incremental** ID col implementation in dbt
+
+* good post on [limitations of incremental models](https://discourse.getdbt.com/t/on-the-limits-of-incrementality/303)
+
+* post that explains on how to [union](https://discourse.getdbt.com/t/unioning-identically-structured-data-sources/921/2) many source tables
 
 * Learn more about dbt [in the docs](https://docs.getdbt.com/docs/introduction)
 
