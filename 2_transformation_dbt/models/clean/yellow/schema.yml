@@ -1,9 +1,9 @@
 version: 2
 
 sources:
-  - name: raw
+  - name: clean.yellow
     database: "{{ env_var('PROJECT_ID') }}"
-    schema: "{{ env_var('BQ_SCHEMA') }}"
+    schema: nytaxi_stage
 
     tables: 
       - name: INFORMATION_SCHEMA.COLUMNS
@@ -30,11 +30,9 @@ sources:
       - name: yellow_tripdata_2018-09
       - name: yellow_tripdata_2018-10
 
-  - name: mapping
+  - name: mapping.yellow
     database: "{{ env_var('PROJECT_ID') }}"
     schema: mapping
 
     tables: 
-      - name: hvlv_base_numbers
       - name: taxi_zone_geom
-      - name: taxi_zone_lookup

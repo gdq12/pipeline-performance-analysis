@@ -1,6 +1,4 @@
-{{ config(materialized='table') }}
-
-with t1 as
+with trps as 
 (select 
     {{ update_vendor_id("vendor_id") }} vendor_id
     ,cast(pickup_datetime as timestamp) pickup_datetime 
@@ -20,13 +18,9 @@ with t1 as
     ,cast(total_amount as float64) total_amount
     ,cast(congestion_surcharge as float64) congestion_surcharge
     ,cast(pickup_date as timestamp) pickup_date
-    ,{{ dbt.safe_cast("trip_type", api.Column.translate_type("string")) }} trip_type
-    ,cast(data_start_date as timestamp) data_start_date
-    ,cast(data_end_date as timestamp) data_end_date
     ,{{ dbt.safe_cast("data_source", api.Column.translate_type("string")) }} data_source
     ,cast(creation_dt as timestamp) creation_dt
-from {{ ref('vw_yellow_tripdata_2009_2010') }}
-where pickup_datetime < dropoff_datetime
+from {{ ref('yellow__2b_2009_2010_location_id_update') }}
 union all 
 select 
     {{ update_vendor_id("vendor_id") }} vendor_id
@@ -47,47 +41,29 @@ select
     ,cast(total_amount as float64) total_amount
     ,cast(congestion_surcharge as float64) congestion_surcharge
     ,cast(pickup_date as timestamp) pickup_date
-    ,{{ dbt.safe_cast("trip_type", api.Column.translate_type("string")) }} trip_type
-    ,cast(data_start_date as timestamp) data_start_date
-    ,cast(data_end_date as timestamp) data_end_date
     ,{{ dbt.safe_cast("data_source", api.Column.translate_type("string")) }} data_source
     ,cast(creation_dt as timestamp) creation_dt
-from {{ ref('vw_yellow_tripdata') }}
-where pickup_datetime < dropoff_datetime
+from {{ ref('yellow__2_post_2010_tbl_collation') }}
 )
 select 
-    {{ dbt_utils.generate_surrogate_key( ['vendor_id', 'pickup_datetime ', 'dropoff_datetime', 'passenger_count', 
-                                        'trip_distance', 'pickup_location_id', 'ratecode_id', 'store_and_fwd_flag', 
-                                        'dropoff_location_id', 'payment_type', 'fare_amount', 'mta_tax', 'tip_amount', 
-                                        'tolls_amount', 'improvement_surcharge', 'total_amount', 'congestion_surcharge',
-                                        'data_source']) }} trip_id
-    ,vendor_id
-    ,pickup_datetime 
-    ,dropoff_datetime
-    ,passenger_count
-    ,trip_distance
-    ,pickup_location_id
-    ,ratecode_id
-    ,store_and_fwd_flag
-    ,dropoff_location_id
-    ,payment_type
-    ,fare_amount
-    ,mta_tax
-    ,tip_amount
-    ,tolls_amount
-    ,improvement_surcharge
-    ,total_amount
-    ,congestion_surcharge
-    ,pickup_date
-    ,trip_type
-    ,data_start_date
-    ,data_end_date
-    ,data_source
-    ,creation_dt
-from t1 
-
-{% if var('is_test_run', default = true) %}
-
-  limit 100 
-
-{% endif %}
+  vendor_id,
+  pickup_datetime,
+  dropoff_datetime,
+  passenger_count,
+  trip_distance,
+  pickup_location_id,
+  ratecode_id,
+  store_and_fwd_flag,
+  dropoff_location_id,
+  payment_type,
+  fare_amount,
+  mta_tax,
+  tip_amount,
+  tolls_amount,
+  improvement_surcharge,
+  total_amount,
+  congestion_surcharge,
+  pickup_date,
+  data_source,
+  creation_dt
+from trps 

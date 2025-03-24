@@ -1,5 +1,3 @@
-{{ config(materialized='view') }}
-
 select 
   table_name
   , column_name old_column_name
@@ -23,7 +21,6 @@ select
       else column_name end new_column_name
   , data_type
   , ordinal_position
-from {{ source('raw','INFORMATION_SCHEMA.COLUMNS')}}
+from {{ source('clean.yellow', 'INFORMATION_SCHEMA.COLUMNS')}}
 where column_name != '__index_level_0__'
-and table_name != 'column_name_data_type_mapping'
-order by 1, 4
+and regexp_substr(table_name, 'yellow_tripdata') is not null 
