@@ -1,5 +1,3 @@
-
-
 select 
   table_name
   , column_name old_column_name
@@ -25,5 +23,4 @@ select
   , ordinal_position
 from `pipeline-analysis-452722`.`nytaxi_stage`.`INFORMATION_SCHEMA.COLUMNS`
 where column_name != '__index_level_0__'
-and table_name != 'column_name_data_type_mapping'
-order by 1, 4
+and regexp_substr(table_name, 'yellow_tripdata') is not null

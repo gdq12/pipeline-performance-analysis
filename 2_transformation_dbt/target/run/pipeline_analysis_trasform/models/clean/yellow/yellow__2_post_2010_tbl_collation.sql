@@ -1,10 +1,10 @@
 
 
-  create or replace view `pipeline-analysis-452722`.`nytaxi_stage`.`vw_yellow_tripdata`
+  create or replace view `pipeline-analysis-452722`.`nytaxi_clean`.`yellow__2_post_2010_tbl_collation`
   OPTIONS()
   as 
 
-with t1 as 
+with trps as 
 (
 
 
@@ -1337,28 +1337,25 @@ with t1 as
     
 )
 select 
-  trp.vendor_id
-  , trp.pickup_datetime
-  , trp.dropoff_datetime
-  , trp.passenger_count
-  , trp.trip_distance
-  , trp.pickup_location_id
-  , trp.ratecode_id
-  , trp.store_and_fwd_flag
-  , trp.dropoff_location_id
-  , trp.payment_type
-  , trp.fare_amount
-  , trp.mta_tax
-  , trp.tip_amount
-  , trp.tolls_amount
-  , trp.improvement_surcharge
-  , trp.total_amount
-  , trp.congestion_surcharge
-  , trp.pickup_date
-  , regexp_replace(regexp_substr(trp.data_source, '[a-z]{1,6}_tripdata'), '_tripdata', '') trip_type
-  , parse_datetime('%Y-%m-%d', regexp_substr(trp.data_source, '[0-9]{4}-[0-9]{2}$')||'-01') data_start_date
-  , last_day(parse_date('%Y-%m-%d', regexp_substr(trp.data_source, '[0-9]{4}-[0-9]{2}$')||'-01'), month) data_end_date
-  , trp.data_source
-  , trp.creation_dt
-from t1 trp;
+  vendor_id,
+  pickup_datetime,
+  dropoff_datetime,
+  passenger_count,
+  trip_distance,
+  pickup_location_id,
+  ratecode_id,
+  store_and_fwd_flag,
+  dropoff_location_id,
+  payment_type,
+  fare_amount,
+  mta_tax,
+  tip_amount,
+  tolls_amount,
+  improvement_surcharge,
+  total_amount,
+  congestion_surcharge,
+  pickup_date,
+  data_source,
+  creation_dt
+from trps;
 

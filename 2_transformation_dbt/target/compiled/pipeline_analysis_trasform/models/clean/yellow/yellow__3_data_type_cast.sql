@@ -1,6 +1,4 @@
-
-
-with t1 as
+with trps as 
 (select 
     case safe_cast(vendor_id as string)
         when 'CMT' then 1
@@ -45,13 +43,9 @@ with t1 as
     ,cast(total_amount as float64) total_amount
     ,cast(congestion_surcharge as float64) congestion_surcharge
     ,cast(pickup_date as timestamp) pickup_date
-    ,safe_cast(trip_type as string) trip_type
-    ,cast(data_start_date as timestamp) data_start_date
-    ,cast(data_end_date as timestamp) data_end_date
     ,safe_cast(data_source as string) data_source
     ,cast(creation_dt as timestamp) creation_dt
-from `pipeline-analysis-452722`.`nytaxi_stage`.`vw_yellow_tripdata_2009_2010`
-where pickup_datetime < dropoff_datetime
+from `pipeline-analysis-452722`.`nytaxi_clean`.`yellow__2b_2009_2010_location_id_update`
 union all 
 select 
     case safe_cast(vendor_id as string)
@@ -97,42 +91,29 @@ select
     ,cast(total_amount as float64) total_amount
     ,cast(congestion_surcharge as float64) congestion_surcharge
     ,cast(pickup_date as timestamp) pickup_date
-    ,safe_cast(trip_type as string) trip_type
-    ,cast(data_start_date as timestamp) data_start_date
-    ,cast(data_end_date as timestamp) data_end_date
     ,safe_cast(data_source as string) data_source
     ,cast(creation_dt as timestamp) creation_dt
-from `pipeline-analysis-452722`.`nytaxi_stage`.`vw_yellow_tripdata`
-where pickup_datetime < dropoff_datetime
+from `pipeline-analysis-452722`.`nytaxi_clean`.`yellow__2_post_2010_tbl_collation`
 )
 select 
-    to_hex(md5(cast(coalesce(cast(vendor_id as string), '_dbt_utils_surrogate_key_null_') || '-' || coalesce(cast(pickup_datetime  as string), '_dbt_utils_surrogate_key_null_') || '-' || coalesce(cast(dropoff_datetime as string), '_dbt_utils_surrogate_key_null_') || '-' || coalesce(cast(passenger_count as string), '_dbt_utils_surrogate_key_null_') || '-' || coalesce(cast(trip_distance as string), '_dbt_utils_surrogate_key_null_') || '-' || coalesce(cast(pickup_location_id as string), '_dbt_utils_surrogate_key_null_') || '-' || coalesce(cast(ratecode_id as string), '_dbt_utils_surrogate_key_null_') || '-' || coalesce(cast(store_and_fwd_flag as string), '_dbt_utils_surrogate_key_null_') || '-' || coalesce(cast(dropoff_location_id as string), '_dbt_utils_surrogate_key_null_') || '-' || coalesce(cast(payment_type as string), '_dbt_utils_surrogate_key_null_') || '-' || coalesce(cast(fare_amount as string), '_dbt_utils_surrogate_key_null_') || '-' || coalesce(cast(mta_tax as string), '_dbt_utils_surrogate_key_null_') || '-' || coalesce(cast(tip_amount as string), '_dbt_utils_surrogate_key_null_') || '-' || coalesce(cast(tolls_amount as string), '_dbt_utils_surrogate_key_null_') || '-' || coalesce(cast(improvement_surcharge as string), '_dbt_utils_surrogate_key_null_') || '-' || coalesce(cast(total_amount as string), '_dbt_utils_surrogate_key_null_') || '-' || coalesce(cast(congestion_surcharge as string), '_dbt_utils_surrogate_key_null_') || '-' || coalesce(cast(data_source as string), '_dbt_utils_surrogate_key_null_') as string))) trip_id
-    ,vendor_id
-    ,pickup_datetime 
-    ,dropoff_datetime
-    ,passenger_count
-    ,trip_distance
-    ,pickup_location_id
-    ,ratecode_id
-    ,store_and_fwd_flag
-    ,dropoff_location_id
-    ,payment_type
-    ,fare_amount
-    ,mta_tax
-    ,tip_amount
-    ,tolls_amount
-    ,improvement_surcharge
-    ,total_amount
-    ,congestion_surcharge
-    ,pickup_date
-    ,trip_type
-    ,data_start_date
-    ,data_end_date
-    ,data_source
-    ,creation_dt
-from t1 
-
-
-
-  limit 100 
-
+  vendor_id,
+  pickup_datetime,
+  dropoff_datetime,
+  passenger_count,
+  trip_distance,
+  pickup_location_id,
+  ratecode_id,
+  store_and_fwd_flag,
+  dropoff_location_id,
+  payment_type,
+  fare_amount,
+  mta_tax,
+  tip_amount,
+  tolls_amount,
+  improvement_surcharge,
+  total_amount,
+  congestion_surcharge,
+  pickup_date,
+  data_source,
+  creation_dt
+from trps
