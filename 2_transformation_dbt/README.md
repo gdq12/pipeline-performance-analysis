@@ -74,6 +74,9 @@
     # sourcing data in queries when in subfolders
     source('folder1Name', 'subfolderName', 'tblName')
 
+    # codagen to generate needed yml files 
+    dbt run-operation generate_model_yaml --args '{"model_names": ["customers"]}'
+
     dbt run 
 
     dbt test
@@ -110,6 +113,8 @@
 * [dbt-utls repo](https://github.com/dbt-labs/dbt-utils?tab=readme-ov-file#get_column_values-source), helpful on seeing how to implement macros into project
 
 * [dbt package hub](https://hub.getdbt.com/)
+
+* dbt package [codagen](https://github.com/dbt-labs/dbt-codegen/tree/0.13.1/) which helps compile code/docs/yml files.
 
 * documentation on [codegen](https://github.com/dbt-labs/dbt-codegen)
 
