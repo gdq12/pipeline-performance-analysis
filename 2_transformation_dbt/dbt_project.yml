@@ -37,7 +37,6 @@ clean-targets:         # directories to be removed by `dbt clean`
 
 models:
   pipeline_analysis_trasform:
-    raw:
-      +enabled: true
-    stage: 
-      +enabled: true 
+    clean:
+      materialize: view
+      +schema: clean
