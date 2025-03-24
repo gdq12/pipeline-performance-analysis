@@ -214,3 +214,4 @@ logs/
 # dbt_modules/
 **/devcontainer.env
 **.user.yml
+**.vscode
