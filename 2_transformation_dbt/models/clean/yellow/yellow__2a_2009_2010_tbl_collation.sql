@@ -34,7 +34,7 @@ with trps as
           {% endif %}
         {% if not loop.last -%} , {% endif -%}
     {% endfor %}
-  from `{{ env_var('PROJECT_ID') }}`.`nytaxi_stage`.`{{ tbl_name }}`
+  from `{{ env_var('PROJECT_ID') }}`.`{{ env_var('BQ_RAW_SCHEMA') }}`.`{{ tbl_name }}`
     {% if not loop.last -%} union all {% endif -%}
 {% endfor %}
 )

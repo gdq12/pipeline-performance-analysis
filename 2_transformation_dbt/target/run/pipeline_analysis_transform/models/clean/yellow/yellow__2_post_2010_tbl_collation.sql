@@ -1,6 +1,6 @@
 
 
-  create or replace view `pipeline-analysis-452722`.`nytaxi_clean`.`yellow__2_post_2010_tbl_collation`
+  create or replace view `pipeline-analysis-452722`.`nytaxi`.`yellow__2_post_2010_tbl_collation`
   OPTIONS()
   as 
 
@@ -1348,12 +1348,14 @@ select
   dropoff_location_id,
   payment_type,
   fare_amount,
+  extra_amount,
   mta_tax,
   tip_amount,
   tolls_amount,
   improvement_surcharge,
   total_amount,
   congestion_surcharge,
+  airport_fee,
   pickup_date,
   data_source,
   creation_dt

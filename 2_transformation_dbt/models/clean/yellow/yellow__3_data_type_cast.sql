@@ -11,12 +11,14 @@ with trps as
     ,{{ dbt.safe_cast("dropoff_location_id", api.Column.translate_type("integer")) }} dropoff_location_id
     ,{{ update_payment_type("update_payment_type") }} payment_type
     ,cast(fare_amount as float64) fare_amount
+    , cast(null as float64) extra_amount
     ,cast(mta_tax as float64) mta_tax
     ,cast(tip_amount as float64) tip_amount
     ,cast(tolls_amount as float64) tolls_amount
     ,cast(null as float64) improvement_surcharge
     ,cast(total_amount as float64) total_amount
     ,cast(congestion_surcharge as float64) congestion_surcharge
+    , cast(null as float64) airport_fee
     ,cast(pickup_date as timestamp) pickup_date
     ,{{ dbt.safe_cast("data_source", api.Column.translate_type("string")) }} data_source
     ,cast(creation_dt as timestamp) creation_dt
@@ -34,12 +36,14 @@ select
     ,{{ dbt.safe_cast("dropoff_location_id", api.Column.translate_type("integer")) }} dropoff_location_id
     ,{{ update_payment_type("update_payment_type") }} payment_type
     ,cast(fare_amount as float64) fare_amount
+    ,cast(extra_amount as float64) extra_amount
     ,cast(mta_tax as float64) mta_tax
     ,cast(tip_amount as float64) tip_amount
     ,cast(tolls_amount as float64) tolls_amount
     ,cast(improvement_surcharge as float64) improvement_surcharge
     ,cast(total_amount as float64) total_amount
     ,cast(congestion_surcharge as float64) congestion_surcharge
+    ,cast(airport_fee as float64) airport_fee
     ,cast(pickup_date as timestamp) pickup_date
     ,{{ dbt.safe_cast("data_source", api.Column.translate_type("string")) }} data_source
     ,cast(creation_dt as timestamp) creation_dt
@@ -57,12 +61,14 @@ select
   dropoff_location_id,
   payment_type,
   fare_amount,
+  extra_amount,
   mta_tax,
   tip_amount,
   tolls_amount,
   improvement_surcharge,
   total_amount,
   congestion_surcharge,
+  airport_fee,
   pickup_date,
   data_source,
   creation_dt

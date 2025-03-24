@@ -19,7 +19,8 @@
         PROJECT_ID=
         PROJECT_KEY=
         BQ_REGION=
-        BQ_SCHEMA=
+        BQ_SCHEMA_PREFIX=
+        BQ_RAW_SCHEMA=
         PROJECT_EMAIL=
         ```
 
@@ -77,6 +78,12 @@
     # codagen to generate needed yml files 
     dbt run-operation generate_model_yaml --args '{"model_names": ["customers"]}'
 
+    # generate documentation 
+    dbt docs generate
+
+    # render documentation 
+    dbt docs serve
+
     dbt run 
 
     dbt test
@@ -117,6 +124,8 @@
 * dbt package [codagen](https://github.com/dbt-labs/dbt-codegen/tree/0.13.1/) which helps compile code/docs/yml files.
 
 * documentation on [codegen](https://github.com/dbt-labs/dbt-codegen)
+
+* [cross database macros](https://docs.getdbt.com/reference/dbt-jinja-functions/cross-database-macros), dbt functions that transform into SQL DB centric syntax. Best when using project files across different DBs. 
 
 * run_query macro [documentation](https://docs.getdbt.com/reference/dbt-jinja-functions/run_query)
 

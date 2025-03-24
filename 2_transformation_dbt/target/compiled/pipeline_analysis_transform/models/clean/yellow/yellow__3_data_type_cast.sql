@@ -36,16 +36,18 @@ with trps as
         else null 
     end payment_type
     ,cast(fare_amount as float64) fare_amount
+    , cast(null as float64) extra_amount
     ,cast(mta_tax as float64) mta_tax
     ,cast(tip_amount as float64) tip_amount
     ,cast(tolls_amount as float64) tolls_amount
     ,cast(null as float64) improvement_surcharge
     ,cast(total_amount as float64) total_amount
     ,cast(congestion_surcharge as float64) congestion_surcharge
+    , cast(null as float64) airport_fee
     ,cast(pickup_date as timestamp) pickup_date
     ,safe_cast(data_source as string) data_source
     ,cast(creation_dt as timestamp) creation_dt
-from `pipeline-analysis-452722`.`nytaxi_clean`.`yellow__2b_2009_2010_location_id_update`
+from `pipeline-analysis-452722`.`nytaxi`.`yellow__2b_2009_2010_location_id_update`
 union all 
 select 
     case safe_cast(vendor_id as string)
@@ -84,16 +86,18 @@ select
         else null 
     end payment_type
     ,cast(fare_amount as float64) fare_amount
+    ,cast(extra_amount as float64) extra_amount
     ,cast(mta_tax as float64) mta_tax
     ,cast(tip_amount as float64) tip_amount
     ,cast(tolls_amount as float64) tolls_amount
     ,cast(improvement_surcharge as float64) improvement_surcharge
     ,cast(total_amount as float64) total_amount
     ,cast(congestion_surcharge as float64) congestion_surcharge
+    ,cast(airport_fee as float64) airport_fee
     ,cast(pickup_date as timestamp) pickup_date
     ,safe_cast(data_source as string) data_source
     ,cast(creation_dt as timestamp) creation_dt
-from `pipeline-analysis-452722`.`nytaxi_clean`.`yellow__2_post_2010_tbl_collation`
+from `pipeline-analysis-452722`.`nytaxi`.`yellow__2_post_2010_tbl_collation`
 )
 select 
   vendor_id,
@@ -107,12 +111,14 @@ select
   dropoff_location_id,
   payment_type,
   fare_amount,
+  extra_amount,
   mta_tax,
   tip_amount,
   tolls_amount,
   improvement_surcharge,
   total_amount,
   congestion_surcharge,
+  airport_fee,
   pickup_date,
   data_source,
   creation_dt

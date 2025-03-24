@@ -5,7 +5,7 @@ dbt-bq-dtc:
       method: service-account
       project: "{{ env_var('PROJECT_ID') }}"
       location: "{{ env_var('BQ_REGION') }}"
-      dataset: "{{ env_var('BQ_SCHEMA') }}"
+      dataset: "{{ env_var('BQ_SCHEMA_PREFIX') }}"
       threads: 4 
       keyfile: "{{ env_var('PROJECT_KEY') }}"
       timeout_seconds: 300

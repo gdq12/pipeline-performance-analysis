@@ -1,0 +1,26 @@
+version: 2
+
+macros:
+  - name: update_payment_type
+    description: syncronizes payment_type across all yellow_tripdata
+    arguments:
+      - name: payment_type
+        type: string
+        description: >
+          auto converts input to string and encodes the value to a specific numeric 
+          depending on the string syntax.
+  - name: update_store_and_fwd_flag
+    description: syncronizes store_and_fwd_flag across all yellow_tripdata
+    arguments:
+      - name: store_and_fwd_flag
+        type: string
+        description: >
+          auto converts input to string and encodes the value to a Y/N flag depending on the string syntax.
+  - name: update_vendor_id
+    description: syncronizes vendor_id across all yellow_tripdata
+    arguments:
+      - name: vendor_id
+        type: string
+        description: >
+          auto converts input to string and encodes the value to a specific numeric 
+          depending on the string syntax.
