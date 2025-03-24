@@ -1,5 +1,3 @@
-{{ config(materialized='view') }}
-
 with trps as 
 ({% set tbl_query %}
   select distinct table_name
