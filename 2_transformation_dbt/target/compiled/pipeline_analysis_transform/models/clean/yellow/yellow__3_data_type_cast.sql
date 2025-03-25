@@ -52,6 +52,8 @@ with trps as
             in ('no', 'no charge', 'noc') then 3
         when lower(trim(safe_cast(payment_type as string)))
             in ('na', '0') then 5
+        when lower(trim(safe_cast(payment_type as string)))
+            is null then 5
         else null 
     end payment_type
     ,cast(fare_amount as float64) fare_amount
@@ -121,6 +123,8 @@ select
             in ('no', 'no charge', 'noc') then 3
         when lower(trim(safe_cast(payment_type as string)))
             in ('na', '0') then 5
+        when lower(trim(safe_cast(payment_type as string)))
+            is null then 5
         else null 
     end payment_type
     ,cast(fare_amount as float64) fare_amount

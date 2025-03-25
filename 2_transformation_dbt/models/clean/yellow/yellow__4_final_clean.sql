@@ -1,3 +1,8 @@
+{{ config(
+    materialized="table",
+    cluster_by = ["data_source", "trip_type_start_date", "pickup_date"]
+)}}
+
 select 
   {{ dbt_utils.generate_surrogate_key( ['vendor_id', 'pickup_datetime ', 'dropoff_datetime', 'passenger_count', 
                                         'trip_distance', 'pickup_location_id', 'ratecode_id', 'store_and_fwd_flag', 
@@ -26,7 +31,7 @@ select
   pickup_date,
   regexp_replace(regexp_substr(data_source, '[a-z]{1,6}_tripdata'), '_tripdata', '') trip_type,
   parse_datetime('%Y-%m-%d', regexp_substr(data_source, '[0-9]{4}-[0-9]{2}$')||'-01') trip_type_start_date,
-  last_day(parse_date('%Y-%m-%d', regexp_substr(data_source, '[0-9]{4}-[0-9]{2}$')||'-01'), month) trip_type_end_date,
+  cast(last_day(parse_date('%Y-%m-%d', regexp_substr(data_source, '[0-9]{4}-[0-9]{2}$')||'-01'), month) as timestamp) trip_type_end_date,
   data_source,
   creation_dt
 from {{ ref('yellow__3_data_type_cast') }}

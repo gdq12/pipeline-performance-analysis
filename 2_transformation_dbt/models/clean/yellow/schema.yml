@@ -422,6 +422,7 @@ models:
         - payment_type
         - store_and_fwd_flag
         - vendor_id
+        - ratecode_id
     columns:
       - name: vendor_id
         data_type: int64
@@ -535,10 +536,12 @@ models:
         description: >
           Timestamp for when the data was copied over into the target schema from bigquery bucket. 
   
-  - name: yellow__4_add_columns
+  - name: yellow__4_final_clean
     description: >
       Adds potentially helpful columns to the yellow_tripdata set (trip_type, type start and end dates). 
       It also creates unique trip ID to establish a primary key column for further transformation steps.
+      This table is materialized as it is in its final format prior to filter out records that might 
+      have a negative impact on analysis.
     columns:
       - name: trip_id
         data_type: string
