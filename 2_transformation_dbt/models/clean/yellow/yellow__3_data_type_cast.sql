@@ -6,12 +6,12 @@ with trps as
     ,{{ dbt.safe_cast("passenger_count", api.Column.translate_type("integer")) }} passenger_count
     ,cast(trip_distance as float64) trip_distance
     ,{{ dbt.safe_cast("pickup_location_id", api.Column.translate_type("integer")) }} pickup_location_id
-    ,{{ dbt.safe_cast("ratecode_id", api.Column.translate_type("string")) }} ratecode_id
+    ,{{ update_ratecode_id("ratecode_id") }} ratecode_id
     ,{{ update_store_and_fwd_flag("store_and_fwd_flag") }}  store_and_fwd_flag
     ,{{ dbt.safe_cast("dropoff_location_id", api.Column.translate_type("integer")) }} dropoff_location_id
     ,{{ update_payment_type("update_payment_type") }} payment_type
     ,cast(fare_amount as float64) fare_amount
-    , cast(null as float64) extra_amount
+    ,cast(null as float64) extra_amount
     ,cast(mta_tax as float64) mta_tax
     ,cast(tip_amount as float64) tip_amount
     ,cast(tolls_amount as float64) tolls_amount
@@ -31,7 +31,7 @@ select
     ,{{ dbt.safe_cast("passenger_count", api.Column.translate_type("integer")) }} passenger_count
     ,cast(trip_distance as float64) trip_distance
     ,{{ dbt.safe_cast("pickup_location_id", api.Column.translate_type("integer")) }} pickup_location_id
-    ,{{ dbt.safe_cast("ratecode_id", api.Column.translate_type("string")) }} ratecode_id
+    ,{{ update_ratecode_id("ratecode_id") }} ratecode_id
     ,{{ update_store_and_fwd_flag("store_and_fwd_flag") }}  store_and_fwd_flag
     ,{{ dbt.safe_cast("dropoff_location_id", api.Column.translate_type("integer")) }} dropoff_location_id
     ,{{ update_payment_type("update_payment_type") }} payment_type

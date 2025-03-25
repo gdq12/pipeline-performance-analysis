@@ -18,10 +18,10 @@ select
   trp.pickup_date,
   trp.data_source,
   trp.creation_dt
-from `pipeline-analysis-452722`.`nytaxi`.`yellow__2a_2009_2010_tbl_collation` trp
+from `pipeline-analysis-452722`.`nytaxi_clean`.`yellow__2a_2009_2010_tbl_collation` trp
 join `pipeline-analysis-452722`.`mapping`.`taxi_zone_geom` pu on (ST_DWithin(pu.zone_geom,ST_GeogPoint(trp.pickup_longitude, trp.pickup_latitude), 0))
 join `pipeline-analysis-452722`.`mapping`.`taxi_zone_geom` du on (ST_DWithin(du.zone_geom,ST_GeogPoint(trp.dropoff_longitude, trp.dropoff_latitude), 0))
-where trp.pickup_longitude between -90 and 90 
+where trp.pickup_longitude between -180 and 180
 and trp.pickup_latitude between -90 and 90
-and trp.dropoff_longitude between -90 and 90 
+and trp.dropoff_longitude between -180 and 180
 and trp.dropoff_latitude between -90 and 90

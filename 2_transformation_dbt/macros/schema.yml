@@ -9,6 +9,14 @@ macros:
         description: >
           auto converts input to string and encodes the value to a specific numeric 
           depending on the string syntax.
+  - name: update_ratecode_id
+    description: syncronizes ratecode_id across all yellow_tripdata
+    arguments:
+      - name: payment_type
+        type: string
+        description: >
+          auto converts input to string and encodes the value to a specific numeric 
+          so only possible values are 1 - 6.
   - name: update_store_and_fwd_flag
     description: syncronizes store_and_fwd_flag across all yellow_tripdata
     arguments:

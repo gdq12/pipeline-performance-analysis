@@ -25,4 +25,4 @@ select
   last_day(parse_date('%Y-%m-%d', regexp_substr(data_source, '[0-9]{4}-[0-9]{2}$')||'-01'), month) trip_type_end_date,
   data_source,
   creation_dt
-from `pipeline-analysis-452722`.`nytaxi`.`yellow__3_data_type_cast`
+from `pipeline-analysis-452722`.`nytaxi_clean`.`yellow__3_data_type_cast`

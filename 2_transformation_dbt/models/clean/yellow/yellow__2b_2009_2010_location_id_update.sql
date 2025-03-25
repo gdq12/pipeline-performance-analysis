@@ -21,7 +21,7 @@ select
 from {{ ref('yellow__2a_2009_2010_tbl_collation') }} trp
 join {{ source('mapping.yellow', 'taxi_zone_geom') }} pu on (ST_DWithin(pu.zone_geom,ST_GeogPoint(trp.pickup_longitude, trp.pickup_latitude), 0))
 join {{ source('mapping.yellow', 'taxi_zone_geom') }} du on (ST_DWithin(du.zone_geom,ST_GeogPoint(trp.dropoff_longitude, trp.dropoff_latitude), 0))
-where trp.pickup_longitude between -90 and 90 
+where trp.pickup_longitude between -180 and 180
 and trp.pickup_latitude between -90 and 90
-and trp.dropoff_longitude between -90 and 90 
+and trp.dropoff_longitude between -180 and 180
 and trp.dropoff_latitude between -90 and 90

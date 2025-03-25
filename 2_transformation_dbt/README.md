@@ -137,6 +137,8 @@
 
 * post that explains on how to [union](https://discourse.getdbt.com/t/unioning-identically-structured-data-sources/921/2) many source tables
 
+* [post](https://discourse.getdbt.com/t/faq-i-got-an-unused-model-configurations-error-message-what-does-this-mean/112) about correctly configuring dbt_project.yml
+
 * Learn more about dbt [in the docs](https://docs.getdbt.com/docs/introduction)
 
 * Check out [Discourse](https://discourse.getdbt.com/) for commonly asked questions and answers

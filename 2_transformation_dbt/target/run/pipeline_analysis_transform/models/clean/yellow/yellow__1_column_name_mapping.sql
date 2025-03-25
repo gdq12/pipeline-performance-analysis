@@ -1,6 +1,6 @@
 
 
-  create or replace view `pipeline-analysis-452722`.`nytaxi`.`yellow__1_column_name_mapping`
+  create or replace view `pipeline-analysis-452722`.`nytaxi_clean`.`yellow__1_column_name_mapping`
   OPTIONS()
   as select 
   table_name

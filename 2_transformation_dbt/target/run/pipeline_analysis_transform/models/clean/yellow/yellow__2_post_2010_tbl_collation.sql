@@ -1,10 +1,8 @@
 
 
-  create or replace view `pipeline-analysis-452722`.`nytaxi`.`yellow__2_post_2010_tbl_collation`
+  create or replace view `pipeline-analysis-452722`.`nytaxi_clean`.`yellow__2_post_2010_tbl_collation`
   OPTIONS()
-  as 
-
-with trps as 
+  as with trps as 
 (
 
 
