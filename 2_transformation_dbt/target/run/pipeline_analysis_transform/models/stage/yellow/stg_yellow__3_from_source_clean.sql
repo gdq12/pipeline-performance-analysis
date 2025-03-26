@@ -4,23 +4,25 @@
 
     create or replace table `pipeline-analysis-452722`.`nytaxi_stage2`.`stg_yellow__3_from_source_clean`
       
-    
-    cluster by data_source, trip_type_start_date, pickup_date
+    partition by timestamp_trunc(trip_type_start_date, month)
+    cluster by data_source, pickup_date
 
     OPTIONS()
     as (
       
 
 select 
+  -- cols that help better scan the data 
+  trip_type_start_date,
+  data_source,
+  pickup_date,
   -- IDs
   trip_id,
   vendor_id,
   -- time centric dimensions 
   pickup_datetime,
   dropoff_datetime,
-  trip_type_start_date,
   trip_type_end_date,
-  pickup_date,
   -- more time dimensions for later analysis 
   
 
@@ -96,8 +98,6 @@ select
   congestion_surcharge,
   airport_fee,
   -- data source centric info
-  trip_type,
-  data_source,
   creation_dt,
   current_timestamp() transformation_dt
 from `pipeline-analysis-452722`.`nytaxi_stage2`.`stg_yellow__2_filter_out_faulty`

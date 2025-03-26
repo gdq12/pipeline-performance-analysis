@@ -1,4 +1,8 @@
 select 
+  tbl.trip_type_start_date,
+  tbl.data_source,
+  tbl.pickup_date,
+  tbl.trip_type_end_date,
   tbl.trip_id,
   tbl.vendor_id,
   tbl.pickup_datetime,
@@ -19,11 +23,7 @@ select
   tbl.total_amount,
   tbl.congestion_surcharge,
   tbl.airport_fee,
-  tbl.pickup_date,
   tbl.trip_type,
-  tbl.trip_type_start_date,
-  tbl.trip_type_end_date,
-  tbl.data_source,
   tbl.creation_dt
 from {{ ref('yellow__4_adds_columns') }} tbl
 left join {{ ref('stg_yellow__1b_id_faulty_trips') }} ft1 on tbl.data_source = ft1.data_source 

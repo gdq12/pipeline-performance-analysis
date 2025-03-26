@@ -543,6 +543,30 @@ models:
       This table is materialized as it is in its final format prior to filter out records that might 
       have a negative impact on analysis.
     columns:
+      - name: trip_type_start_date
+        data_type: datetime
+        description: >
+          First day of the month that pickup_datetime should not be before.
+          Table is partitioned on this column.
+
+      - name: data_source
+        data_type: string
+        description: >
+          Bigquery bucket path where the partitioned source parquets are located.
+          Table is clustered on this column.
+
+      - name: pickup_date
+        data_type: timestamp
+        description: >
+          The day truncation of `pickup_datetime`. This column was used to partition the source parquet 
+          file after it was partially processed by the spark cluster (Dataproc).
+          Table is clustered on this column.
+
+      - name: trip_type_end_date
+        data_type: date
+        description: >
+          Last day of the month that dropoff_datetime should not be too much after (1-2 days max).
+
       - name: trip_id
         data_type: string
         description: >
@@ -643,32 +667,11 @@ models:
         data_type: float64
         description: >
            $1.25 for pickup only at LaGuardia and John F. Kennedy Airports.
-
-      - name: pickup_date
-        data_type: timestamp
-        description: >
-          The day truncation of `pickup_datetime`. This column was used to partition the source parquet 
-          file after it was partially processed by the spark cluster (Dataproc).
       
       - name: trip_type
         data_type: string
         description: >
           Indicates what type of tripdata the records are sourced from. For this table it should all be `yellow`.
-
-      - name: trip_type_start_date
-        data_type: datetime
-        description: >
-          First day of the month that pickup_datetime should not be before. 
-
-      - name: trip_type_end_date
-        data_type: date
-        description: >
-          Last day of the month that dropoff_datetime should not be too much after (1-2 days max).
-
-      - name: data_source
-        data_type: string
-        description: >
-          Bigquery bucket path where the partitioned source parquets are located.
 
       - name: creation_dt
         data_type: timestamp

@@ -1,18 +1,25 @@
 {{ config(
     materialized="table",
-    cluster_by = ["data_source", "trip_type_start_date", "pickup_date"]
+    partition_by={
+      "field": "trip_type_start_date",
+      "data_type": "timestamp",
+      "granularity": "month"
+    },
+    cluster_by = ["data_source", "pickup_date"]
 )}}
 
 select 
+  -- cols that help better scan the data 
+  trip_type_start_date,
+  data_source,
+  pickup_date,
   -- IDs
   trip_id,
   vendor_id,
   -- time centric dimensions 
   pickup_datetime,
   dropoff_datetime,
-  trip_type_start_date,
   trip_type_end_date,
-  pickup_date,
   -- more time dimensions for later analysis 
   {{ dbt.datediff("pickup_datetime", "dropoff_datetime", "minute") }} trip_duration_min,
   extract(year from pickup_datetime) pickup_year,
@@ -50,8 +57,6 @@ select
   congestion_surcharge,
   airport_fee,
   -- data source centric info
-  trip_type,
-  data_source,
   creation_dt,
   {{ dbt.current_timestamp() }} transformation_dt
 from {{ ref('stg_yellow__2_filter_out_faulty') }}
