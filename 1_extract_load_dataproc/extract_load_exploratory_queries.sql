@@ -186,3 +186,72 @@ group by vendor_id, pickup_datetime, dropoff_datetime, pickup_location_id, dropo
 having count(1) > 1
 order by 8 desc
 ;
+
+-- looking candidate records that are prob inccorect 
+select count(1)
+from `pipeline-analysis-452722.nytaxi_clean.yellow__4_final_clean` 
+where (
+      -- invalid trip timestamps
+      (pickup_datetime >= dropoff_datetime)
+      or 
+      -- trip timestamps not inline with source parquet
+      (pickup_datetime < cast(trip_type_start_date as timestamp))
+      or 
+      -- trips with unknown pickup or dropoff location
+      (pickup_location_id = 264 or dropoff_location_id = 264)
+      or 
+      -- trip with airport fee but location not at airport 
+      (coalesce(airport_fee, 0) > 0 and regexp_substr(pickup_location_id||' - '||dropoff_location_id, '138|132') is null)
+      or 
+      -- fare amount negative but payment_type not void, dispute or no charge
+      (fare_amount <= 0 and payment_type not in (3, 4, 6) and trip_type_start_date >= '2022-05-01')
+      or 
+      -- all trips must report some distance to be valid
+      (trip_distance < 0)
+      or 
+      -- trips where charges dont add up
+      (abs(total_amount) - abs(fare_amount+extra_amount+mta_tax+tip_amount+tolls_amount+improvement_surcharge+congestion_surcharge+airport_fee) > 1)
+      or 
+      -- trips with non-JFK destination but got the rate charge
+      (coalesce(ratecode_id, 0) in (2, 0) and regexp_substr(pickup_location_id||' - '||dropoff_location_id, '132') is null and trip_type_start_date >= '2022-05-01')
+      or  
+      -- trips with non-Newark destination but got the rate charge
+      (coalesce(ratecode_id, 0) in (3, 0) and regexp_substr(pickup_location_id||' - '||dropoff_location_id, '^1 - | - 1$') is null and trip_type_start_date >= '2022-05-01')
+      or 
+      -- trips tip with outer city rate but locations not outside the city
+      (coalesce(ratecode_id, 0) in (4, 0) and regexp_substr(pickup_location_id||' - '||dropoff_location_id, '265') is null and trip_type_start_date >= '2022-05-01')
+      or 
+      -- rows that dont have valid passenger count (either 0 or over the legal limit for a single ride)
+      (passenger_count > 6 or passenger_count <= 0)
+      -- all trips with a positive trip amount should have a cc ratecode ID
+      or  
+      (tip_amount > 0 and payment_type != 1 and trip_type_start_date >= '2022-05-01')
+)
+;
+
+-- look at records that cancel each other out 
+create or replace view `pipeline-analysis-452722.nytaxi_clean.yellow__4_duplicate_rows` as 
+select 
+  pickup_datetime, dropoff_datetime, ratecode_id, pickup_location_id, dropoff_location_id, passenger_count, trip_distance
+  , count(1) row_count
+  , sum(fare_amount) total_fare_amount
+from `pipeline-analysis-452722.nytaxi_clean.yellow__4_final_clean` 
+group by pickup_datetime, dropoff_datetime, ratecode_id, pickup_location_id, dropoff_location_id, passenger_count, trip_distance
+;
+
+select count(1)
+from `pipeline-analysis-452722.nytaxi_clean.yellow__4_final_clean` t
+join (select 
+  pickup_datetime, dropoff_datetime, ratecode_id, pickup_location_id, dropoff_location_id, passenger_count, trip_distance
+from `pipeline-analysis-452722.nytaxi_clean.yellow__4_duplicate_rows`
+where row_count = 2
+and total_fare_amount = 0) t1 on t.pickup_datetime = t1.pickup_datetime
+and t.dropoff_datetime = t1.dropoff_datetime
+and coalesce(t.ratecode_id, 0) = coalesce(t1.ratecode_id, 0)
+and t.pickup_location_id = t1.pickup_location_id 
+and t.dropoff_location_id = t1.dropoff_location_id 
+and t.passenger_count = t1.passenger_count
+and t.trip_distance = t1.trip_distance 
+where t.fare_amount > 0 -- 3,411,650 -- 1,697,427
+-- order by t.pickup_datetime, t.dropoff_datetime, t.ratecode_id, t.pickup_location_id, t.dropoff_location_id, t.passenger_count, t.trip_distance
+;
