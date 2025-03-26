@@ -1,5 +1,5 @@
 -- create needed schema 
-create schema if not exists `${PROJECT_ID}`.`mapping`
+create schema if not exists `${PROJECT_ID}`.`nytaxi_mapping`
 options (location = 'EU')
 ;
 
@@ -11,7 +11,7 @@ uris = ['gs://helper-data/bigquery_public_data_taxi_zone_geom.csv']
 )
 ;
 
-create table if not exists `${PROJECT_ID}`.`mapping`.`taxi_zone_geom`
+create table if not exists `${PROJECT_ID}`.`nytaxi_mapping`.`taxi_zone_geom`
 (zone_id integer, zone_name string, borough string, zone_geom geography, creation_dt timestamp) as
 select 
   zone_id, zone_name
@@ -29,7 +29,7 @@ skip_leading_rows = 1
 )
 ;
 
-create table if not exists `${PROJECT_ID}`.`mapping`.`hvlv_base_numbers`
+create table if not exists `${PROJECT_ID}`.`nytaxi_mapping`.`hvlv_base_numbers`
 (hvln string, license_base_number string, base_name string, app_company_affiliation string, creation_dt timestamp) as
 select *, current_timestamp()
 from `${PROJECT_ID}`.`nytaxi_raw`.`mapping_data`
@@ -42,7 +42,7 @@ uris = ['gs://helper-data/taxi_zone_lookup.csv']
 )
 ;
 
-create table if not exists `${PROJECT_ID}`.`mapping`.`taxi_zone_lookup`
+create table if not exists `${PROJECT_ID}`.`nytaxi_mapping`.`taxi_zone_lookup`
 (location_id integer, borough string, zone string, service_zone string, creation_dt timestamp) as
 select *, current_timestamp()
 from `${PROJECT_ID}`.`nytaxi_raw`.`mapping_data`
