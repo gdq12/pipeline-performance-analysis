@@ -16,8 +16,8 @@
         when lower(trim({{ dbt.safe_cast("payment_type", api.Column.translate_type("string")) }}))
             in ('na', '0') then 5
         when lower(trim({{ dbt.safe_cast("payment_type", api.Column.translate_type("string")) }}))
-            is null then 5
-        else null 
+            in ('6', '6.0', 'void', 'voi') then 6
+        else 5
     end
 
 {%- endmacro %}

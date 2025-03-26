@@ -57,8 +57,8 @@
         when lower(trim(safe_cast(payment_type as string)))
             in ('na', '0') then 5
         when lower(trim(safe_cast(payment_type as string)))
-            is null then 5
-        else null 
+            in ('6', '6.0', 'void', 'voi') then 6
+        else 5
     end payment_type
     ,cast(fare_amount as float64) fare_amount
     ,cast(null as float64) extra_amount
@@ -128,8 +128,8 @@ select
         when lower(trim(safe_cast(payment_type as string)))
             in ('na', '0') then 5
         when lower(trim(safe_cast(payment_type as string)))
-            is null then 5
-        else null 
+            in ('6', '6.0', 'void', 'voi') then 6
+        else 5
     end payment_type
     ,cast(fare_amount as float64) fare_amount
     ,cast(extra_amount as float64) extra_amount
