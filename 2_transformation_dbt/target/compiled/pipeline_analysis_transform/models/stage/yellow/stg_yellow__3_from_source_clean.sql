@@ -22,12 +22,44 @@ select
    trip_duration_min,
   extract(year from pickup_datetime) pickup_year,
   extract(dayofweek from pickup_datetime) pickup_weekday_num,
+  case 
+        when extract(dayofweek from pickup_datetime) = 1
+            then 'SUNDAY'
+        when extract(dayofweek from pickup_datetime) = 2
+            then 'MONDAY'
+        when extract(dayofweek from pickup_datetime) = 3
+            then 'TUESDAY'
+        when extract(dayofweek from pickup_datetime) = 4
+            then 'WEDNESDAY'
+        when extract(dayofweek from pickup_datetime) = 5
+            then 'THURSDAY'
+        when extract(dayofweek from pickup_datetime) = 6
+            then 'FRIDAY'
+        when extract(dayofweek from pickup_datetime) = 7
+            then 'SATURDAY'
+    end pickup_weekday_name,
   extract(week from pickup_datetime) pickup_calender_week_num,
   extract(month from pickup_datetime) pickup_month,
   extract(hour from pickup_datetime) pickup_hour,
   bigfunctions.eu.is_public_holiday(cast(pickup_datetime as date), 'US') pickup_public_holiday,
   extract(year from dropoff_datetime) dropoff_year,
   extract(dayofweek from dropoff_datetime) dropoff_weekday_num,
+  case 
+        when extract(dayofweek from dropoff_datetime) = 1
+            then 'SUNDAY'
+        when extract(dayofweek from dropoff_datetime) = 2
+            then 'MONDAY'
+        when extract(dayofweek from dropoff_datetime) = 3
+            then 'TUESDAY'
+        when extract(dayofweek from dropoff_datetime) = 4
+            then 'WEDNESDAY'
+        when extract(dayofweek from dropoff_datetime) = 5
+            then 'THURSDAY'
+        when extract(dayofweek from dropoff_datetime) = 6
+            then 'FRIDAY'
+        when extract(dayofweek from dropoff_datetime) = 7
+            then 'SATURDAY'
+    end dropoff_weekday_name,
   extract(week from dropoff_datetime) dropoff_calender_week_num,
   extract(month from dropoff_datetime) dropoff_month,
   extract(hour from dropoff_datetime) dropoff_hour,

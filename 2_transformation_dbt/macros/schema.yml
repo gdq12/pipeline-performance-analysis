@@ -32,3 +32,10 @@ macros:
         description: >
           auto converts input to string and encodes the value to a specific numeric 
           depending on the string syntax.
+  - name: gate_weekday_name
+    description: converts the numerical weekday value to weekday string name
+    arguments:
+      - name: datetime_col
+        type: timestamp
+        description: >
+          determines weekday based on Bigqueries extracted weekday number.

@@ -270,4 +270,4 @@ select
 from pipeline-analysis-452722.nytaxi_stage2.__TABLES__
 where table_id = 'stg_yellow__3_from_source_clean'
 ;
- -- 1,648,566,991 (626 GB)
+ -- 1,648,566,991 (656 GB)

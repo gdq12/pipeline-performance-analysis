@@ -179,3 +179,5 @@
 * determine if date is [public holiday](https://unytics.io/bigfunctions/bigfunctions/is_public_holiday/#examples)
 
 * round timestamp to nearest [15min](https://stackoverflow.com/questions/53028983/round-timstamp-to-nearest-15-mins-interval-in-bigquery)
+
+* good [YT video](https://www.youtube.com/watch?v=iz6lxi9BczA) on Bigquery query optimization
