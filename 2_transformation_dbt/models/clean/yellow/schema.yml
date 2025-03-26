@@ -536,7 +536,7 @@ models:
         description: >
           Timestamp for when the data was copied over into the target schema from bigquery bucket. 
   
-  - name: yellow__4_final_clean
+  - name: yellow__4_adds_columns
     description: >
       Adds potentially helpful columns to the yellow_tripdata set (trip_type, type start and end dates). 
       It also creates unique trip ID to establish a primary key column for further transformation steps.

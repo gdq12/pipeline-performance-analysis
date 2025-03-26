@@ -84,9 +84,8 @@
     # render documentation 
     dbt docs serve
 
-    dbt run 
-
-    dbt test
+    # run all models in layer except for 1
+    dbt run --select "models/stage/yellow/" --exclude "stg_yellow__from_source_clean"
     ```
 
 * other
@@ -118,6 +117,12 @@
 * documentation on [codegen](https://github.com/dbt-labs/dbt-codegen)
 
 * [cross database macros](https://docs.getdbt.com/reference/dbt-jinja-functions/cross-database-macros), dbt functions that transform into SQL DB centric syntax. Best when using project files across different DBs. 
+
+#### Working with DBT
+
+* possible [commands](https://docs.getdbt.com/reference/dbt-commands) that can use in dbt
+
+* doc on [node selection](https://docs.getdbt.com/reference/node-selection/syntax), syntax to use to run/build only certain models etc.
 
 #### DBT community posts 
 
@@ -170,3 +175,7 @@
 * cleanup trips [medium](https://medium.com/@muhammadaris10/nyc-taxi-trip-data-analysis-45ecfdcb6f91) article
 
 * cleanup tips and analysis [mdeium article](https://medium.com/@haonanzhong/new-york-city-taxi-data-analysis-286e08b174a1)
+
+* determine if date is [public holiday](https://unytics.io/bigfunctions/bigfunctions/is_public_holiday/#examples)
+
+* round timestamp to nearest [15min](https://stackoverflow.com/questions/53028983/round-timstamp-to-nearest-15-mins-interval-in-bigquery)

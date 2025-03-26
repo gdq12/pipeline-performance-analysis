@@ -255,3 +255,19 @@ and t.trip_distance = t1.trip_distance
 where t.fare_amount > 0 -- 3,411,650 -- 1,697,427
 -- order by t.pickup_datetime, t.dropoff_datetime, t.ratecode_id, t.pickup_location_id, t.dropoff_location_id, t.passenger_count, t.trip_distance
 ;
+
+-- comparison of raw data vs stage clean data size 
+select 
+  sum(row_count)
+  , sum(size_bytes)/pow(10,9) size_gb
+from pipeline-analysis-452722.nytaxi_stage.__TABLES__
+;
+-- 1,778,238,040 (411 GB)
+
+select 
+  sum(row_count)
+  , sum(size_bytes)/pow(10,9) size_gb
+from pipeline-analysis-452722.nytaxi_stage2.__TABLES__
+where table_id = 'stg_yellow__3_from_source_clean'
+;
+ -- 1,648,566,991 (626 GB)

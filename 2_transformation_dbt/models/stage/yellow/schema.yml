@@ -1,0 +1,7 @@
+version: 2
+
+models:
+  - name: stg_yellow__1a_id_duplicate_records
+  - name: stg_yellow__1b_id_faulty_trips
+  - name: stg_yellow__2_filter_out_faulty
+  - name: stg_yellow__3_from_source_clean

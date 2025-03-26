@@ -39,3 +39,9 @@ models:
       yellow:
         +materialized: view
         +schema: clean
+        +enabled: true
+    stage:
+      yellow:
+        +materialized: view
+        +schema: stage2
+        +enabled: true

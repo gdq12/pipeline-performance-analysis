@@ -1,8 +1,3 @@
-{{ config(
-    materialized="table",
-    cluster_by = ["data_source", "trip_type_start_date", "pickup_date"]
-)}}
-
 select 
   {{ dbt_utils.generate_surrogate_key( ['vendor_id', 'pickup_datetime ', 'dropoff_datetime', 'passenger_count', 
                                         'trip_distance', 'pickup_location_id', 'ratecode_id', 'store_and_fwd_flag', 
