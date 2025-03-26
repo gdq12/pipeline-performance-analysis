@@ -107,15 +107,7 @@
 
 ### DBT helpful links
 
-* quick-start [dbt core bigquery](https://docs.getdbt.com/guides/manual-install?step=1)
-
-* documentation on [bigquery setup](https://docs.getdbt.com/docs/core/connect-data-platform/bigquery-setup) with dbt
-
-* dbt [schema creation](https://docs.getdbt.com/docs/build/custom-schemas) documentation
-
-* documentation on [incremental models](https://docs.getdbt.com/docs/build/incremental-models)
-
-* doc explaining [jinja](https://docs.getdbt.com/docs/build/jinja-macros) and best practices to apply it 
+#### Packages
 
 * [dbt-utls repo](https://github.com/dbt-labs/dbt-utils?tab=readme-ov-file#get_column_values-source), helpful on seeing how to implement macros into project
 
@@ -127,9 +119,7 @@
 
 * [cross database macros](https://docs.getdbt.com/reference/dbt-jinja-functions/cross-database-macros), dbt functions that transform into SQL DB centric syntax. Best when using project files across different DBs. 
 
-* run_query macro [documentation](https://docs.getdbt.com/reference/dbt-jinja-functions/run_query)
-
-* about [dbt compile](https://docs.getdbt.com/reference/commands/compile)
+#### DBT community posts 
 
 * good [post](https://discourse.getdbt.com/t/can-i-create-an-auto-incrementing-id-in-dbt/579/3) about **auto-incremental** ID col implementation in dbt
 
@@ -139,15 +129,21 @@
 
 * [post](https://discourse.getdbt.com/t/faq-i-got-an-unused-model-configurations-error-message-what-does-this-mean/112) about correctly configuring dbt_project.yml
 
-* Learn more about dbt [in the docs](https://docs.getdbt.com/docs/introduction)
+#### Documentation on code setup
 
-* Check out [Discourse](https://discourse.getdbt.com/) for commonly asked questions and answers
+* quick-start [dbt core bigquery](https://docs.getdbt.com/guides/manual-install?step=1)
 
-* Join the [dbt community](https://getdbt.com/community) to learn from other analytics engineers
+* documentation on [bigquery setup](https://docs.getdbt.com/docs/core/connect-data-platform/bigquery-setup) with dbt
 
-* Find [dbt events](https://events.getdbt.com) near you
+* dbt [schema creation](https://docs.getdbt.com/docs/build/custom-schemas) documentation
 
-* Check out [the blog](https://blog.getdbt.com/) for the latest news on dbt's development and best practices
+* documentation on [incremental models](https://docs.getdbt.com/docs/build/incremental-models)
+
+* doc explaining [jinja](https://docs.getdbt.com/docs/build/jinja-macros) and best practices to apply it 
+
+* run_query macro [documentation](https://docs.getdbt.com/reference/dbt-jinja-functions/run_query)
+
+* about [dbt compile](https://docs.getdbt.com/reference/commands/compile)
 
 ### Good to know 3rd party DBT links
 
@@ -163,6 +159,14 @@
 
 ### Helpful links about the NYC taxi dataset
 
+* where [data documentation](https://www.nyc.gov/site/tlc/about/tlc-trip-record-data.page) background can be found
+
+* background on the logic behind [ratecode](https://www.nyc.gov/site/tlc/passengers/taxi-fare.page).
+
+### Dataset cleanup
+
 * taxidataset [data cleaning](https://medium.com/@linniartan/nyc-taxi-data-analysis-part-1-clean-and-transform-data-in-bigquery-2cb1142c6b8b), which also includes how to convert geospatial coordinates to zone_id
 
-* where [data documentation](https://www.nyc.gov/site/tlc/about/tlc-trip-record-data.page) background can be found
+* cleanup trips [medium](https://medium.com/@muhammadaris10/nyc-taxi-trip-data-analysis-45ecfdcb6f91) article
+
+* cleanup tips and analysis [mdeium article](https://medium.com/@haonanzhong/new-york-city-taxi-data-analysis-286e08b174a1)
