@@ -40,19 +40,19 @@ This part of the project is to fullfill the E (extract) and L (load) of ELT of t
 
     + `+ CREATE` as name: 
         
-        - `spark-scripts-extract-load`
+        - `spark-scripts-extract-load2`
 
-        - `original-parquet-url`
+        - `original-parquet-url2`
 
-        - `helper-data`
+        - `helper-data2`
 
-        - `yellow-taxi-data-extract-load`
+        - `yellow-taxi-data-extract-load2`
 
-        - `green-taxi-data-extract-load`
+        - `green-taxi-data-extract-load2`
 
-        - `fhv-taxi-data-extract-load`
+        - `fhv-taxi-data-extract-load2`
 
-        - `fhvhv-taxi-data-extract-load`
+        - `fhvhv-taxi-data-extract-load2`
 
     + for multi-region choose EU based
 
