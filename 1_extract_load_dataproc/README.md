@@ -158,6 +158,66 @@ python3 extract-load-2-cloud-storage.py \
         --project ${PROJECT_ID}
     ```
 
+* **documenting here the iam permissions that led to successful run of jobs/scripts/ttols**
+
+- in UI
+
+    + compute engine service account (for dataproc): `BigQuery Job User`, `Editor`, `Storage Admin`
+
+    + spark cluster service account (for dataproc): `BigQuery Admin`, `Storage Admin`
+
+    + DBT service account (for transformation): `BigQuery Admin`
+
+- gcloud command line
+
+    + account owner: 
+    
+        - name syntax: name.picked@gmail.com
+
+        - roles: `roles/storage.admin`, `roles/owner`
+
+    + compute engine service account (for dataproc): 
+
+        - name syntax: ${PROJECT_NUMBER}-compute@developer.gserviceaccount.com
+        
+        - roles: `roles/bigquery.jobUser`, `roles/editor`, `roles/storage.admin`
+
+    + spark cluster service account (for dataproc): 
+
+        - name syntax: spark-dataproc-extract-load@${PROJECT_ID}.iam.gserviceaccount.com
+    
+        - roles: `roles/bigquery.admin`, `roles/storage.admin`
+
+    + DBT service account (for transformation): 
+
+        - name syntax: transform-dbt@${PROJECT_ID}.iam.gserviceaccount.com
+    
+        - roles: `roles/bigquery.admin`
+
+    + bigquery datatransfer service account: 
+
+        - name syntax: service-${PROJECT_NUMBER}@gcp-sa-bigquerydatatransfer.iam.gserviceaccount.com
+    
+        - roles: `roles/bigquerydatatransfer.serviceAgent`
+
+    + compute system service account: 
+
+        - name syntax: service-${PROJECT_NUMBER}@compute-system.iam.gserviceaccount.com
+    
+        - roles: `roles/compute.serviceAgent`
+
+    + dataproc service account: 
+
+        - name: service-${PROJECT_NUMBER}@dataproc-accounts.iam.gserviceaccount.com
+    
+        - roles: `roles/dataproc.serviceAgent`
+
+    + cloud service account: 
+
+        - name syntax: ${PROJECT_NUMBER}@cloudservices.gserviceaccount.com
+    
+        - roles: `roles/editor`
+
 4. Work arounds
 
 * had issues with downloading parquets to VM in dataproc: `curl: (28) Failed to connect to d37ci6vzurychx.cloudfront.net port 443 after 300714 ms: Timeout was reached`
