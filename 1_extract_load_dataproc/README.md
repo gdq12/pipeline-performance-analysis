@@ -30,6 +30,8 @@ This part of the project is to fullfill the E (extract) and L (load) of ELT of t
 
     + grant permissions: owner
 
+    + add roles: `BigQuery Admin`, `Storage Admin`
+
     + `ADD KEY` from service account --> dowload
 
     + save json key to `~/Documents/` and `${LOCAL_WORKING_DIRECTORY}/`
@@ -233,8 +235,9 @@ python3 extract-load-2-cloud-storage.py \
     from datetime import datetime
     from dateutil.relativedelta import relativedelta
 
-    bucket_url = f'gs://original-parquet-url'
-    table_name = f'{green}_tripdata'
+    trip_type = 'yellow'
+    bucket_url = f'gs://original-parquet-url2'
+    table_name = f'{trip_type}_tripdata'
     start_dt = datetime.strptime('2009-01-01','%Y-%m-%d')
     end_dt = datetime.strptime('2024-12-01','%Y-%m-%d')
     delta = relativedelta(months=1)
@@ -265,6 +268,8 @@ python3 extract-load-2-cloud-storage.py \
     - fhv: 2015-01-01
 
     - fhvhv: 2019-02-01
+
+* if get error message `401 Anonymous caller` then need to "login" via `gcloud auth login ${PROJECT_EMAIL}`
 
 5. Execute scripts in Dataproc
 
@@ -346,10 +351,25 @@ python3 extract-load-2-cloud-storage.py \
     sudo gsutil rm -r gs://taxi-data-extract/*/_SUCCESS
     ```
 
+* get current account set in gcloud
+
+    ```
+    gcloud config list account --format "value(core.account)"
+    or 
+    sudo gcloud auth list
+    ```
+
 * to remove old account from gcloud config
 
     ```
     gcloud auth revoke old.main.account@gmail.com
+    ```
+
+* to set gcloud default account 
+
+    ```
+    gcloud config set account ${PROJECT_EMAIL}
+    gcloud auth login ${PROJECT_EMAIL}
     ```
 
 * list projects in account
@@ -367,6 +387,7 @@ python3 extract-load-2-cloud-storage.py \
 * login to use gcloud command line
 
     ```
+    gcloud init
     gcloud auth login --no-launch-browser
     gcloud auth login
     gcloud auth application-default login
