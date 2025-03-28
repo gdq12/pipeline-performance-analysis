@@ -168,6 +168,8 @@
 
 * background on the logic behind [ratecode](https://www.nyc.gov/site/tlc/passengers/taxi-fare.page).
 
+* [article](https://toddwschneider.com/posts/analyzing-1-1-billion-nyc-taxi-and-uber-trips-with-a-vengeance/#late-night-taxi-index) on analysis about taxi trips in relation to time, social life etc 
+
 ### Dataset cleanup
 
 * taxidataset [data cleaning](https://medium.com/@linniartan/nyc-taxi-data-analysis-part-1-clean-and-transform-data-in-bigquery-2cb1142c6b8b), which also includes how to convert geospatial coordinates to zone_id
