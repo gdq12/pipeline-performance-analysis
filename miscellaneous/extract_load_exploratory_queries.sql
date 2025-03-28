@@ -1,37 +1,52 @@
--- are there any failed jobs
-SELECT  *
-FROM `pipeline-analysis-452722.nytaxi_monitoring.query_history_extract_load_spark`
-where error_result.message is not null
+-- verify that qhistory table ok populated
+select count(*)/count(distinct data_source)
+from `pipeline-analysis-455005.nytaxi_monitoring.query_history_extract_load_transform_project`
+;
+
+select distinct data_source
+from `pipeline-analysis-455005.nytaxi_monitoring.query_history_extract_load_transform_project`
+;
+
+-- calc size of data loaded from parquets
+select 
+  regexp_substr(table_id, 'yellow|green|fhvhv|fhv') data_type
+  , sum(row_count) row_count
+  , sum(size_bytes)/pow(10,9) size_gb
+from `pipeline-analysis-455005`.`nytaxi_raw_backup`.__TABLES__
+where regexp_substr(table_id, 'external') is null 
+group by regexp_substr(table_id, 'yellow|green|fhvhv|fhv')
 ;
 
 -- get some initial stats on each query 
 SELECT 
-  regexp_substr(data_source, '[a-z]{1,6}_tripdata_[0-9]{4}-[0-9]{2}') label
-  , data_source
-  , start_time, end_time
-  , dml_statistics.inserted_row_count
-  , total_bytes_processed/pow(10,9) tota_gb_processed
-  , total_bytes_billed/pow(10,9) total_gb_billed
-  , job_id, query
-FROM pipeline-analysis-452722.nytaxi_monitoring.query_history_extract_load_spark
-where statement_type in ('INSERT', 'CREATE_TABLE_AS_SELECT')
-and regexp_substr(query, 'insert into `pipeline-analysis-452722.nytaxi_monitoring.query_history_extract_load_spark`') is null
+  regexp_substr(t1.data_source, '[a-z]{1,6}_tripdata_[0-9]{4}-[0-9]{2}') label
+  , t1.data_source
+  , t1.start_time, t1.end_time
+  , t1.dml_statistics.inserted_row_count
+  , t1.total_bytes_processed/pow(10,9) tota_gb_processed
+  , t1.total_bytes_billed/pow(10,9) total_gb_billed
+  , t1.job_id, t1.query
+FROM `pipeline-analysis-455005.nytaxi_monitoring.query_history_extract_load_transform_project` t1
+-- join region-eu.INFORMATION_SCHEMA.JOBS t2 on t1.job_id = t2.job_id and t1.user_email = t2.user_email
+where t1.statement_type in ('INSERT', 'CREATE_TABLE_AS_SELECT')
+and regexp_substr(t1.query, 'nytaxi_monitoring') is null
+and t1.total_bytes_processed is null
 ;
 
--- get some current (size) stats for tables in stage 
+-- how long did it take to load every trip type from buckets 
 select 
-  project_id, dataset_id, table_id
-  , row_count
-  , size_bytes/pow(10,9) size_gb
-from pipeline-analysis-452722.nytaxi_stage.__TABLES__
-order by size_bytes desc
+  regexp_substr(data_source, 'yellow|green|fhvhv|fhv') data_type
+  , min(start_time) start_time_min
+  , max(end_time) end_time_max
+  , max(end_time) - min(start_time) duration
+FROM `pipeline-analysis-455005.nytaxi_monitoring.query_history_extract_load_transform_project`
+group by regexp_substr(data_source, 'yellow|green|fhvhv|fhv')
 ;
 
--- how much volume in total was transfered to bigquery
-select 
-  sum(row_count) row_count
-  , sum(size_bytes)/pow(10,9) size_gb
-from pipeline-analysis-452722.nytaxi_stage.__TABLES__
+-- verify that all tables in stage are clustered
+select * 
+from pipeline-analysis-455005.nytaxi_raw_backup.INFORMATION_SCHEMA.TABLES
+where regexp_substr(ddl, 'CLUSTER BY data_source') is not null
 ;
 
 -- see volume processing size per iteration
@@ -39,41 +54,26 @@ SELECT
   min(total_bytes_processed)/pow(10,9) min_gb_processed
   , max(total_bytes_processed)/pow(10,9) max_gb_processed
   , avg(total_bytes_processed)/pow(10,9) avg_gb_processed
-FROM pipeline-analysis-452722.nytaxi_monitoring.query_history_extract_load_spark
+FROM pipeline-analysis-455005.nytaxi_monitoring.query_history_extract_load_transform_project
 where statement_type in ('INSERT', 'CREATE_TABLE_AS_SELECT')
-and regexp_substr(query, 'insert into `pipeline-analysis-452722.nytaxi_monitoring.query_history_extract_load_spark`') is null
+and regexp_substr(query, 'nytaxi_monitoring.query_history_extract_load_spark') is null
 ;
 
--- verify that all tables in stage are clustered
-select * 
-from pipeline-analysis-452722.nytaxi_stage.INFORMATION_SCHEMA.TABLES
-where regexp_substr(ddl, 'CLUSTER BY data_source') is not null
--- just to make sure there is no clustering of another col 
--- where regexp_substr(ddl, 'CLUSTER BY vendor_id') is not null 
+-- get some current (size) stats for tables in stage 
+select 
+  project_id, dataset_id, table_id
+  , row_count
+  , size_bytes/pow(10,9) size_gb
+from pipeline-analysis-455005.nytaxi_raw_backup.__TABLES__
+order by size_bytes desc
 ;
 
 -- try to determine the variation in col_name/data_types
 select 
-  distinct column_name, data_type, ordinal_position
-from pipeline-analysis-452722.nytaxi_stage.INFORMATION_SCHEMA.COLUMNS
-order by column_name
-;
-
--- spot check to see if there are records that dont pertain to the respective source parquet
--- quite difficult to do with all the different data types, better to do post the col cleaning
-select * from 
-(select 
-  parse_datetime('%Y-%m-%d', regexp_substr(data_source, '[0-9]{4}-[0-9]{2}$')||'-01') start_date
-  , last_day(parse_date('%Y-%m-%d', regexp_substr(data_source, '[0-9]{4}-[0-9]{2}$')||'-01'), month) end_date
-  , *
-from `pipeline-analysis-452722.nytaxi_stage.yellow_tripdata_2009-01`
-)
-
-where (
-  -- (start_date > parse_datetime('%Y-%m-%d %H:%M:%S', trip_pickup_date_time))
-  -- or
-  (end_date < parse_datetime('%Y-%m-%d %H:%M:%S', trip_dropoff_date_time))
-) 
+  distinct regexp_substr(table_name, 'yellow|green|fhvhv|fhv') data_type
+  , column_name, data_type, ordinal_position
+from pipeline-analysis-455005.nytaxi_raw_backup.INFORMATION_SCHEMA.COLUMNS
+order by 1, 2
 ;
 
 -- example queries to cleanup data 
