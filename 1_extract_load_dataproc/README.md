@@ -301,7 +301,7 @@ python3 extract-load-2-cloud-storage.py \
         -- --gcp_id=${PROJECT_ID} \
         --trip_name=yellow \
         --start_date=2009-01-01 \
-        --end_date=2009-01-01 \
+        --end_date=2024-12-01 \
         --gcp_file_cred=${PROJECT_KEY_PATH}
     ```
 
