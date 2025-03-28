@@ -129,6 +129,8 @@ python3 extract-load-2-cloud-storage.py \
 
 **Command below was compiled from Method I, where it provides the "Equivalent in command line" option prior to execution**
 
+**Best to do steps 1 then 3 so GCP creates the compute engine service account. Step 3 will fail at first, so then execute step2, then go back to step 3**
+
 1. enable `Cloud Resource Manager API` in [api library page](https://console.cloud.google.com/apis/library)
 
 2. apply permissions needed for the cloud cluster service account 
@@ -140,7 +142,7 @@ python3 extract-load-2-cloud-storage.py \
 
     sudo gcloud projects add-iam-policy-binding ${PROJECT_ID} \
         --member=serviceAccount:${COMPUTE_ENGINE_ACCOUNT} \
-        --role="roles/roles/storage.admin"
+        --role="roles/storage.admin"
     ```
 
 3. create cluster via GCP UI power shell (there was a zone configuartion issue when attempted to sudo execute the command locally)
@@ -277,13 +279,13 @@ python3 extract-load-2-cloud-storage.py \
 * copy python scripts to script bucket 
 
     ```
-    sudo gsutil cp extract-load-2-cloud-storage.py gs://spark-scripts-extract-load/extract-load-2-cloud-storage.py
+    sudo gsutil cp extract-load-2-cloud-storage.py gs://spark-scripts-extract-load2/extract-load-2-cloud-storage.py
 
-    sudo gsutil cp helper_funcs.py gs://spark-scripts-extract-load/helper_funcs.py
+    sudo gsutil cp helper_funcs.py gs://spark-scripts-extract-load2/helper_funcs.py
 
-    sudo gsutil cp dict_query_helpers.py gs://spark-scripts-extract-load/dict_query_helpers.py
+    sudo gsutil cp dict_query_helpers.py gs://spark-scripts-extract-load2/dict_query_helpers.py
 
-    sudo gsutil cp ${PROJECT_KEY_PATH} gs://spark-scripts-extract-load/${PROJECT_KEY_PATH}
+    sudo gsutil cp ${PROJECT_KEY_PATH} gs://spark-scripts-extract-load2/${PROJECT_KEY_PATH}
     ```
 
 * trigger job per needed paramters
@@ -293,13 +295,13 @@ python3 extract-load-2-cloud-storage.py \
         --cluster=extract-load-spark \
         --region=${CLUSTER_REGION} \
         --jars gs://spark-lib/bigquery/spark-3.4-bigquery-0.37.0.jar  \
-        --py-files gs://spark-scripts-extract-load/dict_query_helpers.py,gs://spark-scripts-extract-load/helper_funcs.py \
+        --py-files gs://spark-scripts-extract-load2/dict_query_helpers.py,gs://spark-scripts-extract-load2/helper_funcs.py \
         --files ${PROJECT_KEY_PATH} \
-        gs://spark-scripts-extract-load/extract-load-2-cloud-storage.py \
+        gs://spark-scripts-extract-load2/extract-load-2-cloud-storage.py \
         -- --gcp_id=${PROJECT_ID} \
         --trip_name=yellow \
         --start_date=2009-01-01 \
-        --end_date=2024-12-01 \
+        --end_date=2009-01-01 \
         --gcp_file_cred=${PROJECT_KEY_PATH}
     ```
 
