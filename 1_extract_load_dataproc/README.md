@@ -299,8 +299,8 @@ python3 extract-load-2-cloud-storage.py \
         --files ${PROJECT_KEY_PATH} \
         gs://spark-scripts-extract-load2/extract-load-2-cloud-storage.py \
         -- --gcp_id=${PROJECT_ID} \
-        --trip_name=fhv \
-        --start_date=2015-01-01 \
+        --trip_name=fhvhv \
+        --start_date=2019-03-01 \
         --end_date=2024-12-01 \
         --gcp_file_cred=${PROJECT_KEY_PATH}
     ```
