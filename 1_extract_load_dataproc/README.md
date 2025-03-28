@@ -85,9 +85,8 @@ localhost:8888
 
 # command for local run
 python3 extract-load-2-cloud-storage.py \
-    --trip_name yellow_tripdata \
-    --start_date 2010-12-01 \
-    --end_date 2011-02-01 \
+    --start_date 2009-01-01 \
+    --end_date 2009-01-01 \
     --gcp_id ${PROJECT_ID}\
     --trip_name yellow 
 ```
@@ -269,7 +268,9 @@ python3 extract-load-2-cloud-storage.py \
 
     - fhvhv: 2019-02-01
 
-* if get error message `401 Anonymous caller` then need to "login" via `gcloud auth login ${PROJECT_EMAIL}`
+* if get error message `401 Anonymous caller` then need to "login" via `gcloud auth login $PROJECT_EMAIL`
+
+* another step that might help is `gcloud auth activate-service-account --key-file $PROJECT_KEY_PATH`
 
 5. Execute scripts in Dataproc
 

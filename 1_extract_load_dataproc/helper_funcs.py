@@ -152,32 +152,20 @@ def data_2_gcp_cloud_storage_dataproc(df, root_path):
     
 def bucket_2_ext_tbl(project_id, ext_table_name, root_path, client):
     '''
-    Creates the needed schemas in Bogquery if they are not already present,
+    Creates the needed schemas in Bigquery if they are not already present,
     creates the external table in nytaxi_raw schema to stage the parquet 
     data exported to cloud storage during the current run.
     '''
     
-    q1a = f"""create schema if not exists `{project_id}`.`nytaxi_raw`
+    q1a = f"""create schema if not exists `{project_id}`.`nytaxi_raw_backup`
     options (location = 'EU')
     """
-
-    # q1b = f"""create schema if not exists `{project_id}`.`nytaxi_stage`
-    # options (location = 'EU')
-    # """
-
-    # q1c = f"""create schema if not exists `{project_id}`.`nytaxi_transform`
-    # options (location = 'EU')
-    # """
-
-    # q1d = f"""create schema if not exists `{project_id}`.`nytaxi_prod`
-    # options (location = 'EU')
-    # """
 
     q1e = f"""create schema if not exists `{project_id}`.`nytaxi_monitoring`
     options (location = 'EU')
     """
 
-    q2 = f"""create or replace external table `{project_id}`.`nytaxi_raw.{ext_table_name}`
+    q2 = f"""create or replace external table `{project_id}`.`nytaxi_raw_backup.{ext_table_name}`
     options (
     format = 'PARQUET',
     uris = ['{root_path}/*']
@@ -188,12 +176,8 @@ def bucket_2_ext_tbl(project_id, ext_table_name, root_path, client):
     logging.info('creating if not already present schemas')
     time.sleep(3)
     client.query(q1a)
-    # time.sleep(3)
-    # client.query(q1b)
-    # time.sleep(3)
-    # client.query(q1c)
-    # time.sleep(3)
-    # client.query(q1d)
+    time.sleep(3)
+    client.query(q1e)
 
     logging.info('creating external table')
     time.sleep(3)
@@ -233,6 +217,7 @@ def bucket_2_bigquery(client, project_id, ext_table_name, schema_raw, schema_sta
     where table_name in (select table_name 
                         from `{}`.`{}`.INFORMATION_SCHEMA.TABLES
                         where regexp_substr(table_name, '{}') is not null
+                        and regexp_substr(table_name, 'external') is null
                         order by creation_time desc
                         limit 1)
     and column_name != 'creation_dt'
@@ -276,6 +261,7 @@ def bucket_2_bigquery(client, project_id, ext_table_name, schema_raw, schema_sta
         q3a = """select table_name 
                 from `{}`.`{}`.INFORMATION_SCHEMA.TABLES
                 where regexp_substr(table_name, '{}') is not null
+                and regexp_substr(table_name, 'external') is null
                 order by creation_time desc
                 limit 1
                 """
