@@ -43,7 +43,7 @@
 
     + assign name `transformation-dbt` and add optional description 
 
-    + grant permissions: `ownerBigQuery Admin`
+    + grant permissions: `BigQuery Admin`
 
     + `ADD KEY` from service account --> dowload
 
