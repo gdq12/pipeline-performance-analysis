@@ -1,7 +1,6 @@
 import os
 import re
 import logging 
-import time
 import pandas as pd 
 from datetime import datetime
 import pyspark.sql.functions as F
@@ -174,14 +173,29 @@ def bucket_2_ext_tbl(project_id, ext_table_name, root_path, client):
     
     # execute queries 
     logging.info('creating if not already present schemas')
-    time.sleep(3)
-    client.query(q1a)
-    time.sleep(3)
-    client.query(q1e)
+
+    query_job1a = client.query(q1a)
+    try:
+        result = query_job1a.result()  
+        print("Query executed successfully.")
+    except Exception as e:
+        print(f"Query failed: {e}")
+
+    query_job1e = client.query(q1e)
+    try:
+        result = query_job1e.result()  
+        print("Query executed successfully.")
+    except Exception as e:
+        print(f"Query failed: {e}")
 
     logging.info('creating external table')
-    time.sleep(3)
-    client.query(q2)
+    
+    query_job2 = client.query(q2)
+    try:
+        result = query_job2.result()  
+        print("Query executed successfully.")
+    except Exception as e:
+        print(f"Query failed: {e}")
 
     logging.info('loading external table complete')
     
@@ -230,26 +244,38 @@ def bucket_2_bigquery(client, project_id, ext_table_name, schema_raw, schema_sta
     where stg.column_name is null
     """
     
-    time.sleep(3)
-    df_compare = client.query(q1.format(project_id, schema_raw, ext_table_name,
+    query_job1 = client.query(q1.format(project_id, schema_raw, ext_table_name,
                                         project_id, schema_stage,
-                                        project_id, schema_stage, parq_subset)).to_dataframe()
+                                        project_id, schema_stage, parq_subset))
     
-    
+    try:
+        df_compare = query_job1.result().to_dataframe()  
+        print("Query executed successfully.")
+    except Exception as e:
+        print(f"Query failed: {e}")
+        
     logging.info('compiling the column/datatype specs to push data to stage')
+    
     # get colname and datatype combos from external tale to create the schema dictionary
     q2 = """SELECT column_name, data_type
     FROM `{}`.`{}`.INFORMATION_SCHEMA.COLUMNS
     where table_name = '{}'
     """
     
-    time.sleep(3)
-    df_tbl = client.query(q2.format(project_id, schema_raw, ext_table_name)).to_dataframe()
+    query_job2 = client.query(q2.format(project_id, schema_raw, ext_table_name))
+    
+    try:
+        df_tbl = query_job2.result().to_dataframe()  
+        print("Query executed successfully.")
+    except Exception as e:
+        print(f"Query failed: {e}")
+    
     # add column that will be present in the stage table 
     df_tbl = pd.concat([df_tbl, 
                         pd.DataFrame({'column_name': ['creation_dt'], 
                                       'data_type': ['TIMESTAMP']})], 
                        ignore_index = True) 
+    
     df_dict = {key: value for key, value in zip(df_tbl.to_dict('series')['column_name'],df_tbl.to_dict('series')['data_type'])}
     
     col_params = ' '.join([key + ' ' + item + ',' for key, item in df_dict.items()])[:-1]
@@ -258,6 +284,7 @@ def bucket_2_bigquery(client, project_id, ext_table_name, schema_raw, schema_sta
     if df_compare.shape[0] == 0:
         # get the table name already in stage 
         logging.info(f'there is no change in col_name/data_type/oridinal_position, data will be pushed to latest {parq_subset} table in stage')
+        
         q3a = """select table_name 
                 from `{}`.`{}`.INFORMATION_SCHEMA.TABLES
                 where regexp_substr(table_name, '{}') is not null
@@ -266,27 +293,45 @@ def bucket_2_bigquery(client, project_id, ext_table_name, schema_raw, schema_sta
                 limit 1
                 """
         
-        time.sleep(3)
-        table_name = client.query(q3a.format(project_id, schema_stage, parq_subset)).to_dataframe()['table_name'][0]
+        query_job3a = client.query(q3a.format(project_id, schema_stage, parq_subset))
+
+        try:
+            table_name = query_job3a.result().to_dataframe()['table_name'][0]
+            print("Query executed successfully.")
+        except Exception as e:
+            print(f"Query failed: {e}")
+    
         # insert records into table                        
         q3b = """insert into `{}`.`{}`.`{}`
         ({})
         select *, current_timestamp() from `{}.{}.{}`
         """
         
-        time.sleep(3)
-        client.query(q3b.format(project_id, schema_stage, table_name, col_names, project_id, schema_raw, ext_table_name))
+        query_job3b = client.query(q3b.format(project_id, schema_stage, table_name, col_names, project_id, schema_raw, ext_table_name))
+
+        try:
+            result = query_job3b.result()
+            print("Query executed successfully.")
+        except Exception as e:
+            print(f"Query failed: {e}")
     else:
         table_name = filename.replace('.parquet', '')
         cluster_col = 'data_source'
         logging.info(f'there is a change in col_name/data_type/oridinal_position, {table_name} in stage will be created')
+        
         # create new table in stage 
         q3a = """create table if not exists `{}`.`{}`.`{}`
         ({})
         cluster by {} as 
         select *, current_timestamp() from `{}.{}.{}`
         """
-        time.sleep(3)
-        client.query(q3a.format(project_id, schema_stage, table_name, col_params, cluster_col, project_id, schema_raw, ext_table_name))
+
+        query_job3a = client.query(q3a.format(project_id, schema_stage, table_name, col_params, cluster_col, project_id, schema_raw, ext_table_name))
+
+        try:
+            result = query_job3a.result()
+            print("Query executed successfully.")
+        except Exception as e:
+            print(f"Query failed: {e}")
 
     logging.info(f'data load to stage complete')

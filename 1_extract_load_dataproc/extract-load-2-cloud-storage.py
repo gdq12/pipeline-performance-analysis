@@ -1,13 +1,12 @@
 import os
 import argparse
-import time
 import pandas as pd
 from google.oauth2 import service_account
 from google.cloud import bigquery
-# # for local runs 
-# from helper_funcs import load_trip_data_local, dimension_name_cleanup, data_2_gcp_cloud_storage_local, bucket_2_ext_tbl, bucket_2_bigquery
-# for dataproc runs 
-from helper_funcs import load_trip_data_dataproc, dimension_name_cleanup, data_2_gcp_cloud_storage_dataproc, bucket_2_ext_tbl, bucket_2_bigquery
+# for local runs 
+from helper_funcs import load_trip_data_local, dimension_name_cleanup, data_2_gcp_cloud_storage_local, bucket_2_ext_tbl, bucket_2_bigquery
+# # for dataproc runs 
+# from helper_funcs import load_trip_data_dataproc, dimension_name_cleanup, data_2_gcp_cloud_storage_dataproc, bucket_2_ext_tbl, bucket_2_bigquery
 # additional queries needed 
 from dict_query_helpers import q_history
 from datetime import datetime
@@ -50,12 +49,12 @@ project_id = args.gcp_id#os.getenv('GCP_ID')
 logging.info(f"will be fetching parquest for {parq_subset}, from {start_dt} - {end_dt}")
 
 #########################################local#############################################################################
-# os.system('gcloud auth activate-service-account --key-file $GOOGLE_APPLICATION_CREDENTIALS')
+os.system('gcloud auth activate-service-account --key-file $GOOGLE_APPLICATION_CREDENTIALS')
 ###########################################################################################################################
 
 # connecting to bigquery 
-# credentials = service_account.Credentials.from_service_account_file(os.getenv('GOOGLE_APPLICATION_CREDENTIALS')) #local
-credentials = service_account.Credentials.from_service_account_file(args.gcp_file_cred) #dataproc
+credentials = service_account.Credentials.from_service_account_file(os.getenv('GOOGLE_APPLICATION_CREDENTIALS')) #local
+# credentials = service_account.Credentials.from_service_account_file(args.gcp_file_cred) #dataproc
 client = bigquery.Client(credentials = credentials, project = project_id)
 
 # start spark session 
@@ -81,9 +80,9 @@ while start_dt <= end_dt:
     root_path = f"gs://{bucket_data}/{time_subset}_{parq_subset}_{year_month}"
         
     ###############################################local run###################################################################
-    # df = load_trip_data_local(spark, url, filename)
+    df = load_trip_data_local(spark, url, filename)
     ###############################################data proc run###############################################################
-    df = load_trip_data_dataproc(spark, url, filename, bucket_url)
+    # df = load_trip_data_dataproc(spark, url, filename, bucket_url)
     ###########################################################################################################################
 
     # fix parquets a bit before the push 
@@ -91,9 +90,9 @@ while start_dt <= end_dt:
     
     # push parquets to bucket
     #################################################local run#################################################################
-    # data_2_gcp_cloud_storage_local(df, parq_subset, year_month, root_path, filename)
+    data_2_gcp_cloud_storage_local(df, parq_subset, year_month, root_path, filename)
     ############################################dataproc run###################################################################
-    data_2_gcp_cloud_storage_dataproc(df, root_path)
+    # data_2_gcp_cloud_storage_dataproc(df, root_path)
     ###########################################################################################################################
     
     # stageing data load
@@ -103,8 +102,13 @@ while start_dt <= end_dt:
     bucket_2_bigquery(client, project_id, ext_table_name, schema_raw, schema_stage, parq_subset, filename)
     
     #save info in qhistory table 
-    time.sleep(3)
-    client.query(q_history.format(project_id, root_path, q_history_time))
+    query_job = client.query(q_history.format(project_id, root_path, q_history_time))
+
+    try:
+        result = query_job.result()
+        print("Query executed successfully.")
+    except Exception as e:
+        print(f"Query failed: {e}")
         
     start_dt += delta
 

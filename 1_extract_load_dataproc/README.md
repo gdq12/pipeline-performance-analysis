@@ -85,10 +85,10 @@ localhost:8888
 
 # command for local run
 python3 extract-load-2-cloud-storage.py \
-    --start_date 2009-01-01 \
-    --end_date 2009-01-01 \
+    --start_date 2019-02-01 \
+    --end_date 2019-02-01 \
     --gcp_id ${PROJECT_ID}\
-    --trip_name yellow 
+    --trip_name fhvhv
 ```
 
 ## Step 2b: Google Cloud Platforms Dataproc w/Spark
