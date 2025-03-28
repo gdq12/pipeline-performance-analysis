@@ -299,8 +299,8 @@ python3 extract-load-2-cloud-storage.py \
         --files ${PROJECT_KEY_PATH} \
         gs://spark-scripts-extract-load2/extract-load-2-cloud-storage.py \
         -- --gcp_id=${PROJECT_ID} \
-        --trip_name=green \
-        --start_date=2014-01-01 \
+        --trip_name=fhv \
+        --start_date=2015-01-01 \
         --end_date=2024-12-01 \
         --gcp_file_cred=${PROJECT_KEY_PATH}
     ```
@@ -401,6 +401,12 @@ python3 extract-load-2-cloud-storage.py \
 
     ```
     sudo gcloud config set account ${PROJECT_EMAIL}
+    ```
+
+* to update gcloud CLI
+
+    ```
+    gcloud components update
     ```
 
 ### Helpful links
