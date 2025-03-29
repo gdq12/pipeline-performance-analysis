@@ -203,6 +203,10 @@ secrets/
 ######################################mage######################################
 **.ssh_tunnel**
 
+###################################dataproc#####################################
+# keep stat files localc only
+1_extract_load_dataproc/data_proc_performance_results
+
 ####################################dbt#########################################
 # # you shouldn't commit these into source control
 # # these are the default directory names, adjust/add to fit your needs
