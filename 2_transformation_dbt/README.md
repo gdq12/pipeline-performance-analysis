@@ -95,7 +95,6 @@
         ```
         {# 
             cmd:  dbt run-operation copy_clone_raw_tables --args '{tbl_substr: "2019|2020|2021"}' --debug
-            error message: 'dict' object is not callable
 
         #}
 
