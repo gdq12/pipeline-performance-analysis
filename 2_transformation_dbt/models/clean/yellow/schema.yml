@@ -8,7 +8,7 @@ sources:
       was pushed to a new table. In total, there were 29 different variations of the yellow_tripdata. Specifics how 
       the data was loaded to BigQuery can be found [here](https://github.com/gdq12/pipeline-performance-analysis/tree/main/1_extract_load_dataproc).
     database: "{{ env_var('PROJECT_ID') }}"
-    schema: "{{ env_var('BQ_RAW_SCHEMA') }}"
+    schema: "{{ env_var('BQ_RAW_SCHEMA') }}_backup"
 
     tables: 
       - name: yellow_tripdata_2009-01

@@ -1,25 +1,52 @@
 {# 
-    cmd:  dbt run-operation copy_clone_raw_tables --args '{tbl_substr: 2019|2020|2021}' 
-    error message: 'dict' object is not callable
+    cmd:  dbt run-operation copy_clone_raw_tables --args '{tbl_name_str: '.*', yr_str: "2019|2020|2021"}' --debug
 
 #}
 
-{% macro copy_clone_raw_tables(tbl_substr) -%}
+{% macro copy_clone_raw_tables(tbl_name_str, yr_str) -%}
 
-{% set schema_drop %}
-drop schema if exists {{ env('BQ_RAW_SCHEMA') }}
+{% set drop_old_tbl_queries %} 
+select concat("drop table `", table_catalog, "`.`",table_schema,"`.`",   table_name, "`;" ) querie_str
+from `pipeline-analysis-455005`.`nytaxi_raw`.INFORMATION_SCHEMA.TABLES
+where table_schema = 'nytaxi_raw'
 {% endset %}
-{% do run_query(schema_drop) %}
+
+{% set queries = dbt_utils.get_query_results_as_dict(drop_old_tbl_queries)%}
+
+{% if 'drop table ' in queries['querie_str'][0] %}
+
+    {% for query in queries['querie_str'] %}
+
+        {% do run_query(query) %}
+
+    {% endfor %}
+
+    {% set schema_drop %}
+    drop schema if exists {{ env_var('BQ_RAW_SCHEMA') }}
+    {% endset %}
+
+    {% do run_query(schema_drop) %}
+
+{% else %}
+
+    {% set schema_drop %}
+    drop schema if exists {{ env_var('BQ_RAW_SCHEMA') }}
+    {% endset %}
+
+    {% do run_query(schema_drop) %}
+
+{% endif %}
 
 {% set schema_create %}
-create schema if not exists {{ env('BQ_RAW_SCHEMA') }} options (location = 'EU')
+create schema if not exists {{ env_var('BQ_RAW_SCHEMA') }} options (location = 'EU')
 {% endset %}
 {% do run_query(schema_create) %}
 
 {% set tbl_query %} 
 select table_name
-from `{{ env('PROJECT_ID') }}`.`{{ env('BQ_RAW_SCHEMA') }}_backup`.INFORMATION_SCHEMA.TABLES
-where regexp_substr(table_name, '{{ tbl_substr }}') is not null
+from `{{ env_var('PROJECT_ID') }}`.`{{ env_var('BQ_RAW_SCHEMA') }}_backup`.INFORMATION_SCHEMA.TABLES
+where regexp_substr(table_name, '{{ tbl_name_str }}') is not null
+and regexp_substr(table_name, '{{ yr_str }}') is not null
 {% endset %}
 
 {% set table_names = dbt_utils.get_query_results_as_dict(tbl_query)%}

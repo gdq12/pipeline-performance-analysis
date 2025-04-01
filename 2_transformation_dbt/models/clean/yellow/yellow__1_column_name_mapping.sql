@@ -1,3 +1,4 @@
+{{ config(enabled = false) }}
 select 
   table_name
   , column_name old_column_name

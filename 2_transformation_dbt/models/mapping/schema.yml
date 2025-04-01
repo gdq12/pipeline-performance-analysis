@@ -3,7 +3,7 @@ version: 2
 sources:
   - name: mapping.raw
     database: "{{ env_var('PROJECT_ID') }}"
-    schema: "{{ env_var('BQ_RAW_SCHEMA') }}"
+    schema: "{{ env_var('BQ_RAW_SCHEMA') }}_backup"
     tables: 
       - name: INFORMATION_SCHEMA.COLUMNS
 

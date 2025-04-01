@@ -38,14 +38,14 @@ models:
 
     mapping:
       +materialized: view
-      +schema: nytaxi_mapping
+      +schema: mapping
       +enabled: true
 
     clean:
       yellow:
         +materialized: view
         +schema: clean
-        +enabled: false
+        +enabled: true
 
     stage:
       yellow:

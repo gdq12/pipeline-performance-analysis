@@ -90,6 +90,32 @@
 
     + post `dbt compile --select "modelName"` can see the compiled sql script in folder: `target/projectName/models/schemaName/`
 
+    + example case to debug macro:
+
+        ```
+        {# 
+            cmd:  dbt run-operation copy_clone_raw_tables --args '{tbl_substr: "2019|2020|2021"}' --debug
+            error message: 'dict' object is not callable
+
+        #}
+
+        {% macro copy_clone_raw_tables(tbl_substr) -%}
+
+
+        {% set tbl_query %} 
+        select table_name
+        from `{{ env_var('PROJECT_ID') }}`.`{{ env_var('BQ_RAW_SCHEMA') }}_backup`.INFORMATION_SCHEMA.TABLES
+        where regexp_substr(table_name, '{{ tbl_substr }}') is not null
+        {% endset %}
+
+        {% set table_names = dbt_utils.get_query_results_as_dict(tbl_query)%}
+
+        {% do log(table_names | tojson, info = True)%}
+
+        {%- endmacro %}
+
+        ```
+
 ## Helpful Links 
 
 ### Installation related
