@@ -1,0 +1,16 @@
+version: 2
+
+sources:
+  - name: mapping.raw
+    database: "{{ env_var('PROJECT_ID') }}"
+    schema: "{{ env_var('BQ_RAW_SCHEMA') }}"
+    tables: 
+      - name: INFORMATION_SCHEMA.COLUMNS
+
+  - name: mapping.map
+    database: "{{ env_var('PROJECT_ID') }}"
+    schema: nytaxi_mapping
+    tables: 
+      - name: taxi_zone_geom
+      - name: taxi_zone_lookup
+      - name: hvlv_base_numbers
