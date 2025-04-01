@@ -11,7 +11,6 @@ sources:
     schema: "{{ env_var('BQ_RAW_SCHEMA') }}"
 
     tables: 
-      - name: INFORMATION_SCHEMA.COLUMNS
       - name: yellow_tripdata_2009-01
       - name: yellow_tripdata_2010-01
       - name: yellow_tripdata_2010-02
@@ -41,13 +40,6 @@ sources:
       - name: yellow_tripdata_2020-10
       - name: yellow_tripdata_2020-11
       - name: yellow_tripdata_2023-02
-
-  - name: mapping.yellow
-    database: "{{ env_var('PROJECT_ID') }}"
-    schema: mapping
-
-    tables: 
-      - name: taxi_zone_geom
 
 models:
   - name: yellow__1_column_name_mapping

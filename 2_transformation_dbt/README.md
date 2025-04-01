@@ -72,11 +72,9 @@
     # to build models in only certain sub folders and thei dependents
     dbt build --select folder1Name.subfolderName+
 
-    # sourcing data in queries when in subfolders
-    source('folder1Name', 'subfolderName', 'tblName')
-
     # codagen to generate needed yml files 
     dbt run-operation generate_model_yaml --args '{"model_names": ["customers"]}'
+    dbt run-operation copy_clone_raw_tables --args '{"tbl_sustr": '2019|2020|2021'}'
 
     # generate documentation 
     dbt docs generate

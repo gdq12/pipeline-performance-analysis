@@ -35,13 +35,20 @@ clean-targets:         # directories to be removed by `dbt clean`
 
 models:
   pipeline_analysis_transform:
+
+    mapping:
+      +materialized: view
+      +schema: nytaxi_mapping
+      +enabled: true
+
     clean:
       yellow:
         +materialized: view
         +schema: clean
-        +enabled: true
+        +enabled: false
+
     stage:
       yellow:
         +materialized: view
-        +schema: stage2
-        +enabled: true
+        +schema: stage
+        +enabled: false
