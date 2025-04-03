@@ -40,3 +40,9 @@ select
   airport_fee,
   creation_dt
 from {{ ref('yellow__3_data_type_cast') }}
+
+{% if var('is_test_run', default = true) %}
+
+  limit 100 
+
+{% endif %}

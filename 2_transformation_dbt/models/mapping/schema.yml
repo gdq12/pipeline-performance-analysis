@@ -3,7 +3,7 @@ version: 2
 sources:
   - name: mapping.raw
     database: "{{ env_var('PROJECT_ID') }}"
-    schema: "{{ env_var('BQ_RAW_SCHEMA') }}_backup"
+    schema: "{{ env_var('BQ_RAW_SCHEMA') }}"
     tables: 
       - name: INFORMATION_SCHEMA.COLUMNS
 
@@ -14,3 +14,42 @@ sources:
       - name: taxi_zone_geom
       - name: taxi_zone_lookup
       - name: hvlv_base_numbers
+
+models:
+  - name: mapping__1_column_name_mapping
+    description: >
+      Assigns the correct column name for each of the original columns for tables imported 
+      from [parquets](https://www.nyc.gov/site/tlc/about/tlc-trip-record-data.page). 
+      This aids in collating the original 28 tables into a single source data for later tranformations.
+      The information here is sourced from `INFORMATION_SCHEMA.COLUMNS` table of the target schema in bigquery.
+    columns: 
+      - name: trip_type
+        data_type: string
+        description: >
+          Trip ride type. It can be either `yellow`, `green`, `fhvhv`, `fhv`.
+
+      - name: table_name
+        data_type: string
+        description: >
+          Name of the table that resides in the target schema that at a minimum has the substring `yellow_tripdata`.
+
+      - name: old_column_name
+        data_type: string
+        description: >
+          Name of column from the original source parquet (transformed to snake version when needed).
+
+      - name: new_column_name
+        data_type: string
+        description: >
+          Name the column should be re-assigned to within the transformation.
+
+      - name: old_data_type
+        data_type: string
+        description: >
+          Data type of the table_name/old_column_name combo as it was from the source parquet data.
+
+      - name: new_data_type
+        data_type: string
+        description: >
+          Data type that the new_column_name should be converted to or already is.
+  

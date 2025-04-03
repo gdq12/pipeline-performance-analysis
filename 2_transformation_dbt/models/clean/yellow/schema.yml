@@ -3,14 +3,11 @@ version: 2
 sources:
   - name: clean.yellow
     description: >
-      Data loaded into BigQuery using spark cluster in Dataproc. All tables in this schema represent the fist instance 
-      a column_name/ordinal_position/dta_type combo was encountered. When a new combination was encountered, the data 
-      was pushed to a new table. In total, there were 29 different variations of the yellow_tripdata. Specifics how 
-      the data was loaded to BigQuery can be found [here](https://github.com/gdq12/pipeline-performance-analysis/tree/main/1_extract_load_dataproc).
+      Data loaded into BigQuery using spark cluster in Dataproc. All tables in this schema represent the fist instance  a column_name/ordinal_position/dta_type combo was encountered. When a new combination was encountered, the data  was pushed to a new table. In total, there were 29 different variations of the yellow_tripdata. Specifics how  the data was loaded to BigQuery can be found [here](https://github.com/gdq12/pipeline-performance-analysis/tree/main/1_extract_load_dataproc).
     database: "{{ env_var('PROJECT_ID') }}"
     schema: "{{ env_var('BQ_RAW_SCHEMA') }}_backup"
 
-    tables: 
+    tables:
       - name: yellow_tripdata_2009-01
       - name: yellow_tripdata_2010-01
       - name: yellow_tripdata_2010-02
@@ -42,42 +39,9 @@ sources:
       - name: yellow_tripdata_2023-02
 
 models:
-  - name: yellow__1_column_name_mapping
-    description: > 
-      Assigns the correct column name for each of the original columns for tables imported 
-      from [parquets](https://www.nyc.gov/site/tlc/about/tlc-trip-record-data.page). 
-      This aids in collating the original 28 tables into a single source data for later tranformations.
-      The information here is sourced from `INFORMATION_SCHEMA.COLUMNS` table of the target schema in bigquery.
-    columns:
-      - name: table_name
-        data_type: string
-        description: >
-          Name of the table that resides in the target schema that at a minimum has the substring `yellow_tripdata`.
-
-      - name: old_column_name
-        data_type: string
-        description: >
-          Name of column from the original source parquet (transformed to snake version when needed).
-
-      - name: new_column_name
-        data_type: string
-        description: >
-          Name the column should be re-assigned to within the transformation.
-
-      - name: data_type
-        data_type: string
-        description: >
-          Data type of the table_name/old_column_name combo as it was from the source parquet data.
-
-      - name: ordinal_position
-        data_type: int64
-        description: >
-          Sequential position of the old_column_name as it was from the source parquet data. 
-
   - name: yellow__2_post_2010_tbl_collation
     description: >
-      Unions all together 24 of the 29 yellow_tripdata tables from the source schema (jan 2011 to present).
-      Uses column name mapping from the `yellow__1_column_name_mapping` model to do this. 
+      Unions all together 24 of the 29 yellow_tripdata tables from the source schema (jan 2011 to present). Uses column name mapping from the `yellow__1_column_name_mapping` model to do this. 
     columns:
       - name: vendor_id
         data_type: int64
@@ -117,13 +81,12 @@ models:
       - name: store_and_fwd_flag
         data_type: string
         description: >
-          This flag indicates whether the trip record was held in vehicle memory before sending to the vendor, 
-          aka “store and forward,” because the vehicle did not have a connection to the server.
+          This flag indicates whether the trip record was held in vehicle memory before sending to the vendor,  aka “store and forward,” because the vehicle did not have a connection to the server.
 
       - name: dropoff_location_id
         data_type: int64
         description: >
-          TLC Taxi Zone in which the taximeter was engaged.
+          TLC Taxi Zone in which the taximeter was disengaged.
 
       - name: payment_type
         data_type: int64
@@ -173,13 +136,12 @@ models:
       - name: airport_fee
         data_type: float64
         description: >
-           $1.25 for pickup only at LaGuardia and John F. Kennedy Airports.
+          $1.25 for pickup only at LaGuardia and John F. Kennedy Airports.
 
       - name: pickup_date
         data_type: timestamp
         description: >
-          The day truncation of `pickup_datetime`. This column was used to partition the source parquet 
-          file after it was partially processed by the spark cluster (Dataproc).
+          The day truncation of `pickup_datetime`. This column was used to partition the source parquet  file after it was partially processed by the spark cluster (Dataproc).
 
       - name: data_source
         data_type: string
@@ -193,8 +155,7 @@ models:
 
   - name: yellow__2a_2009_2010_tbl_collation
     description: >
-      Unions all together 5 of the 29 yellow_tripdata tables from the source schema (jan 2009 to dec 2010).
-      Uses column name mapping from the `yellow__1_column_name_mapping` model to do this. 
+      Unions all together 5 of the 29 yellow_tripdata tables from the source schema (jan 2009 to dec 2010). Uses column name mapping from the `yellow__1_column_name_mapping` model to do this. 
     columns:
       - name: vendor_id
         data_type: string
@@ -239,8 +200,7 @@ models:
       - name: store_and_fwd_flag
         data_type: string
         description: >
-          This flag indicates whether the trip record was held in vehicle memory before sending to the vendor, 
-          aka “store and forward,” because the vehicle did not have a connection to the server.
+          This flag indicates whether the trip record was held in vehicle memory before sending to the vendor,  aka “store and forward,” because the vehicle did not have a connection to the server.
 
       - name: dropoff_longitude
         data_type: float64
@@ -285,14 +245,12 @@ models:
       - name: congestion_surcharge
         data_type: float64
         description: >
-          Originally named `surcharge` in the source data, changed to congestion_surcharge for accuracy. 
-          Total amount collected in trip for NYS congestion surcharge.
+          Originally named `surcharge` in the source data, changed to congestion_surcharge for accuracy.  Total amount collected in trip for NYS congestion surcharge.
 
       - name: pickup_date
         data_type: timestamp
         description: >
-          The day truncation of `pickup_datetime`. This column was used to partition the source parquet 
-          file after it was partially processed by the spark cluster (Dataproc).
+          The day truncation of `pickup_datetime`. This column was used to partition the source parquet  file after it was partially processed by the spark cluster (Dataproc).
 
       - name: data_source
         data_type: string
@@ -306,8 +264,7 @@ models:
 
   - name: yellow__2b_2009_2010_location_id_update
     description: >
-      Convert latitude/longitude coordinates from `yellow__2a_2009_2010_tbl_collation` to location zone IDs
-      using `taxi_zone_geom` mapping table.
+      Convert latitude/longitude coordinates from `yellow__2a_2009_2010_tbl_collation` to location zone IDs using `taxi_zone_geom` mapping table.
     columns:
       - name: vendor_id
         data_type: string
@@ -347,8 +304,7 @@ models:
       - name: store_and_fwd_flag
         data_type: string
         description: >
-          This flag indicates whether the trip record was held in vehicle memory before sending to the vendor, 
-          aka “store and forward,” because the vehicle did not have a connection to the server.
+          This flag indicates whether the trip record was held in vehicle memory before sending to the vendor,  aka “store and forward,” because the vehicle did not have a connection to the server.
 
       - name: dropoff_location_id
         data_type: int64
@@ -388,14 +344,12 @@ models:
       - name: congestion_surcharge
         data_type: float64
         description: >
-          Originally named `surcharge` in the source data, changed to congestion_surcharge for accuracy. 
-          Total amount collected in trip for NYS congestion surcharge.
+          Originally named `surcharge` in the source data, changed to congestion_surcharge for accuracy.  Total amount collected in trip for NYS congestion surcharge.
 
       - name: pickup_date
         data_type: timestamp
         description: >
-          The day truncation of `pickup_datetime`. This column was used to partition the source parquet 
-          file after it was partially processed by the spark cluster (Dataproc).
+          The day truncation of `pickup_datetime`. This column was used to partition the source parquet  file after it was partially processed by the spark cluster (Dataproc).
 
       - name: data_source
         data_type: string
@@ -409,8 +363,7 @@ models:
 
   - name: yellow__3_data_type_cast
     description: >
-      Union all of the `yellow__2b_2009_2010_location_id_update` and `yellow__2_post_2010_tbl_collation`.
-      It safe casts all the columns and fixes the variable coding of the following columns: 
+      Union all of the `yellow__2b_2009_2010_location_id_update` and `yellow__2_post_2010_tbl_collation`. It safe casts all the columns and fixes the variable coding of the following columns: 
         - payment_type
         - store_and_fwd_flag
         - vendor_id
@@ -454,8 +407,7 @@ models:
       - name: store_and_fwd_flag
         data_type: string
         description: >
-          This flag indicates whether the trip record was held in vehicle memory before sending to the vendor, 
-          aka “store and forward,” because the vehicle did not have a connection to the server.
+          This flag indicates whether the trip record was held in vehicle memory before sending to the vendor,  aka “store and forward,” because the vehicle did not have a connection to the server.
 
       - name: dropoff_location_id
         data_type: int64
@@ -510,13 +462,12 @@ models:
       - name: airport_fee
         data_type: float64
         description: >
-           $1.25 for pickup only at LaGuardia and John F. Kennedy Airports.
+          $1.25 for pickup only at LaGuardia and John F. Kennedy Airports.
 
       - name: pickup_date
         data_type: timestamp
         description: >
-          The day truncation of `pickup_datetime`. This column was used to partition the source parquet 
-          file after it was partially processed by the spark cluster (Dataproc).
+          The day truncation of `pickup_datetime`. This column was used to partition the source parquet  file after it was partially processed by the spark cluster (Dataproc).
 
       - name: data_source
         data_type: string
@@ -527,32 +478,29 @@ models:
         data_type: timestamp
         description: >
           Timestamp for when the data was copied over into the target schema from bigquery bucket. 
-  
+
   - name: yellow__4_adds_columns
     description: >
-      Adds potentially helpful columns to the yellow_tripdata set (trip_type, type start and end dates). 
+      Adds potentially helpful columns to the yellow_tripdata set (trip_type, type start and end dates).  
       It also creates unique trip ID to establish a primary key column for further transformation steps.
-      This table is materialized as it is in its final format prior to filter out records that might 
-      have a negative impact on analysis.
+      This table is materialized as it is in its final format prior to filter out records that might  
+      have a negative impact on analysis. The table is partitioned by `trip_type_start_date` and is 
+      clustered by: `data_source`, `pickup_date`.
     columns:
       - name: trip_type_start_date
         data_type: datetime
         description: >
-          First day of the month that pickup_datetime should not be before.
-          Table is partitioned on this column.
+          First day of the month that pickup_datetime should not be before. Table is partitioned on this column.
 
       - name: data_source
         data_type: string
         description: >
-          Bigquery bucket path where the partitioned source parquets are located.
-          Table is clustered on this column.
+          Bigquery bucket path where the partitioned source parquets are located. Table is clustered on this column.
 
       - name: pickup_date
         data_type: timestamp
         description: >
-          The day truncation of `pickup_datetime`. This column was used to partition the source parquet 
-          file after it was partially processed by the spark cluster (Dataproc).
-          Table is clustered on this column.
+          The day truncation of `pickup_datetime`. This column was used to partition the source parquet  file after it was partially processed by the spark cluster (Dataproc). Table is clustered on this column.
 
       - name: trip_type_end_date
         data_type: date
@@ -602,8 +550,7 @@ models:
       - name: store_and_fwd_flag
         data_type: string
         description: >
-          This flag indicates whether the trip record was held in vehicle memory before sending to the vendor, 
-          aka “store and forward,” because the vehicle did not have a connection to the server.
+          This flag indicates whether the trip record was held in vehicle memory before sending to the vendor,  aka “store and forward,” because the vehicle did not have a connection to the server.
 
       - name: dropoff_location_id
         data_type: int64
@@ -658,8 +605,8 @@ models:
       - name: airport_fee
         data_type: float64
         description: >
-           $1.25 for pickup only at LaGuardia and John F. Kennedy Airports.
-      
+          $1.25 for pickup only at LaGuardia and John F. Kennedy Airports.
+
       - name: trip_type
         data_type: string
         description: >
@@ -668,4 +615,4 @@ models:
       - name: creation_dt
         data_type: timestamp
         description: >
-          Timestamp for when the data was copied over into the target schema from bigquery bucket. 
+          Timestamp for when the data was copied over into the target schema from bigquery bucket.

@@ -1,10 +1,14 @@
 {#
-    This macro syncronizes payment_type across all yellow_tripdata
+    This macro syncronizes payment_type to the current data-type and values defined in https://www.nyc.gov/assets/tlc/downloads/pdf/data_dictionary_trip_records_yellow.pdf
+    It also coniders tip_maount in case the payment type is null. 
 #}
 
-{% macro update_payment_type(payment_type) -%}
+{% macro update_payment_type(payment_type, tip_amount) -%}
 
     case 
+        when 
+            lower(trim({{ dbt.safe_cast("payment_type", api.Column.translate_type("string")) }})) is null 
+            and cast(tip_amount as float64) > 0 then 1
         when lower(trim({{ dbt.safe_cast("payment_type", api.Column.translate_type("string")) }})) 
             in ('cash', 'csh', 'cas') then 2
         when lower(trim({{ dbt.safe_cast("payment_type", api.Column.translate_type("string")) }})) 

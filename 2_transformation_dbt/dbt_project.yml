@@ -51,4 +51,10 @@ models:
       yellow:
         +materialized: view
         +schema: stage
-        +enabled: false
+        +enabled: true
+
+    core1:
+      yellow:
+        +materialized: table
+        +schema: core
+        +enabled: true

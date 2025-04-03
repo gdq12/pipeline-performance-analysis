@@ -1,7 +1,7 @@
 with trps as 
 ({% set tbl_query %}
   select distinct table_name
-  from {{ ref('mapping__column_name_mapping') }}
+  from {{ ref('mapping__1_column_name_mapping') }}
   where regexp_substr(table_name, '2009|2010') is null
   and regexp_substr(table_name, 'yellow_tripdata') is not null
   order by 1
@@ -13,7 +13,7 @@ with trps as
 
   {% set col_query %}
   select old_column_name, new_column_name 
-  from {{ ref('mapping__column_name_mapping') }}
+  from {{ ref('mapping__1_column_name_mapping') }}
   where table_name = '{{ tbl_name }}'
   order by 2
   {% endset %}
@@ -25,7 +25,7 @@ with trps as
       {{ old_name }} as {{ new_name }}
         {% if not loop.last -%} , {% endif -%}
     {% endfor %}
-  from `{{ env_var('PROJECT_ID') }}`.`{{ env_var('BQ_RAW_SCHEMA') }}_backup`.`{{ tbl_name }}`
+  from `{{ env_var('PROJECT_ID') }}`.`{{ env_var('BQ_RAW_SCHEMA') }}`.`{{ tbl_name }}`
     {% if not loop.last -%} union all {% endif -%}
 {% endfor %}
 )
