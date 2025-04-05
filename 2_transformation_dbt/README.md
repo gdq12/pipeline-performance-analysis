@@ -173,6 +173,8 @@
 
 * about [dbt compile](https://docs.getdbt.com/reference/commands/compile)
 
+* [graph contect variables](https://docs.getdbt.com/reference/dbt-jinja-functions/graph#accessing-models), helpful to build cleanup bigquery env macro
+
 ### Good to know 3rd party DBT links
 
 * [medium article](https://blog.det.life/5-useful-loop-patterns-in-dbt-f1d959ab38b9) on implementing for-loops with jinja
@@ -184,6 +186,8 @@
 * [jinja cheat sheet](https://datacoves.com/post/dbt-jinja-cheat-sheet)
 
 * [macro use-cases](https://www.getorchestra.io/guides/best-dbt-core-macros-examples-and-use-cases)
+
+* [building macros](https://foundinblank.hashnode.dev/unlock-advanced-dbt-use-cases-with-the-meta-config-and-the-graph-variable) guide, helpful hints how to leverage python funcs
 
 ### Helpful links about the NYC taxi dataset
 
