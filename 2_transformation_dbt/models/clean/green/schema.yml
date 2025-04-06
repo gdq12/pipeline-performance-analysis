@@ -1,0 +1,416 @@
+version: 2
+
+sources:
+  - name: clean.green
+    description: >
+      Data loaded into BigQuery using spark cluster in Dataproc. All tables in this schema represent the fist instance  a column_name/ordinal_position/dta_type combo was encountered. When a new combination was encountered, the data  was pushed to a new table. In total, there were 29 different variations of the yellow_tripdata. Specifics how  the data was loaded to BigQuery can be found [here](https://github.com/gdq12/pipeline-performance-analysis/tree/main/1_extract_load_dataproc).
+    database: "{{ env_var('PROJECT_ID') }}"
+    schema: "{{ env_var('BQ_RAW_SCHEMA') }}"
+
+    tables:
+      - name: green_tripdata_2014-01
+      - name: green_tripdata_2014-02
+      - name: green_tripdata_2014-04
+      - name: green_tripdata_2014-05
+      - name: green_tripdata_2014-11
+      - name: green_tripdata_2015-11
+      - name: green_tripdata_2015-12
+      - name: green_tripdata_2016-01
+      - name: green_tripdata_2016-02
+      - name: green_tripdata_2016-12
+      - name: green_tripdata_2017-03
+      - name: green_tripdata_2017-07
+      - name: green_tripdata_2017-10
+      - name: green_tripdata_2017-11
+      - name: green_tripdata_2017-12
+      - name: green_tripdata_2018-02
+      - name: green_tripdata_2018-04
+      - name: green_tripdata_2018-05
+      - name: green_tripdata_2018-07
+      - name: green_tripdata_2018-10
+      - name: green_tripdata_2019-01
+      - name: green_tripdata_2019-09
+      - name: green_tripdata_2023-02
+
+models:
+
+  - name: green__2_tbl_collation
+    description: >
+      Unions all together 23 green_tripdata tables from the source schema. Uses column name mapping from the `mapping__1_column_name_mapping` model to do this. 
+    columns:
+      - name: vendor_id
+        data_type: int64
+        description: >
+          A code indicating the LPEP provider that provided the record. 
+
+      - name: pickup_datetime
+        data_type: timestamp
+        description: >
+          The date and time when the meter was engaged.
+
+      - name: dropoff_datetime
+        data_type: timestamp
+        description: >
+          The date and time when the meter was disengaged. 
+
+      - name: store_and_fwd_flag
+        data_type: string
+        description: >
+          This flag indicates whether the trip record was held in vehicle memory before sending to the vendor, aka “store and forward,” because the vehicle did not have a connection to the server.
+
+      - name: ratecode_id
+        data_type: float64
+        description: >
+          The final rate code in effect at the end of the trip
+
+      - name: pickup_location_id
+        data_type: int64
+        description: >
+          TLC Taxi Zone in which the taximeter was engaged.
+
+      - name: dropoff_location_id
+        data_type: int64
+        description: >
+          TLC Taxi Zone in which the taximeter was disengaged.
+
+      - name: passenger_count
+        data_type: float64
+        description: >
+          The number of passengers in the vehicle. 
+
+      - name: trip_distance
+        data_type: float64
+        description: >
+          The elapsed trip distance in miles reported by the taximeter.
+
+      - name: fare_amount
+        data_type: float64
+        description: >
+          The time-and-distance fare calculated by the meter.
+
+      - name: extra_amount
+        data_type: float64
+        description: >
+          Miscellaneous extras and surcharges.
+
+      - name: mta_tax
+        data_type: float64
+        description: >
+          Tax that is automatically triggered based on the metered rate in use.
+
+      - name: tip_amount
+        data_type: float64
+        description: >
+          Tip amount. This field is automatically populated for credit card tips. Cash tips are not included.
+
+      - name: tolls_amount
+        data_type: float64
+        description: >
+          Total amount of all tolls paid in trip.
+
+      - name: ehail_fee
+        data_type: float64
+        description: >
+          Licensed E-hail providers to offer upfront pricing in all participating yellow and green taxicabs. In addition to metered fares, passengers riding in Medallion taxicabs and Street Hail Liveries (SHLs) will now have the option to receive binding fare quotes when completing an E-Hail request.
+
+      - name: improvement_surcharge
+        data_type: float64
+        description: >
+          Improvement surcharge assessed trips at the flag drop. The improvement surcharge began being levied in 2015.
+
+      - name: total_amount
+        data_type: float64
+        description: >
+          The total amount charged to passengers. Does not include cash tips.
+
+      - name: payment_type
+        data_type: float64
+        description: >
+          A numeric code signifying how the passenger paid for the trip.
+
+      - name: trip_type
+        data_type: float64
+        description: >
+          A code indicating whether the trip was a street-hail or a dispatch that is automatically assigned based on the metered rate in use but can be altered by the driver. 
+
+      - name: congestion_surcharge
+        data_type: float64
+        description: >
+          Total amount collected in trip for NYS congestion surcharge.
+
+      - name: pickup_date
+        data_type: timestamp
+        description: >
+          The day truncation of `pickup_datetime`. This column was used to partition the source parquet  file after it was partially processed by the spark cluster (Dataproc).
+
+      - name: data_source
+        data_type: string
+        description: >
+          Bigquery bucket path where the partitioned source parquets are located.
+
+      - name: creation_dt
+        data_type: timestamp
+        description: >
+          Timestamp for when the data was copied over into the target schema from bigquery bucket. 
+
+  - name: green__3_data_type
+    description: >
+      It safe casts all the columns and fixes the variable coding of the following columns: 
+        - payment_type
+        - store_and_fwd_flag
+        - vendor_id
+        - ratecode_id
+    columns:
+      - name: vendor_id
+        data_type: int64
+        description: >
+          A code indicating the LPEP provider that provided the record. 
+
+      - name: pickup_datetime
+        data_type: timestamp
+        description: >
+          The date and time when the meter was engaged.
+
+      - name: dropoff_datetime
+        data_type: timestamp
+        description: >
+          The date and time when the meter was disengaged. 
+
+      - name: store_and_fwd_flag
+        data_type: string
+        description: >
+          This flag indicates whether the trip record was held in vehicle memory before sending to the vendor, aka “store and forward,” because the vehicle did not have a connection to the server.
+
+      - name: ratecode_id
+        data_type: int64
+        description: >
+          The final rate code in effect at the end of the trip
+
+      - name: pickup_location_id
+        data_type: int64
+        description: >
+          TLC Taxi Zone in which the taximeter was engaged.
+
+      - name: dropoff_location_id
+        data_type: int64
+        description: >
+          TLC Taxi Zone in which the taximeter was disengaged.
+
+      - name: passenger_count
+        data_type: int64
+        description: >
+          The number of passengers in the vehicle. 
+
+      - name: trip_distance
+        data_type: float64
+        description: >
+          The elapsed trip distance in miles reported by the taximeter.
+
+      - name: fare_amount
+        data_type: float64
+        description: >
+          The time-and-distance fare calculated by the meter.
+
+      - name: extra_amount
+        data_type: float64
+        description: >
+          Miscellaneous extras and surcharges.
+
+      - name: mta_tax
+        data_type: float64
+        description: >
+          Tax that is automatically triggered based on the metered rate in use.
+
+      - name: tip_amount
+        data_type: float64
+        description: >
+          Tip amount. This field is automatically populated for credit card tips. Cash tips are not included.
+
+      - name: tolls_amount
+        data_type: float64
+        description: >
+          Total amount of all tolls paid in trip.
+
+      - name: ehail_fee
+        data_type: float64
+        description: >
+          Licensed E-hail providers to offer upfront pricing in all participating yellow and green taxicabs. In addition to metered fares, passengers riding in Medallion taxicabs and Street Hail Liveries (SHLs) will now have the option to receive binding fare quotes when completing an E-Hail request.
+
+      - name: improvement_surcharge
+        data_type: float64
+        description: >
+          Improvement surcharge assessed trips at the flag drop. The improvement surcharge began being levied in 2015.
+
+      - name: total_amount
+        data_type: float64
+        description: >
+          The total amount charged to passengers. Does not include cash tips.
+
+      - name: payment_type
+        data_type: float64
+        description: >
+          A numeric code signifying how the passenger paid for the trip.
+
+      - name: trip_type
+        data_type: int64
+        description: >
+          A code indicating whether the trip was a street-hail or a dispatch that is automatically assigned based on the metered rate in use but can be altered by the driver. 
+
+      - name: congestion_surcharge
+        data_type: float64
+        description: >
+          Total amount collected in trip for NYS congestion surcharge.
+
+      - name: pickup_date
+        data_type: timestamp
+        description: >
+          The day truncation of `pickup_datetime`. This column was used to partition the source parquet  file after it was partially processed by the spark cluster (Dataproc).
+
+      - name: data_source
+        data_type: string
+        description: >
+          Bigquery bucket path where the partitioned source parquets are located.
+
+      - name: creation_dt
+        data_type: timestamp
+        description: >
+          Timestamp for when the data was copied over into the target schema from bigquery bucket. 
+
+  - name: green__4_adds_columns
+    description: >
+      Adds potentially helpful columns to the green_tripdata set (trip_type, type start and end dates).  
+      It also creates unique trip ID to establish a primary key column for further transformation steps.
+      This table is materialized as it is in its final format prior to filter out records that might  
+      have a negative impact on analysis. The table is partitioned by `trip_type_start_date` and is 
+      clustered by: `data_source`, `pickup_date`.
+
+    columns:
+      - name: trip_type_start_date
+        data_type: datetime
+        description: >
+          First day of the month that pickup_datetime should not be before. Table is partitioned on this column.
+
+      - name: data_source
+        data_type: string
+        description: >
+          Bigquery bucket path where the partitioned source parquets are located. Table is clustered on this column.
+
+      - name: pickup_date
+        data_type: timestamp
+        description: >
+          The day truncation of `pickup_datetime`. This column was used to partition the source parquet  file after it was partially processed by the spark cluster (Dataproc). Table is clustered on this column.
+
+      - name: trip_type_end_date
+        data_type: date
+        description: >
+          Last day of the month that dropoff_datetime should not be too much after (1-2 days max).
+
+      - name: trip_id
+        data_type: string
+        description: >
+          unique ID created from `dbt_utils.generate_surrogate_key` by using all columns in this view.
+
+      - name: vendor_id
+        data_type: int64
+        description: >
+          A code indicating the LPEP provider that provided the record. 
+
+      - name: pickup_datetime
+        data_type: timestamp
+        description: >
+          The date and time when the meter was engaged.
+
+      - name: dropoff_datetime
+        data_type: timestamp
+        description: >
+          The date and time when the meter was disengaged. 
+
+      - name: store_and_fwd_flag
+        data_type: string
+        description: >
+          This flag indicates whether the trip record was held in vehicle memory before sending to the vendor, aka “store and forward,” because the vehicle did not have a connection to the server.
+
+      - name: ratecode_id
+        data_type: int64
+        description: >
+          The final rate code in effect at the end of the trip
+
+      - name: pickup_location_id
+        data_type: int64
+        description: >
+          TLC Taxi Zone in which the taximeter was engaged.
+
+      - name: dropoff_location_id
+        data_type: int64
+        description: >
+          TLC Taxi Zone in which the taximeter was disengaged.
+
+      - name: passenger_count
+        data_type: int64
+        description: >
+          The number of passengers in the vehicle. 
+
+      - name: trip_distance
+        data_type: float64
+        description: >
+          The elapsed trip distance in miles reported by the taximeter.
+
+      - name: fare_amount
+        data_type: float64
+        description: >
+          The time-and-distance fare calculated by the meter.
+
+      - name: extra_amount
+        data_type: float64
+        description: >
+          Miscellaneous extras and surcharges.
+
+      - name: mta_tax
+        data_type: float64
+        description: >
+          Tax that is automatically triggered based on the metered rate in use.
+
+      - name: tip_amount
+        data_type: float64
+        description: >
+          Tip amount. This field is automatically populated for credit card tips. Cash tips are not included.
+
+      - name: tolls_amount
+        data_type: float64
+        description: >
+          Total amount of all tolls paid in trip.
+
+      - name: ehail_fee
+        data_type: float64
+        description: >
+          Licensed E-hail providers to offer upfront pricing in all participating yellow and green taxicabs. In addition to metered fares, passengers riding in Medallion taxicabs and Street Hail Liveries (SHLs) will now have the option to receive binding fare quotes when completing an E-Hail request.
+
+      - name: improvement_surcharge
+        data_type: float64
+        description: >
+          Improvement surcharge assessed trips at the flag drop. The improvement surcharge began being levied in 2015.
+
+      - name: total_amount
+        data_type: float64
+        description: >
+          The total amount charged to passengers. Does not include cash tips.
+
+      - name: payment_type
+        data_type: float64
+        description: >
+          A numeric code signifying how the passenger paid for the trip.
+
+      - name: trip_type
+        data_type: int64
+        description: >
+          A code indicating whether the trip was a street-hail or a dispatch that is automatically assigned based on the metered rate in use but can be altered by the driver. 
+
+      - name: congestion_surcharge
+        data_type: float64
+        description: >
+          Total amount collected in trip for NYS congestion surcharge.
+          
+      - name: creation_dt
+        data_type: timestamp
+        description: >
+          Timestamp for when the data was copied over into the target schema from bigquery bucket. 

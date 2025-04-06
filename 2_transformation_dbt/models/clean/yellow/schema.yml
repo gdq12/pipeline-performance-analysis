@@ -5,7 +5,7 @@ sources:
     description: >
       Data loaded into BigQuery using spark cluster in Dataproc. All tables in this schema represent the fist instance  a column_name/ordinal_position/dta_type combo was encountered. When a new combination was encountered, the data  was pushed to a new table. In total, there were 29 different variations of the yellow_tripdata. Specifics how  the data was loaded to BigQuery can be found [here](https://github.com/gdq12/pipeline-performance-analysis/tree/main/1_extract_load_dataproc).
     database: "{{ env_var('PROJECT_ID') }}"
-    schema: "{{ env_var('BQ_RAW_SCHEMA') }}_backup"
+    schema: "{{ env_var('BQ_RAW_SCHEMA') }}"
 
     tables:
       - name: yellow_tripdata_2009-01
@@ -41,7 +41,7 @@ sources:
 models:
   - name: yellow__2_post_2010_tbl_collation
     description: >
-      Unions all together 24 of the 29 yellow_tripdata tables from the source schema (jan 2011 to present). Uses column name mapping from the `yellow__1_column_name_mapping` model to do this. 
+      Unions all together 24 of the 29 yellow_tripdata tables from the source schema (jan 2011 to present). Uses column name mapping from the `mapping__1_column_name_mapping` model to do this. 
     columns:
       - name: vendor_id
         data_type: int64
@@ -155,7 +155,7 @@ models:
 
   - name: yellow__2a_2009_2010_tbl_collation
     description: >
-      Unions all together 5 of the 29 yellow_tripdata tables from the source schema (jan 2009 to dec 2010). Uses column name mapping from the `yellow__1_column_name_mapping` model to do this. 
+      Unions all together 5 of the 29 yellow_tripdata tables from the source schema (jan 2009 to dec 2010). Uses column name mapping from the `mapping__1_column_name_mapping` model to do this. 
     columns:
       - name: vendor_id
         data_type: string
@@ -607,7 +607,7 @@ models:
         description: >
           $1.25 for pickup only at LaGuardia and John F. Kennedy Airports.
 
-      - name: trip_type
+      - name: trip_type_source
         data_type: string
         description: >
           Indicates what type of tripdata the records are sourced from. For this table it should all be `yellow`.

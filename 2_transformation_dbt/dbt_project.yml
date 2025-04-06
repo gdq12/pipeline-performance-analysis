@@ -46,9 +46,17 @@ models:
         +materialized: view
         +schema: clean
         +enabled: true
+      green:
+        +materialized: view
+        +schema: clean
+        +enabled: true
 
     stage:
       yellow:
+        +materialized: view
+        +schema: stage
+        +enabled: true
+      green:
         +materialized: view
         +schema: stage
         +enabled: true
@@ -56,5 +64,5 @@ models:
     core1:
       yellow:
         +materialized: table
-        +schema: core
+        +schema: core1
         +enabled: true

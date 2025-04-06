@@ -1,7 +1,7 @@
 select 
     data_source, 
     trip_id
-from {{ ref('yellow__4_adds_columns') }}
+from {{ ref('green__4_adds_columns') }}
 where (
       -- invalid trip timestamps
       (pickup_datetime >= dropoff_datetime)
@@ -12,9 +12,6 @@ where (
       -- trips with unknown pickup or dropoff location
       (pickup_location_id = 264 or dropoff_location_id = 264)
       or 
-      -- trip with airport fee but location not at airport 
-      (coalesce(airport_fee, 0) > 0 and regexp_substr(pickup_location_id||' - '||dropoff_location_id, '138|132') is null)
-      or 
       -- fare amount negative but payment_type not void, dispute or no charge
       (fare_amount <= 0 and payment_type not in (3, 4, 6))
       or 
@@ -22,7 +19,7 @@ where (
       (trip_distance < 0)
       or 
       -- trips where charges dont add up
-      (abs(total_amount) - abs(fare_amount+extra_amount+mta_tax+tip_amount+tolls_amount+improvement_surcharge+congestion_surcharge+airport_fee) > 1)
+      (abs(total_amount) - abs(fare_amount+extra_amount+mta_tax+tip_amount+tolls_amount+ehail_fee+improvement_surcharge+congestion_surcharge) > 1)
       or 
       -- trips with non-JFK destination but got the rate charge
       (coalesce(ratecode_id, 0) in (2, 0) and regexp_substr(pickup_location_id||' - '||dropoff_location_id, '132') is null)

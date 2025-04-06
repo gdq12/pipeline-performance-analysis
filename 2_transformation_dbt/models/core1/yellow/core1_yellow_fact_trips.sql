@@ -12,6 +12,7 @@ select
   -- cols that help better scan the data 
   trp.trip_type_start_date,
   trp.data_source,
+  trp.trip_type_source,
   trp.pickup_date,
   -- IDs
   trp.trip_id,

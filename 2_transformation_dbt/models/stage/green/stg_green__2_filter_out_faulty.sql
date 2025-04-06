@@ -1,34 +1,35 @@
 select 
-  tbl.trip_type_start_date,
-  tbl.data_source,
-  tbl.pickup_date,
-  tbl.trip_type_end_date,
-  tbl.trip_id,
-  tbl.vendor_id,
-  tbl.pickup_datetime,
-  tbl.dropoff_datetime,
-  tbl.passenger_count,
-  tbl.trip_distance,
-  tbl.pickup_location_id,
-  tbl.ratecode_id,
-  tbl.store_and_fwd_flag,
-  tbl.dropoff_location_id,
-  tbl.payment_type,
-  tbl.fare_amount,
-  tbl.extra_amount,
-  tbl.mta_tax,
-  tbl.tip_amount,
-  tbl.tolls_amount,
-  tbl.improvement_surcharge,
-  tbl.total_amount,
-  tbl.congestion_surcharge,
-  tbl.airport_fee,
-  tbl.trip_type_source,
-  tbl.creation_dt
-from {{ ref('yellow__4_adds_columns') }} tbl
-left join {{ ref('stg_yellow__1b_id_faulty_trips') }} ft1 on tbl.data_source = ft1.data_source 
+    tbl.trip_type_start_date,
+    tbl.data_source,
+    tbl.pickup_date,
+    tbl.trip_type_end_date,
+    tbl.trip_type_source,
+    tbl.trip_id,
+    tbl.vendor_id,
+    tbl.pickup_datetime,
+    tbl.dropoff_datetime,
+    tbl.store_and_fwd_flag,
+    tbl.ratecode_id,
+    tbl.pickup_location_id,
+    tbl.dropoff_location_id,
+    tbl.passenger_count,
+    tbl.trip_distance,
+    tbl.fare_amount,
+    tbl.extra_amount,
+    tbl.mta_tax,
+    tbl.tip_amount,
+    tbl.tolls_amount,
+    tbl.ehail_fee,
+    tbl.improvement_surcharge,
+    tbl.total_amount,
+    tbl.payment_type,
+    tbl.trip_type,
+    tbl.congestion_surcharge,
+    tbl.creation_dt
+from {{ ref('green__4_adds_columns') }} tbl
+left join {{ ref('stg_green__1b_id_faulty_trips') }} ft1 on tbl.data_source = ft1.data_source 
                                                     and tbl.trip_id = ft1.trip_id
-left join {{ ref('stg_yellow__1a_id_duplicate_records') }} ft2 on tbl.pickup_datetime = ft2.pickup_datetime
+left join {{ ref('stg_green__1a_id_duplicate_records') }} ft2 on tbl.pickup_datetime = ft2.pickup_datetime
                                                         and tbl.dropoff_datetime = ft2.dropoff_datetime
                                                         and coalesce(tbl.ratecode_id, 0) = coalesce(ft2.ratecode_id, 0)
                                                         and tbl.pickup_location_id = ft2.pickup_location_id 

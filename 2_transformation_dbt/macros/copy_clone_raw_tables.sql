@@ -14,7 +14,7 @@
 
 {% if method == 'refresh_schema' %}
 
-    {% do log("----------------" ~ method ~ " chosen, Recreating raw schema" ~ "-----------------", info = True) %}
+    {% do log("---------------------" ~ method ~ " chosen, Recreating raw schema" ~ "--------------------", info = True) %}
     {% do log("-------------------------Compiling drop queries for Schema----------------------------------", info=True) %}
 
     {% set drop_old_tbl_queries %} 
@@ -48,7 +48,7 @@
 
     {% endif %}
 
-    {% do log("-------------------------Env cleanedup, Can copy tables now----------------------------------------", info=True) %}
+    {% do log("---------------------Env cleaned up, Can copy tables now-----------------------------------", info=True) %}
 
     {% set schema_create %}
     create schema if not exists {{ env_var('BQ_RAW_SCHEMA') }} options (location = 'EU')
