@@ -50,6 +50,10 @@ models:
         +materialized: view
         +schema: clean
         +enabled: true
+      fhvhv:
+        +materialized: view
+        +schema: clean
+        +enabled: true
 
     stage:
       yellow:

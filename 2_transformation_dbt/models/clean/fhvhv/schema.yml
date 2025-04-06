@@ -1,0 +1,17 @@
+version: 2
+
+sources:
+  - name: clean.green
+    description: >
+      Data loaded into BigQuery using spark cluster in Dataproc. All tables in this schema represent the fist instance  a column_name/ordinal_position/dta_type combo was encountered. When a new combination was encountered, the data  was pushed to a new table. In total, there were 29 different variations of the yellow_tripdata. Specifics how  the data was loaded to BigQuery can be found [here](https://github.com/gdq12/pipeline-performance-analysis/tree/main/1_extract_load_dataproc).
+    database: "{{ env_var('PROJECT_ID') }}"
+    schema: "{{ env_var('BQ_RAW_SCHEMA') }}"
+
+    tables:
+      - name: fhvhv_tripdata_2019-02
+      - name: fhvhv_tripdata_2019-04
+      - name: fhvhv_tripdata_2019-07
+      - name: fhvhv_tripdata_2020-04
+      - name: fhvhv_tripdata_2020-05
+      - name: fhvhv_tripdata_2020-10
+      - name: fhvhv_tripdata_2020-11

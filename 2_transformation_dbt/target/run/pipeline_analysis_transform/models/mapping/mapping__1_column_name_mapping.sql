@@ -1,4 +1,8 @@
-with t1 as 
+
+
+  create or replace view `pipeline-analysis-455005`.`nytaxi_mapping`.`mapping__1_column_name_mapping`
+  OPTIONS()
+  as with t1 as 
 (select 
   regexp_substr(table_name, 'yellow|green|fhvhv|fhv') trip_type
   , table_name
@@ -29,7 +33,7 @@ with t1 as
         then regexp_replace(regexp_replace(column_name, 'trip_', ''), 'date_time$', 'datetime')
       else column_name end new_column_name
   , data_type old_data_type
-from {{ source('mapping.raw', 'INFORMATION_SCHEMA.COLUMNS')}}
+from `pipeline-analysis-455005`.`nytaxi_raw`.`INFORMATION_SCHEMA.COLUMNS`
 where column_name != '__index_level_0__'
 and regexp_substr(table_name, 'external|mapping') is null
 ), 
@@ -55,4 +59,5 @@ select
   , new_column_name 
   , old_data_type
   , new_data_type 
-from t2
+from t2;
+
