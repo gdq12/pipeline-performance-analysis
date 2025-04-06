@@ -1,6 +1,8 @@
 {# 
     
     This macro compares current bigqeury tables and views to the model nodes and removes the difference.
+    The hard-coded schemas and tables included are to exclude resources created by the spark service account from consideration.
+    cmd: dbt run-operation clean_bigquery_env
 
 #}
 
@@ -56,7 +58,7 @@ where schema_name not in ('{{ env_var("BQ_RAW_SCHEMA") }}_backup', '{{ env_var("
         {% set target_tbl_name = "`" ~ bq_result['table_schema'][i] ~ "`.`" ~ bq_result['table_name'][i] ~ "`" %}
 
         {% if bq_resource in current_dbt_models %}
-            {% do log(bq_resource ~ " wont be dropped", info = True) %}
+            {% do log(bq_resource ~ ": found in current project models, wont be dropped", info = True) %}
         {% else %}
             {% do log("detected BigQuery resource " ~ bq_resource ~ ", dropping table: " ~ target_tbl_name, info = True) %}
 
@@ -69,6 +71,35 @@ where schema_name not in ('{{ env_var("BQ_RAW_SCHEMA") }}_backup', '{{ env_var("
         {% endif %}
 
     {% endfor %}
+
+{% endfor %}
+
+{{ log("--------------------------Scanning for any empty Schemas--------------------------------", info=True) }}
+
+{% for schema_name in schema_dict['schema_name'] %}
+
+    {% set schema_scan_query%}
+    select count(table_name) num_tables
+    from `{{ env_var('PROJECT_ID') }}`.`{{ schema_name }}`.INFORMATION_SCHEMA.TABLES 
+    {% endset %}
+
+    {% set tbl_count_dict = dbt_utils.get_query_results_as_dict(schema_scan_query)%}
+
+    {% if tbl_count_dict['num_tables'][0] == 0 %}
+
+        {% do log(schema_name ~ " has " ~ tbl_count_dict['num_tables'][0] ~ " resources/tables, schema will be dropped", info = True) %}
+
+        {% set schema_drop %}
+        drop schema if exists {{ schema_name }}
+        {% endset %}
+
+        {% do run_query(schema_drop) %}
+    
+    {% else %}
+
+        {% do log(schema_name ~ " has " ~ tbl_count_dict['num_tables'][0] ~ " resources/tables, schema will not be dropped", info = True) %}
+
+    {% endif %}
 
 {% endfor %}
 
