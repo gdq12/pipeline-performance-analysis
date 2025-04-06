@@ -56,14 +56,15 @@ where schema_name not in ('{{ env_var("BQ_RAW_SCHEMA") }}_backup', '{{ env_var("
     
         {% set bq_resource = bq_result['table_schema'][i] ~ "." ~ bq_result['table_name'][i] ~ "." ~ bq_result['table_type'][i]%}
         {% set target_tbl_name = "`" ~ bq_result['table_schema'][i] ~ "`.`" ~ bq_result['table_name'][i] ~ "`" %}
+        {% set target_table_type = bq_result['table_type'][i] %}
 
         {% if bq_resource in current_dbt_models %}
             {% do log(bq_resource ~ ": found in current project models, wont be dropped", info = True) %}
         {% else %}
-            {% do log("detected BigQuery resource not found in current project" ~ bq_resource ~ ", dropping table: " ~ target_tbl_name, info = True) %}
+            {% do log("detected BigQuery resource not found in current project " ~ bq_resource ~ ", dropping " ~ target_table_type ~ ": " ~ target_tbl_name, info = True) %}
 
             {% set drop_tbl_query %}
-            drop table `{{ env_var('PROJECT_ID') }}`.{{target_tbl_name}}
+            drop {{ target_table_type }} `{{ env_var('PROJECT_ID') }}`.{{ target_tbl_name }}
             {% endset %}
 
             {% do run_query(drop_tbl_query) %}
