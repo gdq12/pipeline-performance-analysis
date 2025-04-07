@@ -222,3 +222,4 @@ logs/
 **/target/**.json
 **/target/**.gpickle
 **/target/**.msgpack
+**/target/**.html
