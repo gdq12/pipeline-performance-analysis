@@ -22,6 +22,7 @@ with trps as
     ,cast(pickup_date as timestamp) pickup_date
     ,{{ dbt.safe_cast("data_source", api.Column.translate_type("string")) }} data_source
     ,cast(creation_dt as timestamp) creation_dt
+    ,cast(clone_dt as timestamp) clone_dt
 from {{ ref('yellow__2b_2009_2010_location_id_update') }}
 union all 
 select 
@@ -47,6 +48,7 @@ select
     ,cast(pickup_date as timestamp) pickup_date
     ,{{ dbt.safe_cast("data_source", api.Column.translate_type("string")) }} data_source
     ,cast(creation_dt as timestamp) creation_dt
+    ,cast(clone_dt as timestamp) clone_dt
 from {{ ref('yellow__2_post_2010_tbl_collation') }}
 )
 select 
@@ -71,5 +73,6 @@ select
   airport_fee,
   pickup_date,
   data_source,
-  creation_dt
+  creation_dt,
+  clone_dt
 from trps 

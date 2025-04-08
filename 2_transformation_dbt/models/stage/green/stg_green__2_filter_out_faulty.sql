@@ -25,7 +25,8 @@ select
     tbl.payment_type,
     tbl.trip_type,
     tbl.congestion_surcharge,
-    tbl.creation_dt
+    tbl.creation_dt,
+    tbl.clone_dt
 from {{ ref('green__4_adds_columns') }} tbl
 left join {{ ref('stg_green__1b_id_faulty_trips') }} ft1 on tbl.data_source = ft1.data_source 
                                                     and tbl.trip_id = ft1.trip_id

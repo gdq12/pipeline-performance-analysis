@@ -24,7 +24,8 @@ select
   tbl.congestion_surcharge,
   tbl.airport_fee,
   tbl.trip_type_source,
-  tbl.creation_dt
+  tbl.creation_dt,
+  tbl.clone_dt
 from {{ ref('yellow__4_adds_columns') }} tbl
 left join {{ ref('stg_yellow__1b_id_faulty_trips') }} ft1 on tbl.data_source = ft1.data_source 
                                                     and tbl.trip_id = ft1.trip_id

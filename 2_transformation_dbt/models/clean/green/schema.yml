@@ -153,6 +153,11 @@ models:
         description: >
           Timestamp for when the data was copied over into the target schema from bigquery bucket. 
 
+      - name: clone_dt
+        data_type: timestamp
+        description: >
+          Timestamp for when the data was cloned from the backup schema to the target raw schema.
+
   - name: green__3_data_type
     description: >
       It safe casts all the columns and fixes the variable coding of the following columns: 
@@ -275,6 +280,11 @@ models:
         data_type: timestamp
         description: >
           Timestamp for when the data was copied over into the target schema from bigquery bucket. 
+
+      - name: clone_dt
+        data_type: timestamp
+        description: >
+          Timestamp for when the data was cloned from the backup schema to the target raw schema.
 
   - name: green__4_adds_columns
     description: >
@@ -414,3 +424,8 @@ models:
         data_type: timestamp
         description: >
           Timestamp for when the data was copied over into the target schema from bigquery bucket. 
+
+      - name: clone_dt
+        data_type: timestamp
+        description: >
+          Timestamp for when the data was cloned from the backup schema to the target raw schema.

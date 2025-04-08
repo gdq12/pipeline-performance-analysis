@@ -45,7 +45,8 @@ select
     access_a_ride_flag,
     wav_request_flag, 
     wav_match_flag, 
-    creation_dt
+    creation_dt,
+    clone_dt
 from {{ ref('fhvhv__3_data_type') }}
 
 {% if var('is_test_run', default = true) %}

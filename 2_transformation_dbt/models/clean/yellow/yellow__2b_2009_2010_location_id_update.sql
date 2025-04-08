@@ -17,7 +17,8 @@ select
   trp.congestion_surcharge,
   trp.pickup_date,
   trp.data_source,
-  trp.creation_dt
+  trp.creation_dt,
+  trp.clone_dt
 from {{ ref('yellow__2a_2009_2010_tbl_collation') }} trp
 join {{ source('mapping.map', 'taxi_zone_geom') }} pu on (ST_DWithin(pu.zone_geom,ST_GeogPoint(trp.pickup_longitude, trp.pickup_latitude), 0))
 join {{ source('mapping.map', 'taxi_zone_geom') }} du on (ST_DWithin(du.zone_geom,ST_GeogPoint(trp.dropoff_longitude, trp.dropoff_latitude), 0))

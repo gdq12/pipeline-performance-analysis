@@ -194,3 +194,8 @@ models:
         data_type: timestamp
         description: >
           Timestamp for when the data was copied over into the target schema from bigquery bucket. 
+      
+      - name: clone_dt
+        data_type: timestamp
+        description: >
+          Timestamp for when the data was cloned from the backup schema to the target raw schema.

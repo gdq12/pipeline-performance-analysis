@@ -38,7 +38,8 @@ select
   total_amount,
   congestion_surcharge,
   airport_fee,
-  creation_dt
+  creation_dt,
+  clone_dt
 from {{ ref('yellow__3_data_type_cast') }}
 
 {% if var('is_test_run', default = true) %}

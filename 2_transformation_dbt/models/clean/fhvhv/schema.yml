@@ -154,7 +154,12 @@ models:
       - name: creation_dt
         data_type: timestamp
         description: >
-          Timestamp for when the data was copied over into the target schema from bigquery bucket. 
+          Timestamp for when the data was copied over into the target schema from bigquery bucket.
+
+      - name: clone_dt
+        data_type: timestamp
+        description: >
+          Timestamp for when the data was cloned from the backup schema to the target raw schema. 
 
   - name: fhvhv__3_data_type
     description: > 
@@ -295,6 +300,11 @@ models:
         data_type: timestamp
         description: >
           Timestamp for when the data was copied over into the target schema from bigquery bucket. 
+
+      - name: clone_dt
+        data_type: timestamp
+        description: >
+          Timestamp for when the data was cloned from the backup schema to the target raw schema.
 
   - name: fhvhv__4_adds_columns
     description: >
@@ -454,3 +464,8 @@ models:
         data_type: timestamp
         description: >
           Timestamp for when the data was copied over into the target schema from bigquery bucket. 
+
+      - name: clone_dt
+        data_type: timestamp
+        description: >
+          Timestamp for when the data was cloned from the backup schema to the target raw schema.

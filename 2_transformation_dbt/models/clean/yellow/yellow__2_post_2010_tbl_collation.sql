@@ -51,5 +51,6 @@ select
   airport_fee,
   pickup_date,
   data_source,
-  creation_dt
+  creation_dt,
+  clone_dt
 from trps

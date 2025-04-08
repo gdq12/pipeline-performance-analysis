@@ -153,6 +153,11 @@ models:
         description: >
           Timestamp for when the data was copied over into the target schema from bigquery bucket. 
 
+      - name: clone_dt
+        data_type: timestamp
+        description: >
+          Timestamp for when the data was cloned from the backup schema to the target raw schema.
+
   - name: yellow__2a_2009_2010_tbl_collation
     description: >
       Unions all together 5 of the 29 yellow_tripdata tables from the source schema (jan 2009 to dec 2010). Uses column name mapping from the `mapping__1_column_name_mapping` model to do this. 
@@ -262,6 +267,11 @@ models:
         description: >
           Timestamp for when the data was copied over into the target schema from bigquery bucket. 
 
+      - name: clone_dt
+        data_type: timestamp
+        description: >
+          Timestamp for when the data was cloned from the backup schema to the target raw schema.
+
   - name: yellow__2b_2009_2010_location_id_update
     description: >
       Convert latitude/longitude coordinates from `yellow__2a_2009_2010_tbl_collation` to location zone IDs using `taxi_zone_geom` mapping table.
@@ -360,6 +370,11 @@ models:
         data_type: timestamp
         description: >
           Timestamp for when the data was copied over into the target schema from bigquery bucket. 
+
+      - name: clone_dt
+        data_type: timestamp
+        description: >
+          Timestamp for when the data was cloned from the backup schema to the target raw schema.
 
   - name: yellow__3_data_type_cast
     description: >
@@ -478,6 +493,11 @@ models:
         data_type: timestamp
         description: >
           Timestamp for when the data was copied over into the target schema from bigquery bucket. 
+
+      - name: clone_dt
+        data_type: timestamp
+        description: >
+          Timestamp for when the data was cloned from the backup schema to the target raw schema.
 
   - name: yellow__4_adds_columns
     description: >
@@ -616,3 +636,8 @@ models:
         data_type: timestamp
         description: >
           Timestamp for when the data was copied over into the target schema from bigquery bucket.
+
+      - name: clone_dt
+        data_type: timestamp
+        description: >
+          Timestamp for when the data was cloned from the backup schema to the target raw schema.

@@ -21,5 +21,6 @@ select
     cast(congestion_surcharge as float64) congestion_surcharge,
     cast(pickup_date as timestamp) pickup_date,
     {{ dbt.safe_cast("data_source", api.Column.translate_type("string")) }} data_source,
-    cast(creation_dt as timestamp) creation_dt
+    cast(creation_dt as timestamp) creation_dt,
+    cast(clone_dt as timestamp) clone_dt
 from {{ ref('green__2_tbl_collation') }}

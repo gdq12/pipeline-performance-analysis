@@ -29,7 +29,8 @@ select
     tbl.access_a_ride_flag,
     tbl.wav_request_flag, 
     tbl.wav_match_flag, 
-    tbl.creation_dt
+    tbl.creation_dt,
+    tbl.clone_dt
 from {{ ref('fhvhv__4_adds_columns') }} tbl
 left join {{ ref('stg_fhvhv__1b_id_faulty_trips') }} ft1 on tbl.data_source = ft1.data_source 
                                                     and tbl.trip_id = ft1.trip_id
