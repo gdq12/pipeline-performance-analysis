@@ -15,8 +15,8 @@ where (
       -- fare amount negative but payment_type not void, dispute or no charge
       (fare_amount <= 0 and payment_type not in (3, 4, 6))
       or 
-      -- all trips must report some distance to be valid
-      (trip_distance < 0)
+      -- all trips must report some distance/time to be valid
+      (trip_distance < 0 or trip_tmime < 0)
       or 
       -- trips where charges dont add up
       (abs(total_amount) - abs(fare_amount+extra_amount+mta_tax+tip_amount+tolls_amount+ehail_fee+improvement_surcharge+congestion_surcharge) > 1)
@@ -34,5 +34,5 @@ where (
       (passenger_count > 6 or passenger_count <= 0)
       or
       -- all trips with a positive trip amount should have a cc ratecode ID 
-      (tip_amount > 0 and payment_type != 1)
+      (tip_amount > 0 and payment_type != 1)      
 )
