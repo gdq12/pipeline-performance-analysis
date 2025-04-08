@@ -1,4 +1,239 @@
 version: 2
 
 models:
-  - name: stg_fhvhv_1a_id_duplicate_records
+  - name: stg_fhvhv__1a_id_duplicate_records
+    description: >
+      This view detects rides that appear to be the same but 1 ride has the exact negative `fare amount` 
+      compared to the positive value ride. The dimensions that are considered for comparison are 
+      `hvfhs_license_number`, `dispatching_base_number`, `originating_base_number`, `pickup_datetime`,  
+      `dropoff_datetime`, `pickup_location_id`, `dropoff_location_id`, `trip_distance`, `trip_time`. 
+    columns:
+      - name: hvfhs_license_number
+        data_type: string
+        description: >
+          The TLC license number of the HVFHS base or business.
+
+      - name: dispatching_base_number
+        data_type: string
+        description: >
+          The TLC Base License Number of the base that dispatched the trip.
+
+      - name: originating_base_number
+        data_type: string
+        description: >
+          Base number of the base that received the original trip request.
+
+      - name: pickup_datetime
+        data_type: timestamp
+        description: >
+          The date and time of the trip pick-up.
+
+      - name: dropoff_datetime
+        data_type: timestamp
+        description: >
+          The date and time of the trip drop-off.
+
+      - name: pickup_location_id
+        data_type: int64
+        description: >
+          TLC Taxi Zone in which the trip began.
+
+      - name: dropoff_location_id
+        data_type: int64
+        description: >
+          TLC Taxi Zone in which the trip ended.
+
+      - name: trip_distance
+        data_type: float64
+        description: >
+          Total miles for passenger trip.
+
+      - name: trip_time
+        data_type: int64
+        description: >
+          Total time in seconds for passenger trip.
+
+      - name: row_count
+        data_type: int64
+        description: >
+          number of rows that have identical entries for the target dimensions.
+
+      - name: total_fare_amount
+        data_type: float64
+        description: >
+          sum of fare_amount for the rides with identical entries in the target dimensions.
+
+  - name: stg_fhvhv__1b_id_faulty_trips
+    description: >
+      This view identifies "faulty" ride entries based on comparing the metadat within the given record.
+    columns:
+      - name: data_source
+        data_type: string
+        description: >
+          BigQuery bucket path where the partitioned source parquets are located.
+
+      - name: trip_id
+        data_type: string
+        description: >
+          unique trip/ride ID created in the clean layer of transformation.
+
+  - name: stg_fhvhv__2_filter_out_faulty
+    description: >
+      Filters out faulty trips/rides that were identified in the stg_fhvhv__1* views.
+
+    columns:
+      - name: trip_type_start_date
+        data_type: datetime
+        description: >
+          First day of the month that pickup_datetime should not be before. Table is partitioned on this column.
+
+      - name: data_source
+        data_type: string
+        description: >
+          Bigquery bucket path where the partitioned source parquets are located. Table is clustered on this column.
+
+      - name: pickup_date
+        data_type: timestamp
+        description: >
+          The day truncation of `pickup_datetime`. This column was used to partition the source parquet  file after it was partially processed by the spark cluster (Dataproc). Table is clustered on this column.
+
+      - name: trip_type_end_date
+        data_type: date
+        description: >
+          Last day of the month that dropoff_datetime should not be too much after (1-2 days max).
+
+      - name: trip_id
+        data_type: string
+        description: >
+          unique ID created from `dbt_utils.generate_surrogate_key` by using all columns in this view.
+
+      - name: hvfhs_license_number
+        data_type: string
+        description: >
+          The TLC license number of the HVFHS base or business.
+
+      - name: dispatching_base_number
+        data_type: string
+        description: >
+          The TLC Base License Number of the base that dispatched the trip.
+
+      - name: originating_base_number
+        data_type: string
+        description: >
+          Base number of the base that received the original trip request.
+
+      - name: request_datetime
+        data_type: timestamp
+        description: >
+          Date/time when passenger requested to be picked up.
+
+      - name: on_scene_datetime
+        data_type: timestamp
+        description: >
+          Date/time when driver arrived at the pick-up location (Accessible Vehiclesonly).
+
+      - name: pickup_datetime
+        data_type: timestamp
+        description: >
+          The date and time of the trip pick-up.
+
+      - name: dropoff_datetime
+        data_type: timestamp
+        description: >
+          The date and time of the trip drop-off.
+
+      - name: pickup_location_id
+        data_type: int64
+        description: >
+          TLC Taxi Zone in which the trip began.
+
+      - name: dropoff_location_id
+        data_type: int64
+        description: >
+          TLC Taxi Zone in which the trip ended.
+
+      - name: trip_distance
+        data_type: float64
+        description: >
+          Total miles for passenger trip.
+
+      - name: trip_time
+        data_type: int64
+        description: >
+          Total time in seconds for passenger trip.
+
+      - name: base_passenger_fare
+        data_type: float64
+        description: >
+          Base passenger fare before tolls, tips, taxes, and fees.
+
+      - name: toll_amount
+        data_type: float64
+        description: >
+          Total amount of all tolls paid in trip.
+
+      - name: black_card_fund_amount
+        data_type: float64
+        description: >
+          Total amount collected in trip for Black Car Fund.
+
+      - name: sales_tax
+        data_type: float64
+        description: >
+          Total amount collected in trip for NYS sales tax.
+
+      - name: congestion_surcharge
+        data_type: float64
+        description: >
+          Total amount collected in trip for NYS congestion surcharge.
+
+      - name: airport_fee
+        data_type: float64
+        description: >
+          $2.50 for both drop off and pick up at LaGuardia, Newark, and John F. Kennedy airports
+
+      - name: tip_amount
+        data_type: float64
+        description: >
+          Total amount of tips received from passenger.
+
+      - name: driver_pay_amount
+        data_type: float64
+        description: >
+          Total driver pay (not including tolls or tips and net of commission, surcharges, or taxes).
+
+      - name: shared_request_flag
+        data_type: string
+        description: >
+          Did the passenger agree to a shared/pooled ride, regardless of whether they were matched? (Y/N)
+
+      - name: shared_match_flag
+        data_type: string
+        description: >
+          Did the passenger share the vehicle with another passenger who booked separately at any point during the trip? (Y/N)
+
+      - name: access_a_ride_flag
+        data_type: string
+        description: >
+          Was the trip administered on behalf of the Metropolitan Transportation Authority (MTA)? (Y/N)
+
+      - name: wav_request_flag
+        data_type: string
+        description: > 
+          Did the passenger request a wheelchair-accessible vehicle (WAV)? (Y/N)
+
+      - name: wav_match_flag
+        data_type: string
+        description: >
+          Did the trip occur in a wheelchair-accessible vehicle (WAV)? (Y/N)
+
+      - name: creation_dt
+        data_type: timestamp
+        description: >
+          Timestamp for when the data was copied over into the target schema from bigquery bucket. 
+
+      - name: clone_dt
+        data_type: timestamp
+        description: >
+          Timestamp for when the data was cloned from the backup schema to the target raw schema.
+      
