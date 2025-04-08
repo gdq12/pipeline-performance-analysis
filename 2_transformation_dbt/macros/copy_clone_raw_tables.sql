@@ -3,7 +3,7 @@
     This macro copy clones tables originally created by dataproc to a new schema for developement and performance testing
     Example commands:
         -- to specify tbl names with specific trip type substr and yrs
-        dbt run-operation copy_clone_raw_tables --args '{tbl_name_str: 'yellow', yr_str: "2019|2020|2021", method: "refresh_schema"}'
+        dbt run-operation copy_clone_raw_tables --args '{tbl_name_str: 'fhvhv', yr_str: "2020", method: "refresh_schema"}'
         dbt run-operation copy_clone_raw_tables --args '{tbl_name_str: 'green', yr_str: "2021", method: "add_tables"}'
         -- when dont want to specify 1 where clause use '.*' instead
         dbt run-operation copy_clone_raw_tables --args '{tbl_name_str: 'yellow', yr_str: ".*", method: "refresh_schema"}'
@@ -83,7 +83,19 @@
             clone `{{ env_var('PROJECT_ID') }}`.`{{ env_var('BQ_RAW_SCHEMA') }}_backup`.`{{ tbl_name }}`
             {% endset %}
 
+            {% set alter_tbl_query %}
+            alter table `{{ env_var('PROJECT_ID') }}`.`{{ env_var('BQ_RAW_SCHEMA') }}`.`{{ tbl_name }}`
+            add column clone_dt timestamp
+            {% endset %}
+
+            {% set dt_fill_query %}
+            update  `{{ env_var('PROJECT_ID') }}`.`{{ env_var('BQ_RAW_SCHEMA') }}`.`{{ tbl_name }}`
+            set clone_dt = current_timestamp() where clone_dt is null
+            {% endset %}
+
             {% do run_query(clone_query) %}
+            {% do run_query(alter_tbl_query) %}
+            {% do run_query(dt_fill_query) %}
 
         {% endfor %}
 
@@ -121,7 +133,19 @@
             clone `{{ env_var('PROJECT_ID') }}`.`{{ env_var('BQ_RAW_SCHEMA') }}_backup`.`{{ tbl_name }}`
             {% endset %}
 
+            {% set alter_tbl_query %}
+            alter table `{{ env_var('PROJECT_ID') }}`.`{{ env_var('BQ_RAW_SCHEMA') }}`.`{{ tbl_name }}`
+            add column clone_dt timestamp
+            {% endset %}
+
+            {% set dt_fill_query %}
+            update  `{{ env_var('PROJECT_ID') }}`.`{{ env_var('BQ_RAW_SCHEMA') }}`.`{{ tbl_name }}`
+            set clone_dt = current_timestamp() where clone_dt is null
+            {% endset %}
+
             {% do run_query(clone_query) %}
+            {% do run_query(alter_tbl_query) %}
+            {% do run_query(dt_fill_query) %}
 
         {% endfor %}
 
