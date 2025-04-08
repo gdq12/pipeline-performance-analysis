@@ -64,6 +64,10 @@ models:
         +materialized: view
         +schema: stage
         +enabled: true
+      fhvhv:
+        +materialized: view
+        +schema: stage
+        +enabled: true
 
     core1:
       yellow:

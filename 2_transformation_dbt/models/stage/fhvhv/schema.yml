@@ -1,0 +1,4 @@
+version: 2
+
+models:
+  - name: stg_fhvhv_1a_id_duplicate_records
