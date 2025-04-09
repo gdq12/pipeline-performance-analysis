@@ -23,7 +23,7 @@
       when column_name = 'bcf' then 'black_card_fund_amount'
       when regexp_substr(column_name, 'do_') is not null then regexp_replace(column_name, 'do_', 'dropoff_')
       when regexp_substr(column_name, 'd_o') is not null then regexp_replace(column_name, 'd_o', 'dropoff_')
-      when regexp_substr(column_name, 'drop_off') is not null then regexp_replace(column_name, 'drop_off', 'dropoff_')
+      when regexp_substr(column_name, 'drop_off') is not null then regexp_replace(column_name, 'drop_off', 'dropoff')
       when regexp_substr(column_name, 'pu_') is not null then regexp_replace(column_name, 'pu_', 'pickup_')
       when regexp_substr(column_name, 'p_u') is not null then regexp_replace(column_name, 'p_u', 'pickup_')
       when regexp_substr(column_name, 'amt') is not null then regexp_replace(column_name, 'amt', 'amount')
@@ -45,8 +45,9 @@ t2 as
   , new_column_name
   , old_data_type
   , case 
-    when regexp_substr(new_column_name, 'datetime|date|creation_dt') is not null then 'TIMESTAMP'
+    when regexp_substr(new_column_name, 'datetime|date|creation_dt|clone_dt') is not null then 'TIMESTAMP'
     when regexp_substr(new_column_name, 'fee|amount|surcharge|tax|distance|longitude|latitude|fare') is not null then 'FLOAT64'
+    when new_column_name = 'sr_flag' then 'INT64'
     when regexp_substr(new_column_name, 'data_source|flag|base_number|license_number') is not null then 'STRING'
     else 'INT64'
     end new_data_type

@@ -6,7 +6,7 @@
         dbt run-operation copy_clone_raw_tables --args '{tbl_name_str: 'fhvhv', yr_str: "2020", method: "refresh_schema"}'
         dbt run-operation copy_clone_raw_tables --args '{tbl_name_str: 'green', yr_str: "2021", method: "add_tables"}'
         -- when dont want to specify 1 where clause use '.*' instead
-        dbt run-operation copy_clone_raw_tables --args '{tbl_name_str: 'yellow', yr_str: ".*", method: "refresh_schema"}'
+        dbt run-operation copy_clone_raw_tables --args '{tbl_name_str: 'fhv_', yr_str: ".*", method: "refresh_schema"}'
 
 #}
 
