@@ -8,55 +8,60 @@ models:
       `pickup datetime`, `dropoff datetime`, `ratecode ID`, `pickup location ID`, 
       `dropoff location ID`, `passenger count`, `trip distance`. 
       This is based on the recommendation of the this [medium article](https://medium.com/@muhammadaris10/nyc-taxi-trip-data-analysis-45ecfdcb6f91).
+    
     columns:
       - name: pickup_datetime
         data_type: timestamp
-        quote: true
-        description: The date and time when the meter was engaged.
+        description: >
+          The date and time when the meter was engaged.
       - name: dropoff_datetime
         data_type: timestamp
-        quote: true
-        description: The date and time when the meter was disengaged.
+        description: >
+          The date and time when the meter was disengaged.
       - name: ratecode_id
         data_type: int64
-        quote: true
-        description: the final rate code in effect at the end of the trip.
+        description: > 
+          The final rate code in effect at the end of the trip.
       - name: pickup_location_id
         data_type: int64
-        quote: true
-        description: TLC Taxi Zone in which the taximeter was engaged.
+        description: >
+          TLC Taxi Zone in which the taximeter was engaged.
       - name: dropoff_location_id
         data_type: int64
-        quote: true
-        description: TLC Taxi Zone in which the taximeter was disengaged.
+        description: >
+          TLC Taxi Zone in which the taximeter was disengaged.
       - name: passenger_count
         data_type: int64
-        quote: true
-        description: The number of passengers in the vehicle, which was entered by the driver.
+        description: >
+          The number of passengers in the vehicle, which was entered by the driver.
       - name: trip_distance
         data_type: float64
-        quote: true
-        description: The elapsed trip distance in miles reported by the taximeter.
+        description: >
+          The elapsed trip distance in miles reported by the taximeter.
       - name: row_count
         data_type: int64
-        quote: true
-        description: number of rows that have identical entries for the target dimensions.
+        description: > 
+          Number of rows that have identical entries for the target dimensions.
       - name: total_fare_amount
         data_type: float64
-        quote: true
-        description: sum of fare_amount for the rides with identical entries in the target dimensions.
+        description: >
+          Sum of fare_amount for the rides with identical entries in the target dimensions.
 
   - name: stg_green__1b_id_faulty_trips
     description: >
       This view identifies "faulty" ride entries based on comparing the metadat within the given record. 
-      It is based on background knowledge from the datasets [data dictionary](https://www.nyc.gov/assets/tlc/downloads/pdf/data_dictionary_trip_records_yellow.pdf) and identifies records that do not seem plausible based on this knowledge.
+      It is based on background knowledge from the datasets [data dictionary](https://www.nyc.gov/assets/tlc/downloads/pdf/data_dictionary_trip_records_yellow.pdf) 
+      and identifies records that do not seem plausible based on this knowledge.
+    
     columns:
       - name: data_source
-        description: BigQuery bucket path where the partitioned source parquets are located.
+        description: >
+          BigQuery bucket path where the partitioned source parquets are located.
         data_type: string
 
       - name: trip_id
-        description: unique trip/ride ID created in the clean layer of transformation.
+        description: >
+          unique trip/ride ID created in the clean layer of transformation.
         data_type: string
 
   - name: stg_green__2_filter_out_faulty

@@ -2,40 +2,84 @@ version: 2
 
 macros:
   - name: update_payment_type
-    description: syncronizes payment_type across all yellow_tripdata
+    description: >
+      syncronizes payment_type across all yellow_tripdata based on payment type entries and top amount (when null).
     arguments:
       - name: payment_type
         type: string
         description: >
-          auto converts input to string and encodes the value to a specific numeric 
-          depending on the string syntax.
+          A numeric/string code signifying how the passenger paid for the trip.
+      - name: tip_amount
+        type: float64
+        description: >
+          This field is automatically populated for credit card tips. Cash tips are not included.
+
   - name: update_ratecode_id
-    description: syncronizes ratecode_id across all yellow_tripdata
+    description: >
+      syncronizes ratecode_id to the current data-type and values defined in https://www.nyc.gov/assets/tlc/downloads/pdf/data_dictionary_trip_records_yellow.pdf
+      It also considers location_ids in case the rate code is null.
     arguments:
       - name: payment_type
         type: string
         description: >
-          auto converts input to string and encodes the value to a specific numeric 
-          so only possible values are 1 - 6.
+          Variation of codes signifying how the passenger paid for the trip.
+      - name: pickup_location_id 
+        type: int
+        description: >
+          TLC Taxi Zone in which the taximeter was engaged.
+      - name: dropoff_location_id 
+        type: int
+        description: >
+          TLC Taxi Zone in which the taximeter was disengaged.
+
   - name: update_store_and_fwd_flag
-    description: syncronizes store_and_fwd_flag across all yellow_tripdata
+    description: >
+      syncronizes store_and_fwd_flag across all yellow_tripdata
     arguments:
       - name: store_and_fwd_flag
         type: string
         description: >
-          auto converts input to string and encodes the value to a Y/N flag depending on the string syntax.
+          This flag indicates whether the trip record was held in vehicle memory before sending to the vendor,  
+          aka “store and forward,” because the vehicle did not have a connection to the server.
+
   - name: update_vendor_id
-    description: syncronizes vendor_id across all yellow_tripdata
+    description: >
+      syncronizes vendor_id across all yellow_tripdata
     arguments:
       - name: vendor_id
         type: string
         description: >
-          auto converts input to string and encodes the value to a specific numeric 
-          depending on the string syntax.
+          The TPEP provider that provided the record.
+
   - name: get_weekday_name
-    description: converts the numerical weekday value to weekday string name
+    description: >
+      converts the numerical weekday value to weekday string name
     arguments:
       - name: datetime_col
         type: timestamp
         description: >
           determines weekday based on Bigqueries extracted weekday number.
+
+  - name: copy_clone_raw_tables
+    description: >
+      This macro copy clones tables originally created by dataproc to a new schema for developement and performance testing.
+    arguments: 
+      - name: tbl_name_str
+        type: string
+        description: >
+          trip type substring to use in regular expression for identifying tables to clone to target schema.
+          can either provide a single trip type or a series by using "|".
+      - name: yr_str
+        type: string
+        description: >
+          year value to use in regular expression for identifying tables to clone to target schema.
+          can either provide a single year or a series by using "|".
+      - name: method
+        type: string 
+        description: >
+          can either be 'refresh_schema' or 'add_tables'. To indicate whether the whole schema 
+          to be recreated or add clone tables to the target schema.
+
+  - name: clean_bigquery_env
+    description: >
+      This macro compares current bigqeury tables and views to the model nodes and removes the difference.

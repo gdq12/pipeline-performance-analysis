@@ -2,12 +2,19 @@ version: 2
 
 sources:
   - name: mapping.raw
+    description: >
+      Database where raw data extracted from parquets reside. The `INFORMATION_SCHEMA.COLUMNS` 
+      information is used to compile needed select queries to union all the tables. 
+
     database: "{{ env_var('PROJECT_ID') }}"
     schema: "{{ env_var('BQ_RAW_SCHEMA') }}"
     tables: 
       - name: INFORMATION_SCHEMA.COLUMNS
 
   - name: mapping.map
+    description: >
+      Mapping tables that assist in translating zone ID and geographical coordinates to zone names.
+
     database: "{{ env_var('PROJECT_ID') }}"
     schema: nytaxi_mapping
     tables: 
@@ -20,18 +27,19 @@ models:
     description: >
       Assigns the correct column name for each of the original columns for tables imported 
       from [parquets](https://www.nyc.gov/site/tlc/about/tlc-trip-record-data.page). 
-      This aids in collating the original 28 tables into a single source data for later tranformations.
+      This aids in collating the original 68 tables into a single source data for later tranformations.
       The information here is sourced from `INFORMATION_SCHEMA.COLUMNS` table of the target schema in bigquery.
+
     columns: 
       - name: trip_type
         data_type: string
         description: >
-          Trip ride type. It can be either `yellow`, `green`, `fhvhv`, `fhv`.
+          Trip ride type. It can be either `yellow`, `green`, `fhvhv`.
 
       - name: table_name
         data_type: string
         description: >
-          Name of the table that resides in the target schema that at a minimum has the substring `yellow_tripdata`.
+          Name of the table that resides in the target schema that at a minimum has the substring `<< taxi type >>_tripdata`.
 
       - name: old_column_name
         data_type: string

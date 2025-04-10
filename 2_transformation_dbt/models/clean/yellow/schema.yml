@@ -3,7 +3,10 @@ version: 2
 sources:
   - name: clean.yellow
     description: >
-      Data loaded into BigQuery using spark cluster in Dataproc. All tables in this schema represent the fist instance  a column_name/ordinal_position/dta_type combo was encountered. When a new combination was encountered, the data  was pushed to a new table. In total, there were 29 different variations of the yellow_tripdata. Specifics how  the data was loaded to BigQuery can be found [here](https://github.com/gdq12/pipeline-performance-analysis/tree/main/1_extract_load_dataproc).
+      Data loaded into BigQuery using spark cluster in Dataproc. All tables in this schema represent the fist instance  
+      a column_name/ordinal_position/dta_type combo was encountered. When a new combination was encountered, the data  
+      was pushed to a new table. In total, there were 29 different variations of the yellow_tripdata.
+
     database: "{{ env_var('PROJECT_ID') }}"
     schema: "{{ env_var('BQ_RAW_SCHEMA') }}"
 
@@ -41,7 +44,9 @@ sources:
 models:
   - name: yellow__2_post_2010_tbl_collation
     description: >
-      Unions all together 24 of the 29 yellow_tripdata tables from the source schema (jan 2011 to present). Uses column name mapping from the `mapping__1_column_name_mapping` model to do this. 
+      Unions all together 24 of the 29 yellow_tripdata tables from the source schema (jan 2011 to present). 
+      Uses column name mapping from the `mapping__1_column_name_mapping` model to do this. 
+      
     columns:
       - name: vendor_id
         data_type: int64
@@ -81,7 +86,8 @@ models:
       - name: store_and_fwd_flag
         data_type: string
         description: >
-          This flag indicates whether the trip record was held in vehicle memory before sending to the vendor,  aka “store and forward,” because the vehicle did not have a connection to the server.
+          This flag indicates whether the trip record was held in vehicle memory before sending to the vendor,  
+          aka “store and forward,” because the vehicle did not have a connection to the server.
 
       - name: dropoff_location_id
         data_type: int64
@@ -160,7 +166,9 @@ models:
 
   - name: yellow__2a_2009_2010_tbl_collation
     description: >
-      Unions all together 5 of the 29 yellow_tripdata tables from the source schema (jan 2009 to dec 2010). Uses column name mapping from the `mapping__1_column_name_mapping` model to do this. 
+      Unions all together 5 of the 29 yellow_tripdata tables from the source schema (jan 2009 to dec 2010).
+      Uses column name mapping from the `mapping__1_column_name_mapping` model to do this. 
+
     columns:
       - name: vendor_id
         data_type: string
@@ -274,7 +282,9 @@ models:
 
   - name: yellow__2b_2009_2010_location_id_update
     description: >
-      Convert latitude/longitude coordinates from `yellow__2a_2009_2010_tbl_collation` to location zone IDs using `taxi_zone_geom` mapping table.
+      Convert latitude/longitude coordinates from `yellow__2a_2009_2010_tbl_collation` to location zone IDs 
+      using `taxi_zone_geom` mapping table.
+
     columns:
       - name: vendor_id
         data_type: string
@@ -378,11 +388,13 @@ models:
 
   - name: yellow__3_data_type_cast
     description: >
-      Union all of the `yellow__2b_2009_2010_location_id_update` and `yellow__2_post_2010_tbl_collation`. It safe casts all the columns and fixes the variable coding of the following columns: 
+      Union all of the `yellow__2b_2009_2010_location_id_update` and `yellow__2_post_2010_tbl_collation`. 
+      It safe casts all the columns and fixes the variable coding of the following columns: 
         - payment_type
         - store_and_fwd_flag
         - vendor_id
         - ratecode_id
+
     columns:
       - name: vendor_id
         data_type: int64
@@ -506,6 +518,7 @@ models:
       This table is materialized as it is in its final format prior to filter out records that might  
       have a negative impact on analysis. The table is partitioned by `trip_type_start_date` and is 
       clustered by: `data_source`, `pickup_date`.
+      
     columns:
       - name: trip_type_start_date
         data_type: datetime

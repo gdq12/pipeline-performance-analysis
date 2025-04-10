@@ -3,10 +3,11 @@ version: 2
 models:
   - name: stg_fhvhv__1a_id_duplicate_records
     description: >
-      This view detects rides that appear to be the same but 1 ride has the exact negative `fare amount` 
+      This view detects rides that appear to be the same but 1 ride has the exact negative `base passenger fare` 
       compared to the positive value ride. The dimensions that are considered for comparison are 
       `hvfhs_license_number`, `dispatching_base_number`, `originating_base_number`, `pickup_datetime`,  
       `dropoff_datetime`, `pickup_location_id`, `dropoff_location_id`, `trip_distance`, `trip_time`. 
+
     columns:
       - name: hvfhs_license_number
         data_type: string
@@ -66,6 +67,7 @@ models:
   - name: stg_fhvhv__1b_id_faulty_trips
     description: >
       This view identifies "faulty" ride entries based on comparing the metadat within the given record.
+      
     columns:
       - name: data_source
         data_type: string
