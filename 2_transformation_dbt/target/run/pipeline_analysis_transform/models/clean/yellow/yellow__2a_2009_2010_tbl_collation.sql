@@ -1,4 +1,8 @@
-with trps as 
+
+
+  create or replace view `pipeline-analysis-455005`.`nytaxi_clean`.`yellow__2a_2009_2010_tbl_collation`
+  OPTIONS()
+  as with trps as 
 (
 
 
@@ -319,4 +323,5 @@ select
   data_source,
   creation_dt,
   clone_dt
-from trps
+from trps;
+

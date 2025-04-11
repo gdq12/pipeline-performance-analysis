@@ -1,5 +1,5 @@
 {#
-    This macro syncronizes ratecode_id to the current data-type and values defined in https://www.nyc.gov/assets/tlc/downloads/pdf/data_dictionary_trip_records_yellow.pdf
+    This macro syncronizes ratecode_id to the current data-type and values defined.
     It also considers location_ids in case the rate code is null.
 #}
 

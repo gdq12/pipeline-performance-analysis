@@ -19,10 +19,10 @@ macros:
       syncronizes ratecode_id to the current data-type and values defined in https://www.nyc.gov/assets/tlc/downloads/pdf/data_dictionary_trip_records_yellow.pdf
       It also considers location_ids in case the rate code is null.
     arguments:
-      - name: payment_type
+      - name: ratecode_id
         type: string
         description: >
-          Variation of codes signifying how the passenger paid for the trip.
+          The final rate code in effect at the end of the trip.
       - name: pickup_location_id 
         type: int
         description: >
@@ -59,6 +59,24 @@ macros:
         type: timestamp
         description: >
           determines weekday based on Bigqueries extracted weekday number.
+
+  - name: get_paymnet_description
+    description: > 
+      This macro provides the payment type description based on the input values.
+    arguments: 
+      - name: payment_type 
+        type: int64
+        description: >
+          Variation of codes signifying how the passenger paid for the trip.
+
+  - name: get_ratecode_description
+    description: > 
+       This macro provides the rate code description based on the input values.
+    arguments: 
+      - name: ratecode_id 
+        type: int64
+        description: >
+          The final rate code in effect at the end of the trip.
 
   - name: copy_clone_raw_tables
     description: >

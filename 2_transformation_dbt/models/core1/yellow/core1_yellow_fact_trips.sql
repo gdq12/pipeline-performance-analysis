@@ -46,8 +46,10 @@ select
   dz.service_zone dropoff_service_zone,
   -- trip categorization
   trp.ratecode_id,
+  {{ get_ratecode_description("ratecode_id") }} ratecode_description,
   trp.store_and_fwd_flag,
   trp.payment_type,
+  {{ get_payment_description("payment_type") }} payment_description,
   -- for unit centric calculations
   trp.passenger_count,
   trp.trip_distance,

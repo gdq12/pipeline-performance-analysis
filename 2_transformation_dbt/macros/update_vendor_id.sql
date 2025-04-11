@@ -1,5 +1,5 @@
 {#
-    This macro syncronizes vendor_id across all yellow_tripdata
+    This macro syncronizes vendor_id across all yellow_tripdata.
 #}
 
 {% macro update_vendor_id(vendor_id) -%}

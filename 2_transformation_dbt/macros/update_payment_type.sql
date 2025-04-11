@@ -1,5 +1,5 @@
 {#
-    This macro syncronizes payment_type to the current data-type and values defined in https://www.nyc.gov/assets/tlc/downloads/pdf/data_dictionary_trip_records_yellow.pdf
+    This macro syncronizes payment_type to the current data-type and values defined.
     It also coniders tip_maount in case the payment type is null. 
 #}
 
