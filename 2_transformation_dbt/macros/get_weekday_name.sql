@@ -1,5 +1,5 @@
 {#
-    This macro converts the numerical weekday value to weekday string name
+    This macro converts the numerical weekday value to weekday string name.
 #}
 
 {% macro get_weekday_name(datetime_col) -%}
