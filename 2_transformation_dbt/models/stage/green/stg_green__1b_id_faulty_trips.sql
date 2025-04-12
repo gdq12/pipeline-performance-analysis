@@ -10,7 +10,7 @@ where (
       (pickup_datetime < cast(trip_type_start_date as timestamp))
       or 
       -- trips with unknown pickup or dropoff location
-      (pickup_location_id = 264 or dropoff_location_id = 264)
+      (coalesce(pickup_location_id, 264) = 264 or coalesce(dropoff_location_id, 264) = 264)
       or 
       -- fare amount negative but payment_type not void, dispute or no charge
       (fare_amount <= 0 and payment_type not in (3, 4, 6))

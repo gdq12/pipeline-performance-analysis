@@ -18,7 +18,7 @@ where (
         )
       or
       -- trips with unknown pickup or dropoff location
-      (pickup_location_id = 264 or dropoff_location_id = 264)
+      (coalesce(pickup_location_id, 264) = 264 or coalesce(dropoff_location_id, 264) = 264)
       or 
       -- all trips must report some distance to be valid
       (trip_distance < 0)
