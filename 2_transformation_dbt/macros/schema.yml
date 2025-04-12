@@ -51,6 +51,15 @@ macros:
         description: >
           The TPEP provider that provided the record.
 
+  - name: update_sr_flag
+    description: >
+      This macro cleans up sr_flag according to the latest definition.
+    arguments: 
+      - name: sr_flag
+        type: string
+        description: >
+          Indicates if the trip was a part of a shared ride chain offered by a High Volume FHV company.
+
   - name: get_weekday_name
     description: >
       converts the numerical weekday value to weekday string name

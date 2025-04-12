@@ -1,0 +1,174 @@
+version: 2
+
+models:
+  - name: stg_fhv__1a_id_duplicate_records
+    description: >
+      This view detects rides that appear to be duplicate entries. 
+      The dimensions that are considered for comparison are 
+      `dispatching_base_number`, `pickup_datetime`, `dropoff_datetime`, `pickup_location_id`, 
+      `dropoff_location_id`, `sr_flag`, `affiliated_base_number`.
+
+    columns:
+      - name: dispatching_base_number
+        data_type: string
+        description: >
+          The TLC Base License Number of the base that dispatched the trip.
+
+      - name: pickup_datetime
+        data_type: timestamp
+        description: >
+          The date and time of the trip pick-up.
+
+      - name: dropoff_datetime
+        data_type: timestamp
+        description: >
+          The date and time of the trip dropoff.
+
+      - name: pickup_location_id
+        data_type: int64
+        description: >
+          TLC Taxi Zone in which the trip began.
+
+      - name: dropoff_location_id
+        data_type: int64
+        description: >
+          TLC Taxi Zone in which the trip ended.
+
+      - name: sr_flag
+        data_type: int64
+        description: >
+          Indicates if the trip was a part of a shared ride chain offered by a High
+          Volume FHV company (e.g. Uber Pool, Lyft Line). For shared trips, the value
+          is 1. For non-shared rides, this field is null.
+
+          NOTE: For most High Volume FHV companies, only shared rides that were
+          requested AND matched to another shared-ride request over the course of
+          the journey are flagged. However, Lyft (base license numbers B02510 +
+          B02844) also flags rides for which a shared ride was requested but another
+          passenger was not successfully matched to share the trip—therefore, trips
+          records with SR_Flag=1 from those two bases could indicate EITHER a first
+          trip in a shared trip chain OR a trip for which a shared ride was requested but
+          never matched. Users should anticipate an overcount of successfully shared
+          trips completed by Lyft. 
+
+      - name: affiliated_base_number
+        data_type: string
+        description: >
+          Base number of the base with which the vehicle is affiliated. This
+          must be provided even if the affiliated base is the same as the
+          dispatching base.
+
+      - name: row_count
+        data_type: int64
+        description: >
+          number of rows that have identical entries for the target dimensions.
+
+      - name: second_trip_id
+        data_type: string
+        description: >
+          trip_id of the duplicate trip that should be excluded.
+
+  - name: stg_fhv__1b_id_faulty_trips
+    description: >
+      This view identifies "faulty" ride entries based on comparing the metadat within the given record.
+      
+    columns:
+      - name: data_source
+        data_type: string
+        description: >
+          BigQuery bucket path where the partitioned source parquets are located.
+
+      - name: trip_id
+        data_type: string
+        description: >
+          unique trip/ride ID created in the clean layer of transformation.
+
+  - name: stg_fhv__2_filter_out_faulty
+    description: >
+      Filters out faulty trips/rides that were identified in the stg_fhv__1* views.
+      
+    columns:
+      - name: trip_type_start_date
+        data_type: datetime
+        description: >
+          First day of the month that pickup_datetime should not be before. Table is partitioned on this column.
+
+      - name: data_source
+        data_type: string
+        description: >
+          Bigquery bucket path where the partitioned source parquets are located. Table is clustered on this column.
+
+      - name: pickup_date
+        data_type: timestamp
+        description: >
+          The day truncation of `pickup_datetime`. This column was used to partition the source parquet  file after it was partially processed by the spark cluster (Dataproc). Table is clustered on this column.
+
+      - name: trip_type_end_date
+        data_type: date
+        description: >
+          Last day of the month that dropoff_datetime should not be too much after (1-2 days max).
+
+      - name: trip_id
+        data_type: string
+        description: >
+          unique ID created from `dbt_utils.generate_surrogate_key` by using all columns in this view.
+
+      - name: dispatching_base_number
+        data_type: string
+        description: >
+          The TLC Base License Number of the base that dispatched the trip.
+
+      - name: pickup_datetime
+        data_type: timestamp
+        description: >
+          The date and time of the trip pick-up.
+
+      - name: dropoff_datetime
+        data_type: timestamp
+        description: >
+          The date and time of the trip dropoff.
+
+      - name: pickup_location_id
+        data_type: int64
+        description: >
+          TLC Taxi Zone in which the trip began.
+
+      - name: dropoff_location_id
+        data_type: int64
+        description: >
+          TLC Taxi Zone in which the trip ended.
+
+      - name: sr_flag
+        data_type: int64
+        description: >
+          Indicates if the trip was a part of a shared ride chain offered by a High
+          Volume FHV company (e.g. Uber Pool, Lyft Line). For shared trips, the value
+          is 1. For non-shared rides, this field is null.
+
+          NOTE: For most High Volume FHV companies, only shared rides that were
+          requested AND matched to another shared-ride request over the course of
+          the journey are flagged. However, Lyft (base license numbers B02510 +
+          B02844) also flags rides for which a shared ride was requested but another
+          passenger was not successfully matched to share the trip—therefore, trips
+          records with SR_Flag=1 from those two bases could indicate EITHER a first
+          trip in a shared trip chain OR a trip for which a shared ride was requested but
+          never matched. Users should anticipate an overcount of successfully shared
+          trips completed by Lyft. 
+
+      - name: affiliated_base_number
+        data_type: string
+        description: >
+          Base number of the base with which the vehicle is affiliated. This
+          must be provided even if the affiliated base is the same as the
+          dispatching base.
+
+      - name: creation_dt
+        data_type: timestamp
+        description: >
+          Timestamp for when the data was copied over into the target schema from bigquery bucket.
+
+      - name: clone_dt
+        data_type: timestamp
+        description: >
+          Timestamp for when the data was cloned from the backup schema to the target raw schema. 
+
