@@ -1,0 +1,7 @@
+version: 2 
+
+models:
+  - name: core1_yellow_fact_trips
+  - name: core1_green_fact_trips
+  - name: core1_fhvhv_fact_trips
+  - name: core1_fhvfact_trips

@@ -41,10 +41,18 @@ select
         when extract(dayofweek from pickup_datetime) = 7
             then 'SATURDAY'
     end pickup_weekday_name,
-  extract(week from trp.pickup_datetime) pickup_calender_week_num,
   extract(month from trp.pickup_datetime) pickup_month,
   extract(hour from trp.pickup_datetime) pickup_hour,
   bigfunctions.eu.is_public_holiday(cast(trp.pickup_datetime as date), 'US') pickup_public_holiday,
+  case 
+        when extract(dayofweek from pickup_datetime) in (2, 3, 4, 5, 6)
+            and extract(hour from pickup_datetime) in (6, 7, 8, 9, 10)
+            then 'MORNING RUSH HOUR'
+        when extract(dayofweek from pickup_datetime) in (2, 3, 4, 5, 6)
+            and extract(hour from pickup_datetime) in (4, 5, 6, 7, 8)
+            then 'MORNING RUSH HOUR'
+        else null 
+    end pickup_rush_hour_status,
   extract(year from dropoff_datetime) dropoff_year,
   extract(dayofweek from trp.dropoff_datetime) dropoff_weekday_num,
   case 
@@ -63,10 +71,18 @@ select
         when extract(dayofweek from dropoff_datetime) = 7
             then 'SATURDAY'
     end dropoff_weekday_name,
-  extract(week from trp.dropoff_datetime) dropoff_calender_week_num,
   extract(month from trp.dropoff_datetime) dropoff_month,
   extract(hour from trp.dropoff_datetime) dropoff_hour,
   bigfunctions.eu.is_public_holiday(cast(trp.dropoff_datetime as date), 'US') dropoff_public_holiday,
+  case 
+        when extract(dayofweek from dropoff_datetime) in (2, 3, 4, 5, 6)
+            and extract(hour from dropoff_datetime) in (6, 7, 8, 9, 10)
+            then 'MORNING RUSH HOUR'
+        when extract(dayofweek from dropoff_datetime) in (2, 3, 4, 5, 6)
+            and extract(hour from dropoff_datetime) in (4, 5, 6, 7, 8)
+            then 'MORNING RUSH HOUR'
+        else null 
+    end dropoff_rush_hour_status,
   -- location centric info 
   pz.borough pickup_borough,
   pz.zone pickup_zone,
