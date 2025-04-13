@@ -14,7 +14,7 @@ where (
       (pickup_datetime < cast(trip_type_start_date as timestamp))
       or 
       -- trips with unknown pickup or dropoff location
-      (pickup_location_id = 264 or dropoff_location_id = 264)
+      (coalesce(pickup_location_id, 264) = 264 or coalesce(dropoff_location_id, 264) = 264)
       or 
       -- trip with airport fee but location not at airport 
       (coalesce(airport_fee, 0) > 0 and regexp_substr(pickup_location_id||' - '||dropoff_location_id, '138|132') is null)

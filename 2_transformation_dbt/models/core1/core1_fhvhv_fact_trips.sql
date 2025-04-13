@@ -10,24 +10,24 @@
 
 select 
     -- cols that help better scan the data 
-    tbl.trip_type_start_date,
-    tbl.data_source,
-    tbl.trip_type_source,
-    tbl.pickup_date,
+    trp.trip_type_start_date,
+    trp.data_source,
+    trp.trip_type_source,
+    trp.pickup_date,
     -- IDs
-    tbl.trip_id,
-    tbl.hvfhs_license_number, 
+    trp.trip_id,
+    trp.hvfhs_license_number, 
     mp.app_company_affiliation hvfs_description,
-    tbl.dispatching_base_number, 
-    tbl.originating_base_number,
+    trp.dispatching_base_number, 
+    trp.originating_base_number,
     -- time centric dimensions
-    tbl.request_datetime,
-    tbl.on_scene_datetime,
-    tbl.pickup_datetime,
-    tbl.dropoff_datetime, 
-    tbl.trip_type_end_date,
+    trp.request_datetime,
+    trp.on_scene_datetime,
+    trp.pickup_datetime,
+    trp.dropoff_datetime, 
+    trp.trip_type_end_date,
     -- more time dimensions for later analysis
-    tbl.trip_time,
+    trp.trip_time,
     {{ dbt.datediff("pickup_datetime", "dropoff_datetime", "minute") }} trip_duration_min,
     extract(year from trp.pickup_datetime) pickup_year,
     extract(dayofweek from trp.pickup_datetime) pickup_weekday_num,
@@ -51,29 +51,29 @@ select
     dz.zone dropoff_zone,
     dz.service_zone dropoff_service_zone,
     -- trip metrics
-    tbl.trip_distance, 
+    trp.trip_distance, 
     -- trip categorization
-    tbl.shared_request_flag,
-    tbl.shared_match_flag,
-    tbl.access_a_ride_flag,
-    tbl.wav_request_flag, 
-    tbl.wav_match_flag, 
+    trp.shared_request_flag,
+    trp.shared_match_flag,
+    trp.access_a_ride_flag,
+    trp.wav_request_flag, 
+    trp.wav_match_flag, 
     -- revenue centric stats
-    tbl.base_passenger_fare, 
-    tbl.toll_amount,
-    tbl.black_card_fund_amount,
-    tbl.sales_tax,
-    tbl.congestion_surcharge,
-    tbl.airport_fee,
-    tbl.tip_amount,
-    tbl.driver_pay_amount,
+    trp.base_passenger_fare, 
+    trp.toll_amount,
+    trp.black_card_fund_amount,
+    trp.sales_tax,
+    trp.congestion_surcharge,
+    trp.airport_fee,
+    trp.tip_amount,
+    trp.driver_pay_amount,
     -- data source centric info 
-    tbl.clone_dt
+    trp.clone_dt,
     {{ dbt.current_timestamp() }} transformation_dt
 from {{ ref('stg_fhvhv__2_filter_out_faulty') }} trp 
 join {{ source('mapping.map', 'taxi_zone_lookup') }} pz on trp.pickup_location_id = pz.location_id 
 join {{ source('mapping.map', 'taxi_zone_lookup') }} dz on trp.dropoff_location_id = pz.location_id 
-join {{ source('mapping.map', 'hvlv_base_numbers') }} mp on tbl.hvfhs_license_number = mp.hvln 
+join {{ source('mapping.map', 'hvlv_base_numbers') }} mp on trp.hvfhs_license_number = mp.hvln 
 
 {% if var('is_test_run', default = true) %}
 

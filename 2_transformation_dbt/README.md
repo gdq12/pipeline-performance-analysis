@@ -147,6 +147,10 @@
 
 * doc on [node selection](https://docs.getdbt.com/reference/node-selection/syntax), syntax to use to run/build only certain models etc.
 
+* documentation on [dbt artifacts](https://docs.getdbt.com/reference/artifacts/dbt-artifacts)
+
+
+
 #### DBT community posts 
 
 * good [post](https://discourse.getdbt.com/t/can-i-create-an-auto-incrementing-id-in-dbt/579/3) about **auto-incremental** ID col implementation in dbt
@@ -156,6 +160,8 @@
 * post that explains on how to [union](https://discourse.getdbt.com/t/unioning-identically-structured-data-sources/921/2) many source tables
 
 * [post](https://discourse.getdbt.com/t/faq-i-got-an-unused-model-configurations-error-message-what-does-this-mean/112) about correctly configuring dbt_project.yml
+
+* [post](https://discourse.getdbt.com/t/analyzing-fishtowns-dbt-project-performance-with-artifacts/2214) on performance tracking but from dbt side not query history side
 
 #### Documentation on code setup
 
@@ -174,6 +180,14 @@
 * about [dbt compile](https://docs.getdbt.com/reference/commands/compile)
 
 * [graph contect variables](https://docs.getdbt.com/reference/dbt-jinja-functions/graph#accessing-models), helpful to build cleanup bigquery env macro
+
+* [run start timestamp](https://docs.getdbt.com/reference/dbt-jinja-functions/run_started_at) brief explanation
+
+* [configuring incremental models](https://docs.getdbt.com/docs/build/incremental-models) doc
+
+* [hooks and operations](https://docs.getdbt.com/docs/build/hooks-operations)
+
+* [pre/post hooks](https://docs.getdbt.com/reference/project-configs/on-run-start-on-run-end) to implement additional configurations apart from model execution (grant, alter table etc)
 
 ### Good to know 3rd party DBT links
 

@@ -10,18 +10,18 @@
 
 select 
     -- cols that help better scan the data 
-    tbl.trip_type_start_date,
-    tbl.data_source,
-    tbl.trip_type_source,
-    tbl.pickup_date,
+    trp.trip_type_start_date,
+    trp.data_source,
+    trp.trip_type_source,
+    trp.pickup_date,
     -- IDs
-    tbl.trip_id,
-    tbl.dispatching_base_number,
-    tbl.affiliated_base_number,
+    trp.trip_id,
+    trp.dispatching_base_number,
+    trp.affiliated_base_number,
     -- time centric dimensions 
-    tbl.pickup_datetime, 
-    tbl.dropoff_datetime,
-    tbl.trip_type_end_date,
+    trp.pickup_datetime, 
+    trp.dropoff_datetime,
+    trp.trip_type_end_date,
     -- more time dimensions for later analysis
     {{ dbt.datediff("pickup_datetime", "dropoff_datetime", "minute") }} trip_duration_min,
     extract(year from trp.pickup_datetime) pickup_year,
@@ -46,14 +46,15 @@ select
     dz.zone dropoff_zone,
     dz.service_zone dropoff_service_zone,
     -- trip categorization
-    tbl.sr_flag, 
+    trp.sr_flag, 
+    mp.app_company_affiliation,
     -- data source centric info 
-    tbl.clone_dt
+    trp.clone_dt,
     {{ dbt.current_timestamp() }} transformation_dt
 from {{ ref('stg_fhv__2_filter_out_faulty') }} trp 
 join {{ source('mapping.map', 'taxi_zone_lookup') }} pz on trp.pickup_location_id = pz.location_id 
 join {{ source('mapping.map', 'taxi_zone_lookup') }} dz on trp.dropoff_location_id = pz.location_id 
-join {{ source('mapping.map', 'hvlv_base_numbers') }} mp on tbl.hvfhs_license_number = mp.hvln 
+join {{ source('mapping.map', 'hvlv_base_numbers') }} mp on trp.dispatching_base_number = mp.hvln 
 
 {% if var('is_test_run', default = true) %}
 

@@ -16,7 +16,7 @@ where (
       (fare_amount <= 0 and payment_type not in (3, 4, 6))
       or 
       -- all trips must report some distance/time to be valid
-      (trip_distance < 0 or trip_time < 0)
+      (trip_distance < 0)
       or 
       -- trips where charges dont add up
       (abs(total_amount) - abs(fare_amount+extra_amount+mta_tax+tip_amount+tolls_amount+ehail_fee+improvement_surcharge+congestion_surcharge) > 1)

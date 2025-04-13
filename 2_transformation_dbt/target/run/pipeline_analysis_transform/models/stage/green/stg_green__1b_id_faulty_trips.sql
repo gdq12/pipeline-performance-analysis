@@ -1,4 +1,8 @@
-select 
+
+
+  create or replace view `pipeline-analysis-455005`.`nytaxi_stage`.`stg_green__1b_id_faulty_trips`
+  OPTIONS()
+  as select 
     data_source, 
     trip_id
 from `pipeline-analysis-455005`.`nytaxi_clean`.`green__4_adds_columns`
@@ -35,4 +39,5 @@ where (
       or
       -- all trips with a positive trip amount should have a cc ratecode ID 
       (tip_amount > 0 and payment_type != 1)      
-)
+);
+

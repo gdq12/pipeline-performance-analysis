@@ -64,3 +64,9 @@ models:
       +materialized: table
       +schema: core1
       +enabled: true
+
+vars:
+  run_tag: 'ab123'
+
+on-run-end: 
+  - "{{ get_query_history() }}"

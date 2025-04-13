@@ -10,17 +10,17 @@
 
 select 
     -- cols that help better scan the data 
-    tbl.trip_type_start_date,
-    tbl.data_source,
-    tbl.trip_type_source,
-    tbl.pickup_date,
+    trp.trip_type_start_date,
+    trp.data_source,
+    trp.trip_type_source,
+    trp.pickup_date,
     -- IDs
-    tbl.trip_id,
-    tbl.vendor_id,
+    trp.trip_id,
+    trp.vendor_id,
     -- time centric dimensions
-    tbl.pickup_datetime,
-    tbl.dropoff_datetime,
-    tbl.trip_type_end_date,
+    trp.pickup_datetime,
+    trp.dropoff_datetime,
+    trp.trip_type_end_date,
     -- more time dimensions for later analysis
     {{ dbt.datediff("pickup_datetime", "dropoff_datetime", "minute") }} trip_duration_min,
     extract(year from trp.pickup_datetime) pickup_year,
@@ -50,22 +50,22 @@ select
     trp.store_and_fwd_flag,
     trp.payment_type,
     {{ get_payment_description("payment_type") }} payment_description,
-    tbl.trip_type,
+    trp.trip_type,
     -- for unit centric calculations
-    tbl.passenger_count,
-    tbl.trip_distance,
+    trp.passenger_count,
+    trp.trip_distance,
     -- revenue centric stats
-    tbl.fare_amount,
-    tbl.extra_amount,
-    tbl.mta_tax,
-    tbl.tip_amount,
-    tbl.tolls_amount,
-    tbl.ehail_fee,
-    tbl.improvement_surcharge,
-    tbl.total_amount,
-    tbl.congestion_surcharge,
+    trp.fare_amount,
+    trp.extra_amount,
+    trp.mta_tax,
+    trp.tip_amount,
+    trp.tolls_amount,
+    trp.ehail_fee,
+    trp.improvement_surcharge,
+    trp.total_amount,
+    trp.congestion_surcharge,
     -- data source centric info
-    tbl.clone_dt, 
+    trp.clone_dt, 
     {{ dbt.current_timestamp() }} transformation_dt
 from {{ ref('stg_green__2_filter_out_faulty') }} trp 
 join {{ source('mapping.map', 'taxi_zone_lookup') }} pz on trp.pickup_location_id = pz.location_id 

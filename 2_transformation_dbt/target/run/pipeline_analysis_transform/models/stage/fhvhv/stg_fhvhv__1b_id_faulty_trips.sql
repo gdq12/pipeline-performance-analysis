@@ -1,4 +1,8 @@
-select 
+
+
+  create or replace view `pipeline-analysis-455005`.`nytaxi_stage`.`stg_fhvhv__1b_id_faulty_trips`
+  OPTIONS()
+  as select 
     data_source, 
     trip_id
 from `pipeline-analysis-455005`.`nytaxi_clean`.`fhvhv__4_adds_columns`
@@ -37,4 +41,5 @@ where (
       or 
       -- driver does a trip at a loss (where they make a negative profit)
       (base_passenger_fare < driver_pay_amount)
-)
+);
+

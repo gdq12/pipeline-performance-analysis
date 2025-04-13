@@ -126,7 +126,7 @@ select
   trp.congestion_surcharge,
   trp.airport_fee,
   -- data source centric info
-  trp.creation_dt,
+  trp.clone_dt,
   current_timestamp() transformation_dt
 from `pipeline-analysis-455005`.`nytaxi_stage`.`stg_yellow__2_filter_out_faulty` trp 
 join `pipeline-analysis-455005`.`nytaxi_mapping`.`taxi_zone_lookup` pz on trp.pickup_location_id = pz.location_id 
