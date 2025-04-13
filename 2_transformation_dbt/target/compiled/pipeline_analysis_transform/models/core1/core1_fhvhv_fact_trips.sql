@@ -123,7 +123,3 @@ join `pipeline-analysis-455005`.`nytaxi_mapping`.`hvlv_base_numbers` mp on trp.h
 
 
 
-
-
-  limit 100 
-

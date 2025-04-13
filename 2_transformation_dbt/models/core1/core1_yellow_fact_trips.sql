@@ -71,7 +71,7 @@ join {{ source('mapping.map', 'taxi_zone_lookup') }} dz on trp.dropoff_location_
 
 {% if is_incremental() %}
 
-where trp.data_source not in (select data_source from {{ this }})
+where trp.data_source not in (select distinct data_source from {{ this }})
 
 {% endif %}
 

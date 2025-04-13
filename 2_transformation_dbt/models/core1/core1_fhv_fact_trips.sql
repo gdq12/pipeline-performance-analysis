@@ -57,7 +57,7 @@ join {{ source('mapping.map', 'hvlv_base_numbers') }} mp on trp.dispatching_base
 
 {% if is_incremental() %}
 
-where trp.data_source not in (select data_source from {{ this }})
+where trp.data_source not in (select distinct data_source from {{ this }})
 
 {% endif %}
 

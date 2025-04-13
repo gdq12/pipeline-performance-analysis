@@ -51,7 +51,7 @@ from {{ ref('fhvhv__3_data_type') }}
 
 {% if is_incremental() %}
 
-where data_source not in (select data_source from {{ this }})
+where data_source not in (select distinct data_source from {{ this }})
 
 {% endif %}
 

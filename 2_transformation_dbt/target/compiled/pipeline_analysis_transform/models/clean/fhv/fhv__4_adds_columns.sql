@@ -20,7 +20,7 @@ from `pipeline-analysis-455005`.`nytaxi_clean`.`fhv__3_data_type`
 
 
 
+where data_source not in (select data_source from `pipeline-analysis-455005`.`nytaxi_clean`.`fhv__4_adds_columns`)
 
 
-  limit 10000 
 

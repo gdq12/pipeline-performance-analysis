@@ -8,7 +8,6 @@ dbt-bq-dtc:
       dataset: "{{ env_var('BQ_SCHEMA_PREFIX') }}"
       threads: 4 
       keyfile: "{{ env_var('PROJECT_KEY') }}"
-      timeout_seconds: 300
       fixed_retries: 1
       priority: interactive
   target: dev

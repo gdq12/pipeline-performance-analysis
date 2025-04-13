@@ -44,9 +44,5 @@ from `pipeline-analysis-455005`.`nytaxi_clean`.`yellow__3_data_type_cast`
 
 
 
-
-  limit 10000 
-
-
     );
   

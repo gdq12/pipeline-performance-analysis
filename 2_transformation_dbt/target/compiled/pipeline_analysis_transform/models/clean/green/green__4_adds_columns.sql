@@ -33,7 +33,7 @@ from `pipeline-analysis-455005`.`nytaxi_clean`.`green__3_data_type`
 
 
 
+where data_source not in (select data_source from `pipeline-analysis-455005`.`nytaxi_clean`.`green__4_adds_columns`)
 
 
-  limit 10000 
 

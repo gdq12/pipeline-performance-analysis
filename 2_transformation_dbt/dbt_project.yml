@@ -74,6 +74,13 @@ models:
       +materialized: incremental
       +schema: core1
       +enabled: true
+      +unique_key: 'data_source'
+
+    mart1:
+      +materialized: incremental
+      +schema: mart1
+      +enabled: true
+      +unique_key: 'pickup_date'
 
 vars:
   rate_codes: [1, 2, 3, 4, 5, 6, 99]

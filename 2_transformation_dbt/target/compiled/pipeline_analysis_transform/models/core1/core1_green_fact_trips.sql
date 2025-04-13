@@ -135,7 +135,3 @@ join `pipeline-analysis-455005`.`nytaxi_mapping`.`taxi_zone_lookup` dz on trp.dr
 
 
 
-
-
-  limit 100 
-
