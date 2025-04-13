@@ -44,6 +44,8 @@ from `pipeline-analysis-455005`.`nytaxi_clean`.`green__3_data_type`
 
 
 
+
+
   limit 10000 
 
 

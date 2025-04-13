@@ -3,6 +3,46 @@
     
 
     create or replace table `pipeline-analysis-455005`.`nytaxi_core1`.`core1_fhv_fact_trips`
+        
+  (
+    trip_type_start_date datetime,
+    data_source string,
+    trip_type_source string,
+    pickup_date datetime,
+    trip_id string not null,
+    dispatching_base_number string,
+    affiliated_base_number string,
+    pickup_datetime timestamp,
+    dropoff_datetime timestamp,
+    trip_type_end_date timestamp,
+    trip_duration_min int64,
+    pickup_year int64,
+    pickup_weekday_num int64,
+    pickup_weekday_name string,
+    pickup_month int64,
+    pickup_hour int64,
+    pickup_public_holiday boolean,
+    pickup_rush_hour_status string,
+    dropoff_year int64,
+    dropoff_weekday_num int64,
+    dropoff_weekday_name string,
+    dropoff_month int64,
+    dropoff_hour int64,
+    dropoff_public_holiday boolean,
+    dropoff_rush_hour_status string,
+    pickup_borough string,
+    pickup_zone string,
+    pickup_service_zone string,
+    dropoff_borough string,
+    dropoff_zone string,
+    dropoff_service_zone string,
+    sr_flag int64,
+    app_company_affiliation string,
+    clone_dt timestamp,
+    transformation_dt timestamp
+    
+    )
+
       
     partition by timestamp_trunc(trip_type_start_date, month)
     cluster by data_source, pickup_date
@@ -10,6 +50,9 @@
     OPTIONS()
     as (
       
+    select trip_type_start_date, data_source, trip_type_source, pickup_date, trip_id, dispatching_base_number, affiliated_base_number, pickup_datetime, dropoff_datetime, trip_type_end_date, trip_duration_min, pickup_year, pickup_weekday_num, pickup_weekday_name, pickup_month, pickup_hour, pickup_public_holiday, pickup_rush_hour_status, dropoff_year, dropoff_weekday_num, dropoff_weekday_name, dropoff_month, dropoff_hour, dropoff_public_holiday, dropoff_rush_hour_status, pickup_borough, pickup_zone, pickup_service_zone, dropoff_borough, dropoff_zone, dropoff_service_zone, sr_flag, app_company_affiliation, clone_dt, transformation_dt
+    from (
+        
 
 select 
     -- cols that help better scan the data 
@@ -99,7 +142,7 @@ select
     pz.borough pickup_borough,
     pz.zone pickup_zone,
     pz.service_zone pickup_service_zone,
-    dz.borough dropoffp_borough,
+    dz.borough dropoff_borough,
     dz.zone dropoff_zone,
     dz.service_zone dropoff_service_zone,
     -- trip categorization
@@ -110,13 +153,16 @@ select
     current_timestamp() transformation_dt
 from `pipeline-analysis-455005`.`nytaxi_stage`.`stg_fhv__2_filter_out_faulty` trp 
 join `pipeline-analysis-455005`.`nytaxi_mapping`.`taxi_zone_lookup` pz on trp.pickup_location_id = pz.location_id 
-join `pipeline-analysis-455005`.`nytaxi_mapping`.`taxi_zone_lookup` dz on trp.dropoff_location_id = pz.location_id 
-join `pipeline-analysis-455005`.`nytaxi_mapping`.`hvlv_base_numbers` mp on trp.dispatching_base_number = mp.hvln 
+join `pipeline-analysis-455005`.`nytaxi_mapping`.`taxi_zone_lookup` dz on trp.dropoff_location_id = dz.location_id 
+join `pipeline-analysis-455005`.`nytaxi_mapping`.`hvlv_base_numbers` mp on trp.dispatching_base_number = mp.license_base_number
+
+
 
 
 
   limit 100 
 
 
+    ) as model_subq
     );
   

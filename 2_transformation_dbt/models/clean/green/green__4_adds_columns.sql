@@ -1,5 +1,5 @@
 {{ config(
-    materialized="table",
+    materialized="incremental",
     partition_by={
       "field": "trip_type_start_date",
       "data_type": "timestamp",
@@ -42,6 +42,12 @@ select
     creation_dt,
     clone_dt
 from {{ ref('green__3_data_type') }}
+
+{% if is_incremental() %}
+
+where data_source not in (select data_source from {{ this }})
+
+{% endif %}
 
 {% if var('is_test_run', default = true) %}
 

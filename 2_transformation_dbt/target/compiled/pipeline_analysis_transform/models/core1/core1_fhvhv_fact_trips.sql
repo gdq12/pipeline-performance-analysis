@@ -93,7 +93,7 @@ select
     pz.borough pickup_borough,
     pz.zone pickup_zone,
     pz.service_zone pickup_service_zone,
-    dz.borough dropoffp_borough,
+    dz.borough dropoff_borough,
     dz.zone dropoff_zone,
     dz.service_zone dropoff_service_zone,
     -- trip metrics
@@ -118,8 +118,10 @@ select
     current_timestamp() transformation_dt
 from `pipeline-analysis-455005`.`nytaxi_stage`.`stg_fhvhv__2_filter_out_faulty` trp 
 join `pipeline-analysis-455005`.`nytaxi_mapping`.`taxi_zone_lookup` pz on trp.pickup_location_id = pz.location_id 
-join `pipeline-analysis-455005`.`nytaxi_mapping`.`taxi_zone_lookup` dz on trp.dropoff_location_id = pz.location_id 
+join `pipeline-analysis-455005`.`nytaxi_mapping`.`taxi_zone_lookup` dz on trp.dropoff_location_id = dz.location_id 
 join `pipeline-analysis-455005`.`nytaxi_mapping`.`hvlv_base_numbers` mp on trp.hvfhs_license_number = mp.hvln 
+
+
 
 
 

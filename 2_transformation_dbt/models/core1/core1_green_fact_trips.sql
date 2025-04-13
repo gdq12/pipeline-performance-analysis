@@ -1,5 +1,4 @@
 {{ config(
-    materialized="table",
     partition_by={
       "field": "trip_type_start_date",
       "data_type": "timestamp",
@@ -41,7 +40,7 @@ select
     pz.borough pickup_borough,
     pz.zone pickup_zone,
     pz.service_zone pickup_service_zone,
-    dz.borough dropoffp_borough,
+    dz.borough dropoff_borough,
     dz.zone dropoff_zone,
     dz.service_zone dropoff_service_zone,
     -- trip categorization
@@ -69,7 +68,13 @@ select
     {{ dbt.current_timestamp() }} transformation_dt
 from {{ ref('stg_green__2_filter_out_faulty') }} trp 
 join {{ source('mapping.map', 'taxi_zone_lookup') }} pz on trp.pickup_location_id = pz.location_id 
-join {{ source('mapping.map', 'taxi_zone_lookup') }} dz on trp.dropoff_location_id = pz.location_id 
+join {{ source('mapping.map', 'taxi_zone_lookup') }} dz on trp.dropoff_location_id = dz.location_id 
+
+{% if is_incremental() %}
+
+where trp.data_source in (select data_source from {{ this }})
+
+{% endif %}
 
 {% if var('is_test_run', default = true) %}
 

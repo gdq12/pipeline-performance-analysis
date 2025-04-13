@@ -17,6 +17,8 @@ clean-targets:
   - "dbt_packages"
 
 models:
+  +incremental_strategy: "merge"
+  +on_schema_change: "fail"
   pipeline_analysis_transform:
 
     mapping:
@@ -29,44 +31,54 @@ models:
         +materialized: view
         +schema: clean
         +enabled: true
+        +unique_key: 'data_source'
       green:
         +materialized: view
         +schema: clean
         +enabled: true
+        +unique_key: 'data_source'
       fhvhv:
         +materialized: view
         +schema: clean
         +enabled: true
+        +unique_key: 'data_source'
       fhv:
         +materialized: view
         +schema: clean
         +enabled: true
+        +unique_key: 'data_source'
 
     stage:
       yellow:
         +materialized: view
         +schema: stage
         +enabled: true
+        +unique_key: 'data_source'
       green:
         +materialized: view
         +schema: stage
         +enabled: true
+        +unique_key: 'data_source'
       fhvhv:
         +materialized: view
         +schema: stage
         +enabled: true
+        +unique_key: 'data_source'
       fhv:
         +materialized: view
         +schema: stage
         +enabled: true
+        +unique_key: 'data_source'
 
     core1:
-      +materialized: table
+      +materialized: incremental
       +schema: core1
       +enabled: true
 
 vars:
-  run_tag: 'ab123'
+  rate_codes: [1, 2, 3, 4, 5, 6, 99]
+  payment_types: [1, 2, 3, 4, 5, 6]
+  run_tag: 'abc123'
 
 on-run-end: 
   - "{{ get_query_history() }}"

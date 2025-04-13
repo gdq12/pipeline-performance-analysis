@@ -48,6 +48,8 @@ from `pipeline-analysis-455005`.`nytaxi_clean`.`fhvhv__3_data_type`
 
 
 
+
+
   limit 10000 
 
 
