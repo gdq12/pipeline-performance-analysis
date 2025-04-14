@@ -39,7 +39,8 @@ select
   congestion_surcharge,
   airport_fee,
   creation_dt,
-  clone_dt
+  clone_dt,
+  {{ dbt.current_timestamp() }} transformation_dt
 from {{ ref('yellow__3_data_type_cast') }}
 
 {% if is_incremental() %}

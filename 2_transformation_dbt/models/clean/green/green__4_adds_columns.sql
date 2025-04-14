@@ -40,7 +40,8 @@ select
     trip_type,
     congestion_surcharge,
     creation_dt,
-    clone_dt
+    clone_dt,
+    {{ dbt.current_timestamp() }} transformation_dt
 from {{ ref('green__3_data_type') }}
 
 {% if is_incremental() %}

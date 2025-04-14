@@ -25,7 +25,8 @@ select
     sr_flag, 
     affiliated_base_number,
     creation_dt, 
-    clone_dt
+    clone_dt,
+    {{ dbt.current_timestamp() }} transformation_dt
 from {{ ref('fhv__3_data_type') }}
 
 {% if is_incremental() %}

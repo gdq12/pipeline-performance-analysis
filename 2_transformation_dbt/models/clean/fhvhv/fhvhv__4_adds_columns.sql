@@ -46,7 +46,8 @@ select
     wav_request_flag, 
     wav_match_flag, 
     creation_dt,
-    clone_dt
+    clone_dt,
+    {{ dbt.current_timestamp() }} transformation_dt
 from {{ ref('fhvhv__3_data_type') }}
 
 {% if is_incremental() %}

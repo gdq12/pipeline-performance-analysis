@@ -37,7 +37,7 @@ select
     dm.total_fees,
     dm.passenger_count,
     dm.num_trips,
-    dm.transformation_dt
+    {{ dbt.current_timestamp() }} transformation_dt
 from {{ ref('core2_dm_daily_stats') }} dm 
 join {{ source('mapping.map', 'taxi_zone_lookup') }} pz on dm.pickup_location_id = pz.location_id 
 join {{ source('mapping.map', 'taxi_zone_lookup') }} dz on dm.dropoff_location_id = dz.location_id 
