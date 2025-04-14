@@ -32,7 +32,3 @@ from `pipeline-analysis-455005`.`nytaxi_clean`.`yellow__3_data_type_cast`
 
 
 
-where data_source not in (select data_source from `pipeline-analysis-455005`.`nytaxi_clean`.`yellow__4_adds_columns`)
-
-
-

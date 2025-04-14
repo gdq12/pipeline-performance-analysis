@@ -1,4 +1,15 @@
 
+  
+    
+
+    create or replace table `pipeline-analysis-455005`.`nytaxi_mart1`.`mart1_dm_daily_revenue`
+      
+    partition by timestamp_trunc(pickup_date, day)
+    
+
+    OPTIONS()
+    as (
+      
 
 with yel as 
 (select 
@@ -13,11 +24,13 @@ with yel as
     pickup_date,
     pickup_public_holiday, 
     -- other info 
+    ratecode_description,
     payment_description, 
     trip_type_source trip_type,
     cast(null as string) hvfs_description,
     -- aggregations
     avg(trip_distance) avg_trip_distance,
+    avg(trip_duration_min) avg_trip_duration_min,
     sum(fare_amount) fare_amount, 
     sum(tip_amount) tip_amount,
     sum(total_amount) total_amount,
@@ -26,10 +39,6 @@ with yel as
     count(1) num_trips,
     current_timestamp() transformation_dt
 from `pipeline-analysis-455005`.`nytaxi_core1`.`core1_yellow_fact_trips`
-
-
-
-where pickup_date not in (select distinct pickup_date from `pipeline-analysis-455005`.`nytaxi_mart1`.`mart1_dm_daily_stats`)
 
 
 
@@ -48,11 +57,13 @@ grn as
     pickup_date,
     pickup_public_holiday,
     -- other info 
+    ratecode_description,
     payment_description, 
     trip_type_source trip_type,
     cast(null as string) hvfs_description,
     -- aggregations
     avg(trip_distance) avg_trip_distance,
+    avg(trip_duration_min) avg_trip_duration_min,
     sum(fare_amount) fare_amount, 
     sum(tip_amount) tip_amount,
     sum(total_amount) total_amount,
@@ -61,10 +72,6 @@ grn as
     count(1) num_trips,
     current_timestamp() transformation_dt
 from `pipeline-analysis-455005`.`nytaxi_core1`.`core1_green_fact_trips`
-
-
-
-where pickup_date not in (select distinct pickup_date from `pipeline-analysis-455005`.`nytaxi_mart1`.`mart1_dm_daily_stats`)
 
 
 
@@ -83,11 +90,13 @@ fhvhv as
     pickup_date,
     pickup_public_holiday,
     -- other info 
+    cast(null as string) ratecode_description,
     cast(null as string) payment_description, 
     trip_type_source trip_type,
     hvfs_description,
     -- aggregations
     avg(trip_distance) avg_trip_distance,
+    avg(trip_duration_min) avg_trip_duration_min,
     sum(base_passenger_fare) fare_amount, 
     sum(tip_amount) tip_amount,
     cast(null as float64) total_amount,
@@ -96,10 +105,6 @@ fhvhv as
     count(1) num_trips,
     current_timestamp() transformation_dt
 from `pipeline-analysis-455005`.`nytaxi_core1`.`core1_fhvhv_fact_trips`
-
-
-
-where pickup_date not in (select distinct pickup_date from `pipeline-analysis-455005`.`nytaxi_mart1`.`mart1_dm_daily_stats`)
 
 
 
@@ -117,11 +122,13 @@ select
     pickup_date,
     pickup_public_holiday,
     -- other info 
+    ratecode_description,
     payment_description, 
     trip_type,
     hvfs_description,
     -- aggregations
     avg_trip_distance,
+    avg_trip_duration_min,
     fare_amount, 
     tip_amount,
     total_amount,
@@ -143,11 +150,13 @@ select
     pickup_date,
     pickup_public_holiday,
     -- other info 
+    ratecode_description,
     payment_description, 
     trip_type,
     hvfs_description,
     -- aggregations
     avg_trip_distance,
+    avg_trip_duration_min,
     fare_amount, 
     tip_amount,
     total_amount,
@@ -169,11 +178,13 @@ select
     pickup_date,
     pickup_public_holiday,
     -- other info 
+    ratecode_description,
     payment_description, 
     trip_type,
     hvfs_description,
     -- aggregations
     avg_trip_distance,
+    avg_trip_duration_min,
     fare_amount, 
     tip_amount,
     total_amount,
@@ -182,3 +193,5 @@ select
     num_trips,
     transformation_dt
 from fhvhv
+    );
+  

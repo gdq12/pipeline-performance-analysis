@@ -76,16 +76,26 @@ models:
       +enabled: true
       +unique_key: 'data_source'
 
+    core2:
+      +materialized: incremental
+      +schema: core2
+      +enabled: true
+      +unique_key: 'data_source'
+
     mart1:
       +materialized: incremental
       +schema: mart1
       +enabled: true
-      +unique_key: 'pickup_date'
+
+    mart2:
+      +materialized: incremental
+      +schema: mart2
+      +enabled: true
 
 vars:
   rate_codes: [1, 2, 3, 4, 5, 6, 99]
   payment_types: [1, 2, 3, 4, 5, 6]
-  run_tag: 'abc123'
+  run_tag: 'test qhistory insertion'
 
 on-run-end: 
   - "{{ get_query_history() }}"

@@ -1,0 +1,5 @@
+version: 2
+
+models:
+  - name: mart2_dm_daily_stats
+  - name: mart2_dm_monthly_stats

@@ -3,21 +3,24 @@
 with yel as 
 (select 
     -- zone info
-    pickup_borough,
-    pickup_zone,
-    pickup_service_zone,
-    dropoff_borough,
-    dropoff_zone,
-    dropoff_service_zone,
+    pickup_location_id,
+    dropoff_location_id,
     -- time info
     pickup_date,
     pickup_public_holiday, 
+    extract(year from pickup_datetime) pickup_year,
+    extract(month from pickup_datetime) pickup_month,
+    extract(hour from pickup_datetime) pickup_hour,
+    pickup_rush_hour_status, 
+    pickup_weekday_name,
     -- other info 
-    payment_description, 
+    ratecode_id,
+    payment_type, 
     trip_type_source trip_type,
-    cast(null as string) hvfs_description,
+    cast(null as string) hvfhs_license_number,
     -- aggregations
     avg(trip_distance) avg_trip_distance,
+    avg(trip_duration_min) avg_trip_duration_min,
     sum(fare_amount) fare_amount, 
     sum(tip_amount) tip_amount,
     sum(total_amount) total_amount,
@@ -25,11 +28,7 @@ with yel as
     sum(passenger_count) passenger_count,
     count(1) num_trips,
     current_timestamp() transformation_dt
-from `pipeline-analysis-455005`.`nytaxi_core1`.`core1_yellow_fact_trips`
-
-
-
-where pickup_date not in (select distinct pickup_date from `pipeline-analysis-455005`.`nytaxi_mart1`.`mart1_dm_daily_stats`)
+from `pipeline-analysis-455005`.`nytaxi_core2`.`core2_yellow_fact_trips`
 
 
 
@@ -38,21 +37,24 @@ group by all
 grn as 
 (select 
     -- zone info
-    pickup_borough,
-    pickup_zone,
-    pickup_service_zone,
-    dropoff_borough,
-    dropoff_zone,
-    dropoff_service_zone,
+    pickup_location_id,
+    dropoff_location_id,
     -- time info
     pickup_date,
-    pickup_public_holiday,
+    pickup_public_holiday, 
+    extract(year from pickup_datetime) pickup_year,
+    extract(month from pickup_datetime) pickup_month,
+    extract(hour from pickup_datetime) pickup_hour,
+    pickup_rush_hour_status, 
+    pickup_weekday_name,
     -- other info 
-    payment_description, 
+    ratecode_id,
+    payment_type, 
     trip_type_source trip_type,
-    cast(null as string) hvfs_description,
+    cast(null as string) hvfhs_license_number,
     -- aggregations
     avg(trip_distance) avg_trip_distance,
+    avg(trip_duration_min) avg_trip_duration_min,
     sum(fare_amount) fare_amount, 
     sum(tip_amount) tip_amount,
     sum(total_amount) total_amount,
@@ -60,11 +62,7 @@ grn as
     sum(passenger_count) passenger_count,
     count(1) num_trips,
     current_timestamp() transformation_dt
-from `pipeline-analysis-455005`.`nytaxi_core1`.`core1_green_fact_trips`
-
-
-
-where pickup_date not in (select distinct pickup_date from `pipeline-analysis-455005`.`nytaxi_mart1`.`mart1_dm_daily_stats`)
+from `pipeline-analysis-455005`.`nytaxi_core2`.`core2_green_fact_trips`
 
 
 
@@ -73,21 +71,24 @@ group by all
 fhvhv as 
 (select 
     -- zone info
-    pickup_borough,
-    pickup_zone,
-    pickup_service_zone,
-    dropoff_borough,
-    dropoff_zone,
-    dropoff_service_zone,
+    pickup_location_id,
+    dropoff_location_id,
     -- time info
     pickup_date,
-    pickup_public_holiday,
+    pickup_public_holiday, 
+    extract(year from pickup_datetime) pickup_year,
+    extract(month from pickup_datetime) pickup_month,
+    extract(hour from pickup_datetime) pickup_hour,
+    pickup_rush_hour_status, 
+    pickup_weekday_name,
     -- other info 
-    cast(null as string) payment_description, 
+    cast(null as int64) ratecode_id,
+    cast(null as int64) payment_type, 
     trip_type_source trip_type,
-    hvfs_description,
+    hvfhs_license_number,
     -- aggregations
     avg(trip_distance) avg_trip_distance,
+    avg(trip_duration_min) avg_trip_duration_min,
     sum(base_passenger_fare) fare_amount, 
     sum(tip_amount) tip_amount,
     cast(null as float64) total_amount,
@@ -95,11 +96,7 @@ fhvhv as
     cast(null as int64) passenger_count,
     count(1) num_trips,
     current_timestamp() transformation_dt
-from `pipeline-analysis-455005`.`nytaxi_core1`.`core1_fhvhv_fact_trips`
-
-
-
-where pickup_date not in (select distinct pickup_date from `pipeline-analysis-455005`.`nytaxi_mart1`.`mart1_dm_daily_stats`)
+from `pipeline-analysis-455005`.`nytaxi_core2`.`core2_fhvhv_fact_trips`
 
 
 
@@ -107,21 +104,24 @@ group by all
 )
 select 
     -- zone info
-    pickup_borough,
-    pickup_zone,
-    pickup_service_zone,
-    dropoff_borough,
-    dropoff_zone,
-    dropoff_service_zone,
+    pickup_location_id,
+    dropoff_location_id,
     -- time info
     pickup_date,
-    pickup_public_holiday,
+    pickup_public_holiday, 
+    pickup_year,
+    pickup_month,
+    pickup_hour,
+    pickup_rush_hour_status, 
+    pickup_weekday_name,
     -- other info 
-    payment_description, 
+    ratecode_id,
+    payment_type, 
     trip_type,
-    hvfs_description,
+    hvfhs_license_number,
     -- aggregations
     avg_trip_distance,
+    avg_trip_duration_min,
     fare_amount, 
     tip_amount,
     total_amount,
@@ -133,21 +133,24 @@ from yel
 union all 
 select 
     -- zone info
-    pickup_borough,
-    pickup_zone,
-    pickup_service_zone,
-    dropoff_borough,
-    dropoff_zone,
-    dropoff_service_zone,
+    pickup_location_id,
+    dropoff_location_id,
     -- time info
     pickup_date,
-    pickup_public_holiday,
+    pickup_public_holiday, 
+    pickup_year,
+    pickup_month,
+    pickup_hour,
+    pickup_rush_hour_status, 
+    pickup_weekday_name,
     -- other info 
-    payment_description, 
+    ratecode_id,
+    payment_type, 
     trip_type,
-    hvfs_description,
+    hvfhs_license_number,
     -- aggregations
     avg_trip_distance,
+    avg_trip_duration_min,
     fare_amount, 
     tip_amount,
     total_amount,
@@ -159,21 +162,24 @@ from grn
 union all 
 select 
     -- zone info
-    pickup_borough,
-    pickup_zone,
-    pickup_service_zone,
-    dropoff_borough,
-    dropoff_zone,
-    dropoff_service_zone,
+    pickup_location_id,
+    dropoff_location_id,
     -- time info
     pickup_date,
-    pickup_public_holiday,
+    pickup_public_holiday, 
+    pickup_year,
+    pickup_month,
+    pickup_hour,
+    pickup_rush_hour_status, 
+    pickup_weekday_name,
     -- other info 
-    payment_description, 
+    ratecode_id,
+    payment_type, 
     trip_type,
-    hvfs_description,
+    hvfhs_license_number,
     -- aggregations
     avg_trip_distance,
+    avg_trip_duration_min,
     fare_amount, 
     tip_amount,
     total_amount,

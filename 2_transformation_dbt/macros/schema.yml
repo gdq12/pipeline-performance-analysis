@@ -69,7 +69,7 @@ macros:
         description: >
           determines weekday based on Bigqueries extracted weekday number.
 
-  - name: get_paymnet_description
+  - name: get_payment_description
     description: > 
       This macro provides the payment type description based on the input values.
     arguments: 

@@ -1,0 +1,9 @@
+version: 2
+
+models:
+  - name: core2_yellow_fact_trips
+  - name: core2_green_fact_trips
+  - name: core2_fhvhv_fact_trips
+  - name: core2_fhv_fact_trips
+  - name: core2_dm_daily_stats
+  - name: core2_dm_monthly_stats
