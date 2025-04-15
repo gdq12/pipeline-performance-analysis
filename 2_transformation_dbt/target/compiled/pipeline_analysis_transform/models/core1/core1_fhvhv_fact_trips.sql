@@ -9,7 +9,12 @@ select
     -- IDs
     trp.trip_id,
     trp.hvfhs_license_number, 
-    mp.app_company_affiliation hvfs_description,
+    case 
+      when trp.hvfhs_license_number = 'HV0002' then 'Juno'
+      when trp.hvfhs_license_number = 'HV0005' then 'Lyft'
+      when trp.hvfhs_license_number = 'HV0003' then 'Uber'
+      when trp.hvfhs_license_number = 'HV0004' then 'Via'
+      end hvfs_description,
     trp.dispatching_base_number, 
     trp.originating_base_number,
     -- time centric dimensions
@@ -119,7 +124,6 @@ select
 from `pipeline-analysis-455005`.`nytaxi_stage`.`stg_fhvhv__2_filter_out_faulty` trp 
 join `pipeline-analysis-455005`.`nytaxi_mapping`.`taxi_zone_lookup` pz on trp.pickup_location_id = pz.location_id 
 join `pipeline-analysis-455005`.`nytaxi_mapping`.`taxi_zone_lookup` dz on trp.dropoff_location_id = dz.location_id 
-join `pipeline-analysis-455005`.`nytaxi_mapping`.`hvlv_base_numbers` mp on trp.hvfhs_license_number = mp.hvln 
 
 
 

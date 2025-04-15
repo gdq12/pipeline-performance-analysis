@@ -8,6 +8,45 @@
     cluster_by = ["data_source", "pickup_date"]
 )}}
 
+with fhvhv as 
+(select 
+  data_source,
+  pickup_date,
+  hvfhs_license_number, 
+  dispatching_base_number, 
+  originating_base_number,
+  request_datetime,
+  on_scene_datetime,
+  pickup_datetime,
+  dropoff_datetime, 
+  pickup_location_id,
+  dropoff_location_id,
+  trip_distance, 
+  trip_time, 
+  base_passenger_fare, 
+  toll_amount,
+  black_card_fund_amount,
+  sales_tax,
+  congestion_surcharge,
+  airport_fee,
+  tip_amount,
+  driver_pay_amount,
+  shared_request_flag,
+  shared_match_flag,
+  access_a_ride_flag,
+  wav_request_flag, 
+  wav_match_flag, 
+  creation_dt,
+  clone_dt, 
+  row_number() over (order by hvfhs_license_number,dispatching_base_number,originating_base_number, 
+                              request_datetime, on_scene_datetime, pickup_datetime, dropoff_datetime,
+                              pickup_location_id, dropoff_location_id, trip_distance,trip_time,
+                              base_passenger_fare,toll_amount, black_card_fund_amount, sales_tax, 
+                              congestion_surcharge, airport_fee, tip_amount, driver_pay_amount, 
+                              shared_request_flag, shared_match_flag, access_a_ride_flag, 
+                              wav_request_flag,wav_match_flag) row_num
+from {{ ref('fhvhv__3_data_type') }}
+)
 select 
     parse_datetime('%Y-%m-%d', regexp_substr(data_source, '[0-9]{4}-[0-9]{2}$')||'-01') trip_type_start_date,
     data_source,
@@ -20,7 +59,7 @@ select
                                         'base_passenger_fare','toll_amount', 'black_card_fund_amount', 'sales_tax', 
                                         'congestion_surcharge', 'airport_fee', 'tip_amount', 'driver_pay_amount', 
                                         'shared_request_flag', 'shared_match_flag', 'access_a_ride_flag', 
-                                        'wav_request_flag','wav_match_flag']) }} trip_id,
+                                        'wav_request_flag','wav_match_flag', 'row_num']) }} trip_id,
     hvfhs_license_number, 
     dispatching_base_number, 
     originating_base_number,
@@ -48,7 +87,7 @@ select
     creation_dt,
     clone_dt,
     {{ dbt.current_timestamp() }} transformation_dt
-from {{ ref('fhvhv__3_data_type') }}
+from fhvhv
 
 {% if is_incremental() %}
 
