@@ -463,7 +463,9 @@ models:
         constraints:
           - type: not_null
         tests:
-          - unique:
+          - name: surggate_key_validity 
+            test_name: unique
+            config:
               severity: warn
           - not_null:
               severity: warn
