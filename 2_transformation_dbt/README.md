@@ -224,3 +224,9 @@
 * round timestamp to nearest [15min](https://stackoverflow.com/questions/53028983/round-timstamp-to-nearest-15-mins-interval-in-bigquery)
 
 * good [YT video](https://www.youtube.com/watch?v=iz6lxi9BczA) on Bigquery query optimization
+
+### Bigquery docs
+
+* query cahce [docs](https://cloud.google.com/bigquery/docs/cached-results#cache-exceptions)
+
+* this [section of documentation](https://cloud.google.com/bigquery/docs/best-practices-performance-overview) is great to understand query processing and computing to then optimize queries accordingly
