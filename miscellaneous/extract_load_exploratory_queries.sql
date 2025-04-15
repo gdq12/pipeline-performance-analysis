@@ -333,3 +333,23 @@ from pipeline-analysis-452722.nytaxi_stage2.__TABLES__
 where table_id = 'stg_yellow__3_from_source_clean'
 ;
  -- 1,648,566,991 (656 GB)
+
+
+-- data volume selection for incremental testing 
+select 
+-- table_id
+sum(size_bytes)/pow(10,9) 
+from `pipeline-analysis-455005`.`nytaxi_raw_backup`.__TABLES__
+where (
+      -- -- 177
+      -- (regexp_substr(table_id, 'yellow|green|fhvhv|fhv') is not null
+      -- and regexp_substr(table_id, '2009|2015|2019') is not null)
+      -- -- 443
+      -- (regexp_substr(table_id, 'yellow|green|fhvhv|fhv') is not null
+      -- and regexp_substr(table_id, '2010|2014|2020') is not null)
+      -- -- 608
+      -- (regexp_substr(table_id, 'yellow|green|fhvhv|fhv') is not null
+      -- and regexp_substr(table_id, '2009|2010|2011|2014|2018|2020|2023') is not null)
+      table_id in ('yellow_tripdata_2009-01', 'yellow_tripdata_2011-01', 'green_tripdata_2014-01', 'fhvhv_tripdata_2019-02', 'fhv_tripdata_2015-01')
+)
+;
