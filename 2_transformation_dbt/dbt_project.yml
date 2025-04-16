@@ -94,7 +94,10 @@ models:
 
 vars:
   rate_codes: [1, 2, 3, 4, 5, 6, 99]
+  rate_description: ["'STANDARD RATE'", "'JFK'", "'NEWARK'", "'NASSAU/WESTCHESTER'", "'NEGOTIATED FARE'", "'GROUP RIDE'", "'UNKNOWN'"]
   payment_types: [1, 2, 3, 4, 5, 6]
+  payment_description: ["'FLEX FARE TRIP'", "'CREDIT CARD'", "'CASH'", "'NO CHARGE'", "'DISPUTE'", "'UNKNOWN'", "'VOIDED TRIP'"]
+  'dbt_date:time_zone': 'Europe/Berlin'
   run_tag: 'test qhistory insertion'
 
 on-run-end: 

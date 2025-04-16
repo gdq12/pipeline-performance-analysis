@@ -5,7 +5,7 @@ sources:
     description: >
       Data loaded into BigQuery using spark cluster in Dataproc. All tables in this schema represent the fist instance  
       a column_name/ordinal_position/dta_type combo was encountered. When a new combination was encountered, the data  
-      was pushed to a new table. In total, there were 29 different variations of the yellow_tripdata.
+      was pushed to a new table. In total, there were 7 different variations of the fhvhv_tripdata.
 
     database: "{{ env_var('PROJECT_ID') }}"
     schema: "{{ env_var('BQ_RAW_SCHEMA') }}"
@@ -24,7 +24,9 @@ models:
     description: >
       Unions all together 7 fhvhv_tripdata tables from the source schema. Uses column name mapping 
       from the `mapping__1_column_name_mapping` model to do this. 
-
+    config:
+      contract:
+        enforced: true
     columns:
       - name: hvfhs_license_number
         data_type: string
@@ -169,7 +171,9 @@ models:
   - name: fhvhv__3_data_type
     description: > 
       It safe data type casts all the columns.
-
+    config:
+      contract:
+        enforced: true
     columns:
       - name: hvfhs_license_number
         data_type: string
@@ -318,7 +322,9 @@ models:
       This table is materialized as it is in its final format prior to filter out records that might  
       have a negative impact on analysis. The table is partitioned by `trip_type_start_date` and is 
       clustered by: `data_source`, `pickup_date`.
-
+    config:
+      contract:
+        enforced: true
     columns:
       - name: trip_type_start_date
         data_type: datetime
@@ -336,14 +342,28 @@ models:
           The day truncation of `pickup_datetime`. This column was used to partition the source parquet  file after it was partially processed by the spark cluster (Dataproc). Table is clustered on this column.
 
       - name: trip_type_end_date
-        data_type: date
+        data_type: timestamp
         description: >
           Last day of the month that dropoff_datetime should not be too much after (1-2 days max).
+
+      - name: trip_type_source
+        data_type: string
+        description: >
+          Indicates what trip data set the record was sourced from: yellow, green, fhvhv or fhv
 
       - name: trip_id
         data_type: string
         description: >
           unique ID created from `dbt_utils.generate_surrogate_key` by using all columns in this view.
+        tests:
+          - name: clean.fhvhv.unique_trip_id
+            test_name: unique
+            config:
+              severity: warn
+          - name: clean.fhvhv.null_trip_id
+            test_name: not_null
+            config:
+              severity: warn
 
       - name: hvfhs_license_number
         data_type: string
@@ -384,11 +404,23 @@ models:
         data_type: int64
         description: >
           TLC Taxi Zone in which the trip began.
+        tests:
+          - name: clean.fhvhv.eval_pickup_location
+            test_name: relationships
+            to: source('mapping.map', 'taxi_zone_lookup')
+            field: location_id
+            severity: warn
 
       - name: dropoff_location_id
         data_type: int64
         description: >
           TLC Taxi Zone in which the trip ended.
+        tests:
+          - name: clean.fhvhv.eval_dropoff_location
+            test_name: relationships 
+            to: source('mapping.map', 'taxi_zone_lookup')
+            field: location_id
+            severity: warn
 
       - name: trip_distance
         data_type: float64
@@ -474,3 +506,9 @@ models:
         data_type: timestamp
         description: >
           Timestamp for when the data was cloned from the backup schema to the target raw schema.
+      
+      - name: transformation_dt
+        data_type: timestamp
+        description: >
+          Timestamp for when the record was in the table. The principle rolw of the column to verify 
+          that query cache is disabled for performance testing purposes.

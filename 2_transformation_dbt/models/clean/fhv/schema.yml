@@ -1,13 +1,35 @@
 version: 2
 
-models:
+sources:
+  - name: clean.fhv
+    description: >
+      Data loaded into BigQuery using spark cluster in Dataproc. All tables in this schema represent the fist instance  
+      a column_name/ordinal_position/dta_type combo was encountered. When a new combination was encountered, the data  
+      was pushed to a new table. In total, there were 8 different variations of the fhv_tripdata.
 
+    database: "{{ env_var('PROJECT_ID') }}"
+    schema: "{{ env_var('BQ_RAW_SCHEMA') }}"
+
+    tables:
+      - name: fhv_tripdata_2015-01
+      - name: fhv_tripdata_2017-05
+      - name: fhv_tripdata_2019-03
+      - name: fhv_tripdata_2019-05
+      - name: fhv_tripdata_2019-07
+      - name: fhv_tripdata_2020-07
+      - name: fhv_tripdata_2020-08
+      - name: fhv_tripdata_2023-02
+
+
+models:
   - name: fhv__2_tbl_collation
     description: >
       Data loaded into BigQuery using spark cluster in Dataproc. All tables in this schema represent the fist instance  
       a column_name/ordinal_position/dta_type combo was encountered. When a new combination was encountered, the data  
       was pushed to a new table. In total, there were 8 different variations of the fhv_tripdata. 
-
+    config:
+      contract:
+        enforced: true
     columns:
       - name: dispatching_base_number
         data_type: string
@@ -35,7 +57,7 @@ models:
           TLC Taxi Zone in which the trip ended.
 
       - name: sr_flag
-        data_type: float64
+        data_type: int64
         description: >
           Indicates if the trip was a part of a shared ride chain offered by a High
           Volume FHV company (e.g. Uber Pool, Lyft Line). For shared trips, the value
@@ -81,7 +103,9 @@ models:
   - name: fhv__3_data_type
     description: >
       It safe data type casts all the columns.
-
+    config:
+      contract:
+        enforced: true
     columns:
       - name: dispatching_base_number
         data_type: string
@@ -159,7 +183,9 @@ models:
       This table is materialized as it is in its final format prior to filter out records that might  
       have a negative impact on analysis. The table is partitioned by `trip_type_start_date` and is 
       clustered by: `data_source`, `pickup_date`.
-
+    config:
+      contract:
+        enforced: true
     columns:
       - name: trip_type_start_date
         data_type: datetime
@@ -181,10 +207,25 @@ models:
         description: >
           Last day of the month that dropoff_datetime should not be too much after (1-2 days max).
 
+      - name: trip_type_source
+        data_type: string
+        description: >
+          Indicates what trip data set the record was sourced from: yellow, green, fhvhv or fhv
+
       - name: trip_id
         data_type: string
         description: >
           unique ID created from `dbt_utils.generate_surrogate_key` by using all columns in this view.
+        tests:
+          - name: clean.fhv.unique_trip_id
+            test_name: unique
+            config:
+              severity: warn
+
+          - name: clean.fhv.null_trip_id
+            test_name: not_null
+            config:
+              severity: warn
 
       - name: dispatching_base_number
         data_type: string
@@ -205,11 +246,23 @@ models:
         data_type: int64
         description: >
           TLC Taxi Zone in which the trip began.
+        tests:
+          - name: clean.fhv.eval_pickup_location
+            test_name: relationships
+            to: source('mapping.map', 'taxi_zone_lookup')
+            field: location_id
+            severity: warn
 
       - name: dropoff_location_id
         data_type: int64
         description: >
           TLC Taxi Zone in which the trip ended.
+        tests:
+          - name: clean.fhv.eval_dropoff_location
+            test_name: relationships 
+            to: source('mapping.map', 'taxi_zone_lookup')
+            field: location_id
+            severity: warn
 
       - name: sr_flag
         data_type: int64
@@ -244,3 +297,9 @@ models:
         data_type: timestamp
         description: >
           Timestamp for when the data was cloned from the backup schema to the target raw schema. 
+
+      - name: transformation_dt
+        data_type: timestamp
+        description: >
+          Timestamp for when the record was in the table. The principle rolw of the column to verify 
+          that query cache is disabled for performance testing purposes.

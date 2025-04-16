@@ -91,7 +91,6 @@ select
     dz.zone dropoff_zone,
     dz.service_zone dropoff_service_zone,
     -- trip categorization
-    trp.ratecode_id,
     case safe_cast(ratecode_id as INT64)
         when 1 then 'STANDARD RATE'
         when 2 then 'JFK'
@@ -102,7 +101,6 @@ select
         when 99 then 'UNKNOWN'
     end ratecode_description,
     trp.store_and_fwd_flag,
-    trp.payment_type,
     case safe_cast(ratecode_id as INT64)
         when 0 then 'FLEX FARE TRIP'
         when 1 then 'CREDIT CARD'

@@ -8,6 +8,24 @@
     cluster_by = ["data_source", "pickup_date"]
 )}}
 
+with fhv as 
+(select 
+  data_source,
+  pickup_date,
+  dispatching_base_number,
+  pickup_datetime, 
+  dropoff_datetime,
+  pickup_location_id,
+  dropoff_location_id,
+  sr_flag, 
+  affiliated_base_number,
+  creation_dt, 
+  clone_dt,
+  row_number() over (order by dispatching_base_number, pickup_datetime, dropoff_datetime, 
+                              pickup_location_id, dropoff_location_id, sr_flag, 
+                              affiliated_base_number, pickup_date) row_num
+from {{ ref('fhv__3_data_type') }}
+)
 select 
     parse_datetime('%Y-%m-%d', regexp_substr(data_source, '[0-9]{4}-[0-9]{2}$')||'-01') trip_type_start_date,
     data_source,

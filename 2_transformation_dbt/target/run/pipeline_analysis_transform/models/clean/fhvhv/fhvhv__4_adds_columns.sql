@@ -3,6 +3,44 @@
     
 
     create or replace table `pipeline-analysis-455005`.`nytaxi_clean`.`fhvhv__4_adds_columns`
+        
+  (
+    trip_type_start_date datetime,
+    data_source string,
+    pickup_date timestamp,
+    trip_type_end_date timestamp,
+    trip_type_source string,
+    trip_id string,
+    hvfhs_license_number string,
+    dispatching_base_number string,
+    originating_base_number string,
+    request_datetime timestamp,
+    on_scene_datetime timestamp,
+    pickup_datetime timestamp,
+    dropoff_datetime timestamp,
+    pickup_location_id int64,
+    dropoff_location_id int64,
+    trip_distance float64,
+    trip_time int64,
+    base_passenger_fare float64,
+    toll_amount float64,
+    black_card_fund_amount float64,
+    sales_tax float64,
+    congestion_surcharge float64,
+    airport_fee float64,
+    tip_amount float64,
+    driver_pay_amount float64,
+    shared_request_flag string,
+    shared_match_flag string,
+    access_a_ride_flag string,
+    wav_request_flag string,
+    wav_match_flag string,
+    creation_dt timestamp,
+    clone_dt timestamp,
+    transformation_dt timestamp
+    
+    )
+
       
     partition by timestamp_trunc(trip_type_start_date, month)
     cluster by data_source, pickup_date
@@ -10,6 +48,9 @@
     OPTIONS()
     as (
       
+    select trip_type_start_date, data_source, pickup_date, trip_type_end_date, trip_type_source, trip_id, hvfhs_license_number, dispatching_base_number, originating_base_number, request_datetime, on_scene_datetime, pickup_datetime, dropoff_datetime, pickup_location_id, dropoff_location_id, trip_distance, trip_time, base_passenger_fare, toll_amount, black_card_fund_amount, sales_tax, congestion_surcharge, airport_fee, tip_amount, driver_pay_amount, shared_request_flag, shared_match_flag, access_a_ride_flag, wav_request_flag, wav_match_flag, creation_dt, clone_dt, transformation_dt
+    from (
+        
 
 with fhvhv as 
 (select 
@@ -89,5 +130,6 @@ from fhvhv
 
 
 
+    ) as model_subq
     );
   

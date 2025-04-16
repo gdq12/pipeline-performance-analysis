@@ -46,7 +46,7 @@ select
     dm.total_fees,
     dm.passenger_count,
     dm.num_trips,
-    dm.transformation_dt
+    current_timestamp() transformation_dt
 from `pipeline-analysis-455005`.`nytaxi_core2`.`core2_dm_daily_stats` dm 
 join `pipeline-analysis-455005`.`nytaxi_mapping`.`taxi_zone_lookup` pz on dm.pickup_location_id = pz.location_id 
 join `pipeline-analysis-455005`.`nytaxi_mapping`.`taxi_zone_lookup` dz on dm.dropoff_location_id = dz.location_id 

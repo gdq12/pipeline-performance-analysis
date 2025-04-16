@@ -353,3 +353,78 @@ where (
       table_id in ('yellow_tripdata_2009-01', 'yellow_tripdata_2011-01', 'green_tripdata_2014-01', 'fhvhv_tripdata_2019-02', 'fhv_tripdata_2015-01')
 )
 ;
+
+test yml configs
+
+config:
+  contract:
+    enforced: true
+
+- name: unique_trip_id
+  test_name: unique
+  config:
+    severity: warn
+
+- name: null_trip_id
+  test_name: not_null
+  config:
+    severity: warn
+
+- name: eval_rate_codes
+  test_name: accepted_values
+  values: "{{ var('rate_codes') }}"
+  severity: warn 
+  quote: false
+
+- name: eval_rate_description
+  test_name: accepted_values
+  values: "{{ var('rate_description') }}"
+  severity: warn 
+  quote: false
+
+- name: eval_payment_type
+  test_name: accepted_values
+  values: "{{ var('payment_types') }}"
+  severity: warn 
+  quote: false
+
+- name: eval_payment_description
+  test_name: accepted_values
+  values: "{{ var('payment_description') }}"
+  severity: warn 
+  quote: false
+
+- name: eval_pickup_location
+  test_name: relationships
+  to: source('mapping.map', 'taxi_zone_lookup')
+  field: location_id
+  severity: warn
+
+- name: eval_pickup_name
+  test_name: relationships
+  to: source('mapping.map', 'taxi_zone_lookup')
+  field: zone
+  severity: warn
+
+- name: eval_dropoff_location
+  test_name: relationships 
+  to: source('mapping.map', 'taxi_zone_lookup')
+  field: location_id
+  severity: warn
+
+- name: eval_dropoff_name
+  test_name: relationships 
+  to: source('mapping.map', 'taxi_zone_lookup')
+  field: zone
+  severity: warn
+
+- name: eval_num_public_holidays
+  test_name: dbt_expectations.expect_column_values_to_be_between:
+  min_value: 0 
+  max_value: 31
+
+- name: eval_num_public_holidays
+  test_name: dbt_utils.accepted_range
+  min_value: 0
+  max_value: 31
+  inclusive: true

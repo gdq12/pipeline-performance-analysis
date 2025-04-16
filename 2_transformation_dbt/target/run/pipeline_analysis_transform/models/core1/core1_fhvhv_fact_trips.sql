@@ -9,7 +9,7 @@
     data_source string,
     trip_type_source string,
     pickup_date timestamp,
-    trip_id string not null,
+    trip_id string,
     hvfhs_license_number string,
     hvfs_description string,
     dispatching_base_number string,

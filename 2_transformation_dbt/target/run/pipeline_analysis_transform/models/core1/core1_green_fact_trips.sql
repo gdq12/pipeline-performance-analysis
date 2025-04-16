@@ -9,7 +9,7 @@
     data_source string,
     trip_type_source string,
     pickup_date timestamp,
-    trip_id string not null,
+    trip_id string,
     vendor_id int64,
     pickup_datetime timestamp,
     dropoff_datetime timestamp,
@@ -35,10 +35,8 @@
     dropoff_borough string,
     dropoff_zone string,
     dropoff_service_zone string,
-    ratecode_id int64,
     ratecode_description string,
     store_and_fwd_flag string,
-    payment_type int64,
     payment_description string,
     trip_type int64,
     passenger_count int64,
@@ -64,7 +62,7 @@
     OPTIONS()
     as (
       
-    select trip_type_start_date, data_source, trip_type_source, pickup_date, trip_id, vendor_id, pickup_datetime, dropoff_datetime, trip_type_end_date, trip_duration_min, pickup_year, pickup_weekday_num, pickup_weekday_name, pickup_month, pickup_hour, pickup_public_holiday, pickup_rush_hour_status, dropoff_year, dropoff_weekday_num, dropoff_weekday_name, dropoff_month, dropoff_hour, dropoff_public_holiday, dropoff_rush_hour_status, pickup_borough, pickup_zone, pickup_service_zone, dropoff_borough, dropoff_zone, dropoff_service_zone, ratecode_id, ratecode_description, store_and_fwd_flag, payment_type, payment_description, trip_type, passenger_count, trip_distance, fare_amount, extra_amount, mta_tax, tip_amount, tolls_amount, ehail_fee, improvement_surcharge, total_amount, congestion_surcharge, clone_dt, transformation_dt
+    select trip_type_start_date, data_source, trip_type_source, pickup_date, trip_id, vendor_id, pickup_datetime, dropoff_datetime, trip_type_end_date, trip_duration_min, pickup_year, pickup_weekday_num, pickup_weekday_name, pickup_month, pickup_hour, pickup_public_holiday, pickup_rush_hour_status, dropoff_year, dropoff_weekday_num, dropoff_weekday_name, dropoff_month, dropoff_hour, dropoff_public_holiday, dropoff_rush_hour_status, pickup_borough, pickup_zone, pickup_service_zone, dropoff_borough, dropoff_zone, dropoff_service_zone, ratecode_description, store_and_fwd_flag, payment_description, trip_type, passenger_count, trip_distance, fare_amount, extra_amount, mta_tax, tip_amount, tolls_amount, ehail_fee, improvement_surcharge, total_amount, congestion_surcharge, clone_dt, transformation_dt
     from (
         
 
@@ -159,7 +157,6 @@ select
     dz.zone dropoff_zone,
     dz.service_zone dropoff_service_zone,
     -- trip categorization
-    trp.ratecode_id,
     case safe_cast(ratecode_id as INT64)
         when 1 then 'STANDARD RATE'
         when 2 then 'JFK'
@@ -170,7 +167,6 @@ select
         when 99 then 'UNKNOWN'
     end ratecode_description,
     trp.store_and_fwd_flag,
-    trp.payment_type,
     case safe_cast(ratecode_id as INT64)
         when 0 then 'FLEX FARE TRIP'
         when 1 then 'CREDIT CARD'

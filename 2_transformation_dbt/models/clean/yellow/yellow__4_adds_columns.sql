@@ -8,6 +8,38 @@
     cluster_by = ["data_source", "pickup_date"]
 )}}
 
+with yellow as 
+(select 
+  data_source,
+  pickup_date,
+  vendor_id,
+  pickup_datetime,
+  dropoff_datetime,
+  passenger_count,
+  trip_distance,
+  pickup_location_id,
+  ratecode_id,
+  store_and_fwd_flag,
+  dropoff_location_id,
+  payment_type,
+  fare_amount,
+  extra_amount,
+  mta_tax,
+  tip_amount,
+  tolls_amount,
+  improvement_surcharge,
+  total_amount,
+  congestion_surcharge,
+  airport_fee,
+  creation_dt,
+  clone_dt,
+  row_number() over (order by vendor_id, pickup_datetime , dropoff_datetime, passenger_count, 
+                          trip_distance, pickup_location_id, ratecode_id, store_and_fwd_flag, 
+                          dropoff_location_id, payment_type, fare_amount, extra_amount,
+                          mta_tax, tip_amount, tolls_amount, improvement_surcharge, 
+                          total_amount, congestion_surcharge, airport_fee) row_num
+from {{ ref('yellow__3_data_type_cast') }}
+)
 select 
   parse_datetime('%Y-%m-%d', regexp_substr(data_source, '[0-9]{4}-[0-9]{2}$')||'-01') trip_type_start_date,
   data_source,
@@ -18,7 +50,7 @@ select
                                         'trip_distance', 'pickup_location_id', 'ratecode_id', 'store_and_fwd_flag', 
                                         'dropoff_location_id', 'payment_type', 'fare_amount', 'extra_amount',
                                         'mta_tax', 'tip_amount', 'tolls_amount', 'improvement_surcharge', 
-                                        'total_amount', 'congestion_surcharge', 'airport_fee', 'data_source']) }} trip_id,
+                                        'total_amount', 'congestion_surcharge', 'airport_fee', 'row_num']) }} trip_id,
   vendor_id,
   pickup_datetime,
   dropoff_datetime,
@@ -41,7 +73,7 @@ select
   creation_dt,
   clone_dt,
   {{ dbt.current_timestamp() }} transformation_dt
-from {{ ref('yellow__3_data_type_cast') }}
+from yellow
 
 {% if is_incremental() %}
 

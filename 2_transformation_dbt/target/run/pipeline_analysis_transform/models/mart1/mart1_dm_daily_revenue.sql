@@ -3,6 +3,32 @@
     
 
     create or replace table `pipeline-analysis-455005`.`nytaxi_mart1`.`mart1_dm_daily_revenue`
+        
+  (
+    pickup_borough string,
+    pickup_zone string,
+    pickup_service_zone string,
+    dropoff_borough string,
+    dropoff_zone string,
+    dropoff_service_zone string,
+    pickup_date timestamp,
+    pickup_public_holiday boolean,
+    ratecode_description string,
+    payment_description string,
+    trip_type string,
+    hvfs_description string,
+    avg_trip_distance float64,
+    avg_trip_duration_min float64,
+    fare_amount float64,
+    tip_amount float64,
+    total_amount float64,
+    total_fees float64,
+    passenger_count int64,
+    num_trips int64,
+    transformation_dt timestamp
+    
+    )
+
       
     partition by timestamp_trunc(pickup_date, day)
     
@@ -10,6 +36,9 @@
     OPTIONS()
     as (
       
+    select pickup_borough, pickup_zone, pickup_service_zone, dropoff_borough, dropoff_zone, dropoff_service_zone, pickup_date, pickup_public_holiday, ratecode_description, payment_description, trip_type, hvfs_description, avg_trip_distance, avg_trip_duration_min, fare_amount, tip_amount, total_amount, total_fees, passenger_count, num_trips, transformation_dt
+    from (
+        
 
 with yel as 
 (select 
@@ -193,5 +222,6 @@ select
     num_trips,
     transformation_dt
 from fhvhv
+    ) as model_subq
     );
   

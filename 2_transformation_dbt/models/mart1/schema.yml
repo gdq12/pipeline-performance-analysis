@@ -3,6 +3,9 @@ version: 2
 models:
   - name: mart1_dm_daily_revenue
     description: ""
+    config:
+      contract:
+        enforced: true
     columns:
       - name: pickup_borough
         data_type: string
@@ -11,6 +14,12 @@ models:
       - name: pickup_zone
         data_type: string
         description: ""
+        tests:
+          - name: mart1.daily.eval_pickup_name
+            test_name: relationships
+            to: source('mapping.map', 'taxi_zone_lookup')
+            field: zone
+            severity: warn
 
       - name: pickup_service_zone
         data_type: string
@@ -23,6 +32,12 @@ models:
       - name: dropoff_zone
         data_type: string
         description: ""
+        tests:
+          - name: mart1.daily.eval_dropoff_name
+            test_name: relationships 
+            to: source('mapping.map', 'taxi_zone_lookup')
+            field: zone
+            severity: warn
 
       - name: dropoff_service_zone
         data_type: string
@@ -90,6 +105,9 @@ models:
 
   - name: mart1_dm_monthly_revenue
     description: ""
+    config:
+      contract:
+        enforced: true
     columns:
       - name: pickup_borough
         data_type: string
@@ -98,6 +116,12 @@ models:
       - name: pickup_zone
         data_type: string
         description: ""
+        tests:
+          - name: mart1.monthly.eval_pickup_name
+            test_name: relationships
+            to: source('mapping.map', 'taxi_zone_lookup')
+            field: zone
+            severity: warn
 
       - name: pickup_service_zone
         data_type: string
@@ -110,6 +134,12 @@ models:
       - name: dropoff_zone
         data_type: string
         description: ""
+        tests:
+          - name: mart1.monthly.eval_dropoff_name
+            test_name: relationships 
+            to: source('mapping.map', 'taxi_zone_lookup')
+            field: zone
+            severity: warn
 
       - name: dropoff_service_zone
         data_type: string
@@ -171,10 +201,11 @@ models:
         data_type: int64
         description: ""
         tests:
-          - dbt_utils.accepted_range:
-              min_value: 0
-              max_value: 31
-              inclusive: true
+          - name: mart1.monthly.eval_num_public_holidays
+            test_name: dbt_utils.accepted_range
+            min_value: 0
+            max_value: 31
+            inclusive: true
 
       - name: transformation_dt
         data_type: timestamp

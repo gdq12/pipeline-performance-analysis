@@ -26,12 +26,15 @@ models:
       - name: trip_id
         data_type: string
         description: ""
-        constraints:
-          - type: not_null
         tests:
-          - unique:
+          - name: core1.yellow.unique_trip_id
+            test_name: unique
+            config:
               severity: warn
-          - not_null:
+
+          - name: null_trip_id
+            test_name: not_null
+            config:
               severity: warn
 
       - name: vendor_id
@@ -117,6 +120,12 @@ models:
       - name: pickup_zone
         data_type: string
         description: ""
+        tests:
+          - name: core1.yellow.eval_pickup_name
+            test_name: relationships
+            to: source('mapping.map', 'taxi_zone_lookup')
+            field: zone
+            severity: warn
 
       - name: pickup_service_zone
         data_type: string
@@ -129,40 +138,40 @@ models:
       - name: dropoff_zone
         data_type: string
         description: ""
+        tests:
+          - name: core1.yellow.eval_dropoff_name
+            test_name: relationships 
+            to: source('mapping.map', 'taxi_zone_lookup')
+            field: zone
+            severity: warn
 
       - name: dropoff_service_zone
         data_type: string
         description: ""
 
-      - name: ratecode_id
-        data_type: int64
-        description: ""
-        tests:
-          - accepted_values:
-              values: "{{ var('rate_codes') }}"
-              severity: warn
-              quote: false
-
       - name: ratecode_description
         data_type: string
         description: ""
+        tests:
+          - name: core1.yellow.eval_rate_description
+            test_name: accepted_values
+            values: "{{ var('rate_description') }}"  
+            severity: warn 
+            quote: false
 
       - name: store_and_fwd_flag
         data_type: string
         description: ""
 
-      - name: payment_type
-        data_type: int64
-        description: ""
-        tests:
-          - accepted_values:
-              values: "{{ var('payment_types') }}"
-              severity: warn
-              quote: false
-
       - name: payment_description
         data_type: string
         description: ""
+        tests: 
+          - name: core1.yellow.eval_payment_description
+            test_name: accepted_values
+            values: "{{ var('payment_description') }}"
+            severity: warn 
+            quote: false
 
       - name: passenger_count
         data_type: int64
@@ -241,12 +250,14 @@ models:
       - name: trip_id
         data_type: string
         description: ""
-        constraints:
-          - type: not_null
         tests:
-          - unique:
+          - name: core1.green.unique_trip_id
+            test_name: unique
+            config:
               severity: warn
-          - not_null:
+          - name: core1.green.null_trip_id
+            test_name: not_null
+            config:
               severity: warn
 
       - name: vendor_id
@@ -332,6 +343,12 @@ models:
       - name: pickup_zone
         data_type: string
         description: ""
+        tests:
+          - name: core1.green.eval_pickup_name
+            test_name: relationships
+            to: source('mapping.map', 'taxi_zone_lookup')
+            field: zone
+            severity: warn
 
       - name: pickup_service_zone
         data_type: string
@@ -344,40 +361,40 @@ models:
       - name: dropoff_zone
         data_type: string
         description: ""
+        tests:
+          - name: core1.green.eval_dropoff_name
+            test_name: relationships 
+            to: source('mapping.map', 'taxi_zone_lookup')
+            field: zone
+            severity: warn
 
       - name: dropoff_service_zone
         data_type: string
         description: ""
 
-      - name: ratecode_id
-        data_type: int64
-        description: ""
-        tests:
-          - accepted_values:
-              values: "{{ var('rate_codes') }}"
-              severity: warn
-              quote: false
-
       - name: ratecode_description
         data_type: string
         description: ""
+        tests:
+          - name: core1.green.eval_rate_description
+            test_name: accepted_values
+            values: "{{ var('rate_description') }}"
+            severity: warn 
+            quote: false
 
       - name: store_and_fwd_flag
         data_type: string
         description: ""
 
-      - name: payment_type
-        data_type: int64
-        description: ""
-        tests:
-          - accepted_values:
-              values: "{{ var('payment_types') }}"
-              severity: warn
-              quote: false
-
       - name: payment_description
         data_type: string
         description: ""
+        tests:
+          - name: core1.green.eval_payment_description
+            test_name: accepted_values
+            values: "{{ var('payment_description') }}"
+            severity: warn 
+            quote: false
 
       - name: trip_type
         data_type: int64
@@ -460,14 +477,14 @@ models:
       - name: trip_id
         data_type: string
         description: ""
-        constraints:
-          - type: not_null
         tests:
-          - name: surggate_key_validity 
+          - name: core1.fhvhv.unique_trip_id
             test_name: unique
             config:
               severity: warn
-          - not_null:
+          - name: core1.fhvhv.null_trip_id
+            test_name: not_null
+            config:
               severity: warn
 
       - name: hvfhs_license_number
@@ -581,6 +598,12 @@ models:
       - name: pickup_service_zone
         data_type: string
         description: ""
+        tests:
+          - name: core1.fhvhv.eval_pickup_name
+            test_name: relationships
+            to: source('mapping.map', 'taxi_zone_lookup')
+            field: zone
+            severity: warn
 
       - name: dropoff_borough
         data_type: string
@@ -589,6 +612,12 @@ models:
       - name: dropoff_zone
         data_type: string
         description: ""
+        tests:
+          - name: core1.fhvhv.eval_dropoff_name
+            test_name: relationships 
+            to: source('mapping.map', 'taxi_zone_lookup')
+            field: zone
+            severity: warn
 
       - name: dropoff_service_zone
         data_type: string
@@ -683,12 +712,15 @@ models:
       - name: trip_id
         data_type: string
         description: ""
-        constraints:
-          - type: not_null
         tests:
-          - unique:
+          - name: core1.fhv.unique_trip_id
+            test_name: unique
+            config:
               severity: warn
-          - not_null:
+
+          - name: core1.fhv.null_trip_id
+            test_name: not_null
+            config:
               severity: warn
 
       - name: dispatching_base_number
@@ -778,6 +810,12 @@ models:
       - name: pickup_zone
         data_type: string
         description: ""
+        tests:
+          - name: core1.fhv.eval_pickup_name
+            test_name: relationships
+            to: source('mapping.map', 'taxi_zone_lookup')
+            field: zone
+            severity: warn
 
       - name: pickup_service_zone
         data_type: string
@@ -790,6 +828,12 @@ models:
       - name: dropoff_zone
         data_type: string
         description: ""
+        tests:
+          - name: core1.fhv.eval_dropoff_name
+            test_name: relationships 
+            to: source('mapping.map', 'taxi_zone_lookup')
+            field: zone
+            severity: warn
 
       - name: dropoff_service_zone
         data_type: string

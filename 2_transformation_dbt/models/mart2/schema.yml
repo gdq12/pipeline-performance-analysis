@@ -2,4 +2,271 @@ version: 2
 
 models:
   - name: mart2_dm_daily_stats
+    description: ""
+    config:
+      contract:
+        enforced: true
+    columns:
+      - name: pickup_borough
+        data_type: string
+        description: ""
+
+      - name: pickup_zone
+        data_type: string
+        description: ""
+        tests:
+          - name: mart2.dm_daily.eval_pickup_name
+            test_name: relationships
+            to: source('mapping.map', 'taxi_zone_lookup')
+            field: zone
+            severity: warn
+
+      - name: pickup_service_zone
+        data_type: string
+        description: ""
+
+      - name: dropoff_borough
+        data_type: string
+        description: ""
+
+      - name: dropoff_zone
+        data_type: string
+        description: ""
+        tests:
+          - name: mart2.dm_daily.eval_dropoff_name
+            test_name: relationships 
+            to: source('mapping.map', 'taxi_zone_lookup')
+            field: zone
+            severity: warn
+
+      - name: dropoff_service_zone
+        data_type: string
+        description: ""
+
+      - name: pickup_date
+        data_type: timestamp
+        description: ""
+
+      - name: pickup_public_holiday
+        data_type: boolean
+        description: ""
+
+      - name: pickup_year
+        data_type: int64
+        description: ""
+
+      - name: pickup_month
+        data_type: int64
+        description: ""
+
+      - name: pickup_hour
+        data_type: int64
+        description: ""
+
+      - name: pickup_rush_hour_status
+        data_type: string
+        description: ""
+
+      - name: pickup_weekday_name
+        data_type: string
+        description: ""
+
+      - name: applied_rate
+        data_type: string
+        description: ""
+        tests:
+          - name: mart2.dm_daily.eval_rate_description
+            test_name: accepted_values
+            values: "{{ var('rate_description') }}"
+            severity: warn 
+            quote: false
+        
+      - name: payment_type
+        data_type: string
+        description: ""
+        tests:
+          - name: mart2.dm_daily.eval_payment_description
+            test_name: accepted_values
+            values: "{{ var('payment_description') }}"
+            severity: warn 
+            quote: false
+
+      - name: trip_type
+        data_type: string
+        description: ""
+
+      - name: hvfs_license_name
+        data_type: string
+        description: ""
+
+      - name: avg_trip_distance
+        data_type: float64
+        description: ""
+
+      - name: avg_trip_duration_min
+        data_type: float64
+        description: ""
+
+      - name: fare_amount
+        data_type: float64
+        description: ""
+
+      - name: tip_amount
+        data_type: float64
+        description: ""
+
+      - name: total_amount
+        data_type: float64
+        description: ""
+
+      - name: total_fees
+        data_type: float64
+        description: ""
+
+      - name: passenger_count
+        data_type: int64
+        description: ""
+
+      - name: num_trips
+        data_type: int64
+        description: ""
+
+      - name: transformation_dt
+        data_type: timestamp
+        description: ""
+
   - name: mart2_dm_monthly_stats
+    description: ""
+    config:
+      contract:
+        enforced: true
+    columns:
+      - name: pickup_borough
+        data_type: string
+        description: ""
+
+      - name: pickup_zone
+        data_type: string
+        description: ""
+        tests:
+          - name: mart2.dm_monthly.eval_pickup_name
+            test_name: relationships
+            to: source('mapping.map', 'taxi_zone_lookup')
+            field: zone
+            severity: warn
+
+      - name: pickup_service_zone
+        data_type: string
+        description: ""
+
+      - name: dropoff_borough
+        data_type: string
+        description: ""
+
+      - name: dropoff_zone
+        data_type: string
+        description: ""
+        tests:
+          - name: mart2.dm_monthly.eval_dropoff_name
+            test_name: relationships 
+            to: source('mapping.map', 'taxi_zone_lookup')
+            field: zone
+            severity: warn
+
+      - name: dropoff_service_zone
+        data_type: string
+        description: ""
+
+      - name: pickup_date
+        data_type: timestamp
+        description: ""
+
+      - name: pickup_year
+        data_type: int64
+        description: ""
+
+      - name: pickup_month
+        data_type: int64
+        description: ""
+
+      - name: pickup_rush_hour_status
+        data_type: string
+        description: ""
+
+      - name: pickup_weekday_name
+        data_type: string
+        description: ""
+
+      - name: applied_rate
+        data_type: string
+        description: ""
+        tests:
+          - name: mart2.dm_monthly.eval_rate_description
+            test_name: accepted_values
+            values: "{{ var('rate_description') }}"
+            severity: warn 
+            quote: false
+
+      - name: payment_type
+        data_type: string
+        description: ""
+        tests:
+          - name: mart2.dm_monthly.eval_payment_description
+            test_name: accepted_values
+            values: "{{ var('payment_description') }}"
+            severity: warn 
+            quote: false
+
+      - name: trip_type
+        data_type: string
+        description: ""
+
+      - name: hvfs_license_name
+        data_type: string
+        description: ""
+
+      - name: avg_trip_distance
+        data_type: float64
+        description: ""
+
+      - name: avg_trip_duration_min
+        data_type: float64
+        description: ""
+
+      - name: fare_amount
+        data_type: float64
+        description: ""
+
+      - name: tip_amount
+        data_type: float64
+        description: ""
+
+      - name: total_amount
+        data_type: float64
+        description: ""
+
+      - name: total_fees
+        data_type: float64
+        description: ""
+
+      - name: passenger_count
+        data_type: int64
+        description: ""
+
+      - name: num_public_holidays
+        data_type: int64
+        description: ""
+        tests:
+          - name: mart2.dm_monthly.eval_num_public_holidays
+            test_name: dbt_utils.accepted_range
+            min_value: 0
+            max_value: 31
+            inclusive: true
+
+      - name: num_trips
+        data_type: int64
+        description: ""
+
+      - name: transformation_dt
+        data_type: timestamp
+        description: ""

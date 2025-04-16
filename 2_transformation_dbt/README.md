@@ -230,3 +230,5 @@
 * query cahce [docs](https://cloud.google.com/bigquery/docs/cached-results#cache-exceptions)
 
 * this [section of documentation](https://cloud.google.com/bigquery/docs/best-practices-performance-overview) is great to understand query processing and computing to then optimize queries accordingly
+
+* [article](https://datacoves.com/post/dbt-test-options) about different types of testing to implement

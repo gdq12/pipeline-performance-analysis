@@ -46,7 +46,9 @@ models:
     description: >
       Unions all together 24 of the 29 yellow_tripdata tables from the source schema (jan 2011 to present). 
       Uses column name mapping from the `mapping__1_column_name_mapping` model to do this. 
-      
+    config:
+      contract:
+        enforced: true
     columns:
       - name: vendor_id
         data_type: int64
@@ -168,7 +170,9 @@ models:
     description: >
       Unions all together 5 of the 29 yellow_tripdata tables from the source schema (jan 2009 to dec 2010).
       Uses column name mapping from the `mapping__1_column_name_mapping` model to do this. 
-
+    config:
+      contract:
+        enforced: true
     columns:
       - name: vendor_id
         data_type: string
@@ -284,7 +288,9 @@ models:
     description: >
       Convert latitude/longitude coordinates from `yellow__2a_2009_2010_tbl_collation` to location zone IDs 
       using `taxi_zone_geom` mapping table.
-
+    config:
+      contract:
+        enforced: true
     columns:
       - name: vendor_id
         data_type: string
@@ -394,7 +400,9 @@ models:
         - store_and_fwd_flag
         - vendor_id
         - ratecode_id
-
+    config:
+      contract:
+        enforced: true
     columns:
       - name: vendor_id
         data_type: int64
@@ -427,7 +435,7 @@ models:
           TLC Taxi Zone in which the taximeter was engaged
 
       - name: ratecode_id
-        data_type: string
+        data_type: int64
         description: >
           The final rate code in effect at the end of the trip.
 
@@ -518,7 +526,9 @@ models:
       This table is materialized as it is in its final format prior to filter out records that might  
       have a negative impact on analysis. The table is partitioned by `trip_type_start_date` and is 
       clustered by: `data_source`, `pickup_date`.
-      
+    config:
+      contract:
+        enforced: true
     columns:
       - name: trip_type_start_date
         data_type: datetime
@@ -536,14 +546,28 @@ models:
           The day truncation of `pickup_datetime`. This column was used to partition the source parquet  file after it was partially processed by the spark cluster (Dataproc). Table is clustered on this column.
 
       - name: trip_type_end_date
-        data_type: date
+        data_type: timestamp
         description: >
           Last day of the month that dropoff_datetime should not be too much after (1-2 days max).
+
+      - name: trip_type_source
+        data_type: string
+        description: >
+          Indicates what trip data set the record was sourced from: yellow, green, fhvhv or fhv
 
       - name: trip_id
         data_type: string
         description: >
           unique ID created from `dbt_utils.generate_surrogate_key` by using all columns in this view.
+        tests:
+          - name: clean.yellow.unique_trip_id
+            test_name: unique
+            config:
+              severity: warn
+          - name: clean.yellow.null_trip_id
+            test_name: not_null
+            config:
+              severity: warn          
 
       - name: vendor_id
         data_type: int64
@@ -573,12 +597,24 @@ models:
       - name: pickup_location_id
         data_type: int64
         description: >
-          TLC Taxi Zone in which the taximeter was engaged
+          TLC Taxi Zone in which the taximeter was engaged.
+        tests:
+          - name: clean.yellow.eval_pickup_location
+            test_name: relationships
+            to: source('mapping.map', 'taxi_zone_lookup')
+            field: location_id
+            severity: warn
 
       - name: ratecode_id
-        data_type: string
+        data_type: int64
         description: >
           The final rate code in effect at the end of the trip.
+        tests: 
+          - name: clean.yellow.eval_rate_codes
+            test_name: accepted_values
+            values: "{{ var('rate_codes') }}"
+            severity: warn 
+            quote: false
 
       - name: store_and_fwd_flag
         data_type: string
@@ -589,11 +625,23 @@ models:
         data_type: int64
         description: >
           TLC Taxi Zone in which the taximeter was disengaged.
+        tests:
+          - name: clean.yellow.eval_dropoff_location
+            test_name: relationships 
+            to: source('mapping.map', 'taxi_zone_lookup')
+            field: location_id
+            severity: warn
 
       - name: payment_type
         data_type: int64
         description: >
           A numeric code signifying how the passenger paid for the trip.
+        tests: 
+          - name: clean.yellow.eval_payment_type
+            test_name: accepted_values
+            values: "{{ var('payment_types') }}"
+            severity: warn 
+            quote: false
 
       - name: fare_amount
         data_type: float64
@@ -654,3 +702,9 @@ models:
         data_type: timestamp
         description: >
           Timestamp for when the data was cloned from the backup schema to the target raw schema.
+
+      - name: transformation_dt
+        data_type: timestamp
+        description: >
+          Timestamp for when the record was in the table. The principle rolw of the column to verify 
+          that query cache is disabled for performance testing purposes.

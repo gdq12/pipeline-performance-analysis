@@ -2,8 +2,889 @@ version: 2
 
 models:
   - name: core2_yellow_fact_trips
+    description: ""
+    config:
+      contract:
+        enforced: true
+    columns:
+      - name: trip_type_start_date
+        data_type: datetime
+        description: ""
+
+      - name: data_source
+        data_type: string
+        description: ""
+
+      - name: trip_type_source
+        data_type: string
+        description: ""
+
+      - name: pickup_date
+        data_type: timestamp
+        description: ""
+
+      - name: trip_type_end_date
+        data_type: timestamp
+        description: ""
+
+      - name: trip_id
+        data_type: string
+        description: ""
+        tests:
+          - name: core2.yellow.unique_trip_id
+            test_name: unique
+            config:
+              severity: warn
+
+          - name: core2.yellow.null_trip_id
+            test_name: not_null
+            config:
+              severity: warn
+
+      - name: vendor_id
+        data_type: int64
+        description: ""
+
+      - name: trip_duration_min
+        data_type: int64
+        description: ""
+
+      - name: pickup_datetime
+        data_type: timestamp
+        description: ""
+
+      - name: pickup_weekday_name
+        data_type: string
+        description: ""
+
+      - name: pickup_public_holiday
+        data_type: boolean
+        description: ""
+
+      - name: pickup_rush_hour_status
+        data_type: string
+        description: ""
+
+      - name: dropoff_datetime
+        data_type: timestamp
+        description: ""
+
+      - name: dropoff_weekday_name
+        data_type: string
+        description: ""
+
+      - name: dropoff_public_holiday
+        data_type: boolean
+        description: ""
+
+      - name: dropoff_rush_hour_status
+        data_type: string
+        description: ""
+
+      - name: pickup_location_id
+        data_type: int64
+        description: ""
+        tests:
+          - name: core2.yellow.eval_pickup_location
+            test_name: relationships
+            to: source('mapping.map', 'taxi_zone_lookup')
+            field: location_id
+            severity: warn
+
+      - name: dropoff_location_id
+        data_type: int64
+        description: ""
+        tests:
+          - name: core2.yellow.eval_dropoff_location
+            test_name: relationships 
+            to: source('mapping.map', 'taxi_zone_lookup')
+            field: location_id
+            severity: warn
+
+      - name: ratecode_id
+        data_type: int64
+        description: ""
+        tests:
+          - name: core2.yellow.eval_rate_codes
+            test_name: accepted_values
+            values: "{{ var('rate_codes') }}"
+            severity: warn 
+            quote: false
+
+      - name: store_and_fwd_flag
+        data_type: string
+        description: ""
+
+      - name: payment_type
+        data_type: int64
+        description: ""
+        tests:
+          - name: core2.yellow.eval_payment_type
+            test_name: accepted_values
+            values: "{{ var('payment_types') }}"
+            severity: warn 
+            quote: false
+
+      - name: passenger_count
+        data_type: int64
+        description: ""
+
+      - name: trip_distance
+        data_type: float64
+        description: ""
+
+      - name: fare_amount
+        data_type: float64
+        description: ""
+
+      - name: extra_amount
+        data_type: float64
+        description: ""
+
+      - name: mta_tax
+        data_type: float64
+        description: ""
+
+      - name: tip_amount
+        data_type: float64
+        description: ""
+
+      - name: tolls_amount
+        data_type: float64
+        description: ""
+
+      - name: improvement_surcharge
+        data_type: float64
+        description: ""
+
+      - name: total_amount
+        data_type: float64
+        description: ""
+
+      - name: congestion_surcharge
+        data_type: float64
+        description: ""
+
+      - name: airport_fee
+        data_type: float64
+        description: ""
+
+      - name: clone_dt
+        data_type: timestamp
+        description: ""
+
+      - name: transformation_dt
+        data_type: timestamp
+        description: ""
+
   - name: core2_green_fact_trips
+    description: ""
+    config:
+      contract:
+        enforced: true
+    columns:
+      - name: trip_type_start_date
+        data_type: datetime
+        description: ""
+
+      - name: data_source
+        data_type: string
+        description: ""
+
+      - name: trip_type_source
+        data_type: string
+        description: ""
+
+      - name: pickup_date
+        data_type: timestamp
+        description: ""
+
+      - name: trip_type_end_date
+        data_type: timestamp
+        description: ""
+
+      - name: trip_id
+        data_type: string
+        description: ""
+        tests:
+          - name: core2.green.unique_trip_id
+            test_name: unique
+            config:
+              severity: warn
+
+          - name: core2.green.null_trip_id
+            test_name: not_null
+            config:
+              severity: warn
+
+      - name: vendor_id
+        data_type: int64
+        description: ""
+
+      - name: trip_duration_min
+        data_type: int64
+        description: ""
+
+      - name: pickup_datetime
+        data_type: timestamp
+        description: ""
+
+      - name: pickup_weekday_name
+        data_type: string
+        description: ""
+
+      - name: pickup_public_holiday
+        data_type: boolean
+        description: ""
+
+      - name: pickup_rush_hour_status
+        data_type: string
+        description: ""
+
+      - name: dropoff_datetime
+        data_type: timestamp
+        description: ""
+
+      - name: dropoff_weekday_name
+        data_type: string
+        description: ""
+
+      - name: dropoff_public_holiday
+        data_type: boolean
+        description: ""
+
+      - name: dropoff_rush_hour_status
+        data_type: string
+        description: ""
+
+      - name: pickup_location_id
+        data_type: int64
+        description: ""
+        tests:
+          - name: core2.green.eval_pickup_location
+            test_name: relationships
+            to: source('mapping.map', 'taxi_zone_lookup')
+            field: location_id
+            severity: warn
+
+      - name: dropoff_location_id
+        data_type: int64
+        description: ""
+        tests:
+          - name: core2.green.eval_dropoff_location
+            test_name: relationships 
+            to: source('mapping.map', 'taxi_zone_lookup')
+            field: location_id
+            severity: warn
+
+      - name: ratecode_id
+        data_type: int64
+        description: ""
+        tests:
+          - name: core2.green.eval_rate_codes
+            test_name: accepted_values
+            values: "{{ var('rate_codes') }}"
+            severity: warn 
+            quote: false
+
+      - name: store_and_fwd_flag
+        data_type: string
+        description: ""
+
+      - name: payment_type
+        data_type: int64
+        description: ""
+        tests:
+          - name: core2.green.eval_payment_type
+            test_name: accepted_values
+            values: "{{ var('payment_types') }}"
+            severity: warn 
+            quote: false
+
+      - name: trip_type
+        data_type: int64
+        description: ""
+
+      - name: passenger_count
+        data_type: int64
+        description: ""
+
+      - name: trip_distance
+        data_type: float64
+        description: ""
+
+      - name: fare_amount
+        data_type: float64
+        description: ""
+
+      - name: extra_amount
+        data_type: float64
+        description: ""
+
+      - name: mta_tax
+        data_type: float64
+        description: ""
+
+      - name: tip_amount
+        data_type: float64
+        description: ""
+
+      - name: tolls_amount
+        data_type: float64
+        description: ""
+
+      - name: ehail_fee
+        data_type: float64
+        description: ""
+
+      - name: improvement_surcharge
+        data_type: float64
+        description: ""
+
+      - name: total_amount
+        data_type: float64
+        description: ""
+
+      - name: congestion_surcharge
+        data_type: float64
+        description: ""
+
+      - name: clone_dt
+        data_type: timestamp
+        description: ""
+
+      - name: transformation_dt
+        data_type: timestamp
+        description: ""
+
   - name: core2_fhvhv_fact_trips
+    description: ""
+    config:
+      contract:
+        enforced: true
+    columns:
+      - name: trip_type_start_date
+        data_type: datetime
+        description: ""
+
+      - name: data_source
+        data_type: string
+        description: ""
+
+      - name: trip_type_source
+        data_type: string
+        description: ""
+
+      - name: pickup_date
+        data_type: timestamp
+        description: ""
+
+      - name: trip_type_end_date
+        data_type: timestamp
+        description: ""
+
+      - name: trip_id
+        data_type: string
+        description: ""
+        tests:
+          - name: core2.fhvhv.unique_trip_id
+            test_name: unique
+            config:
+              severity: warn
+
+          - name: core2.fhvhv.null_trip_id
+            test_name: not_null
+            config:
+              severity: warn
+
+      - name: hvfhs_license_number
+        data_type: string
+        description: ""
+
+      - name: dispatching_base_number
+        data_type: string
+        description: ""
+
+      - name: originating_base_number
+        data_type: string
+        description: ""
+
+      - name: request_datetime
+        data_type: timestamp
+        description: ""
+
+      - name: on_scene_datetime
+        data_type: timestamp
+        description: ""
+
+      - name: trip_time
+        data_type: int64
+        description: ""
+
+      - name: trip_duration_min
+        data_type: int64
+        description: ""
+
+      - name: pickup_datetime
+        data_type: timestamp
+        description: ""
+
+      - name: pickup_weekday_name
+        data_type: string
+        description: ""
+
+      - name: pickup_public_holiday
+        data_type: boolean
+        description: ""
+
+      - name: pickup_rush_hour_status
+        data_type: string
+        description: ""
+
+      - name: dropoff_datetime
+        data_type: timestamp
+        description: ""
+
+      - name: dropoff_weekday_name
+        data_type: string
+        description: ""
+
+      - name: dropoff_public_holiday
+        data_type: boolean
+        description: ""
+
+      - name: dropoff_rush_hour_status
+        data_type: string
+        description: ""
+
+      - name: pickup_location_id
+        data_type: int64
+        description: ""
+        tests:
+          - name: core2.fhvhv.eval_pickup_location
+            test_name: relationships
+            to: source('mapping.map', 'taxi_zone_lookup')
+            field: location_id
+            severity: warn
+
+      - name: dropoff_location_id
+        data_type: int64
+        description: ""
+        tests:
+          - name: core2.fhvhv.eval_dropoff_location
+            test_name: relationships 
+            to: source('mapping.map', 'taxi_zone_lookup')
+            field: location_id
+            severity: warn
+
+      - name: trip_distance
+        data_type: float64
+        description: ""
+
+      - name: shared_request_flag
+        data_type: string
+        description: ""
+
+      - name: shared_match_flag
+        data_type: string
+        description: ""
+
+      - name: access_a_ride_flag
+        data_type: string
+        description: ""
+
+      - name: wav_request_flag
+        data_type: string
+        description: ""
+
+      - name: wav_match_flag
+        data_type: string
+        description: ""
+
+      - name: base_passenger_fare
+        data_type: float64
+        description: ""
+
+      - name: toll_amount
+        data_type: float64
+        description: ""
+
+      - name: black_card_fund_amount
+        data_type: float64
+        description: ""
+
+      - name: sales_tax
+        data_type: float64
+        description: ""
+
+      - name: congestion_surcharge
+        data_type: float64
+        description: ""
+
+      - name: airport_fee
+        data_type: float64
+        description: ""
+
+      - name: tip_amount
+        data_type: float64
+        description: ""
+
+      - name: driver_pay_amount
+        data_type: float64
+        description: ""
+
+      - name: clone_dt
+        data_type: timestamp
+        description: ""
+
+      - name: transformation_dt
+        data_type: timestamp
+        description: ""
+
   - name: core2_fhv_fact_trips
+    description: ""
+    config:
+      contract:
+        enforced: true
+    columns:
+      - name: trip_type_start_date
+        data_type: datetime
+        description: ""
+
+      - name: data_source
+        data_type: string
+        description: ""
+
+      - name: trip_type_source
+        data_type: string
+        description: ""
+
+      - name: pickup_date
+        data_type: datetime
+        description: ""
+
+      - name: trip_type_end_date
+        data_type: timestamp
+        description: ""
+
+      - name: trip_id
+        data_type: string
+        description: ""
+        tests:
+          - name: core2.fhv.unique_trip_id
+            test_name: unique
+            config:
+              severity: warn
+
+          - name: core2.fhv.null_trip_id
+            test_name: not_null
+            config:
+              severity: warn
+
+      - name: dispatching_base_number
+        data_type: string
+        description: ""
+
+      - name: affiliated_base_number
+        data_type: string
+        description: ""
+
+      - name: trip_duration_min
+        data_type: int64
+        description: ""
+
+      - name: pickup_datetime
+        data_type: timestamp
+        description: ""
+
+      - name: pickup_weekday_name
+        data_type: string
+        description: ""
+
+      - name: pickup_public_holiday
+        data_type: boolean
+        description: ""
+
+      - name: pickup_rush_hour_status
+        data_type: string
+        description: ""
+
+      - name: dropoff_datetime
+        data_type: timestamp
+        description: ""
+
+      - name: dropoff_weekday_name
+        data_type: string
+        description: ""
+
+      - name: dropoff_public_holiday
+        data_type: boolean
+        description: ""
+
+      - name: dropoff_rush_hour_status
+        data_type: string
+        description: ""
+
+      - name: pickup_location_id
+        data_type: int64
+        description: ""
+        tests:
+          - name: core2.fhv.eval_pickup_location
+            test_name: relationships
+            to: source('mapping.map', 'taxi_zone_lookup')
+            field: location_id
+            severity: warn
+
+      - name: dropoff_location_id
+        data_type: int64
+        description: ""
+        tests:
+          - name: core2.fhv.eval_dropoff_location
+            test_name: relationships 
+            to: source('mapping.map', 'taxi_zone_lookup')
+            field: location_id
+            severity: warn
+
+      - name: sr_flag
+        data_type: int64
+        description: ""
+
+      - name: clone_dt
+        data_type: timestamp
+        description: ""
+
+      - name: transformation_dt
+        data_type: timestamp
+        description: ""
+
   - name: core2_dm_daily_stats
+    description: ""
+    config:
+      contract:
+        enforced: true
+    columns:
+      - name: pickup_location_id
+        data_type: int64
+        description: ""
+        tests:
+          - name: core2.dm_daily.eval_pickup_location
+            test_name: relationships
+            to: source('mapping.map', 'taxi_zone_lookup')
+            field: location_id
+            severity: warn
+
+      - name: dropoff_location_id
+        data_type: int64
+        description: ""
+        tests:
+          - name: core2.dm_daily.eval_dropoff_location
+            test_name: relationships 
+            to: source('mapping.map', 'taxi_zone_lookup')
+            field: location_id
+            severity: warn
+
+      - name: pickup_date
+        data_type: timestamp
+        description: ""
+
+      - name: pickup_public_holiday
+        data_type: boolean
+        description: ""
+
+      - name: pickup_year
+        data_type: int64
+        description: ""
+
+      - name: pickup_month
+        data_type: int64
+        description: ""
+
+      - name: pickup_hour
+        data_type: int64
+        description: ""
+
+      - name: pickup_rush_hour_status
+        data_type: string
+        description: ""
+
+      - name: pickup_weekday_name
+        data_type: string
+        description: ""
+
+      - name: ratecode_id
+        data_type: int64
+        description: ""
+        tests:
+          - name: core2.dm_daily.eval_rate_codes
+            test_name: accepted_values
+            values: "{{ var('rate_codes') }}"
+            severity: warn 
+            quote: false
+
+      - name: payment_type
+        data_type: int64
+        description: ""
+        tests:
+          - name: core2.dm_daily.eval_payment_type
+            test_name: accepted_values
+            values: "{{ var('payment_types') }}"
+            severity: warn 
+            quote: false
+
+      - name: trip_type
+        data_type: string
+        description: ""
+
+      - name: hvfhs_license_number
+        data_type: string
+        description: ""
+
+      - name: avg_trip_distance
+        data_type: float64
+        description: ""
+
+      - name: avg_trip_duration_min
+        data_type: float64
+        description: ""
+
+      - name: fare_amount
+        data_type: float64
+        description: ""
+
+      - name: tip_amount
+        data_type: float64
+        description: ""
+
+      - name: total_amount
+        data_type: float64
+        description: ""
+
+      - name: total_fees
+        data_type: float64
+        description: ""
+
+      - name: passenger_count
+        data_type: int64
+        description: ""
+
+      - name: num_trips
+        data_type: int64
+        description: ""
+
+      - name: transformation_dt
+        data_type: timestamp
+        description: ""
+
   - name: core2_dm_monthly_stats
+    description: ""
+    config:
+      contract:
+        enforced: true
+    columns:
+      - name: pickup_location_id
+        data_type: int64
+        description: ""
+        tests:
+          - name: core2.dm_monthly.eval_pickup_location
+            test_name: relationships
+            to: source('mapping.map', 'taxi_zone_lookup')
+            field: location_id
+            severity: warn
+
+      - name: dropoff_location_id
+        data_type: int64
+        description: ""
+        tests:
+          - name: core2.dm_monthly.eval_dropoff_location
+            test_name: relationships 
+            to: source('mapping.map', 'taxi_zone_lookup')
+            field: location_id
+            severity: warn
+
+      - name: pickup_date
+        data_type: timestamp
+        description: ""
+
+      - name: pickup_year
+        data_type: int64
+        description: ""
+
+      - name: pickup_month
+        data_type: int64
+        description: ""
+
+      - name: pickup_rush_hour_status
+        data_type: string
+        description: ""
+
+      - name: pickup_weekday_name
+        data_type: string
+        description: ""
+
+      - name: ratecode_id
+        data_type: int64
+        description: ""
+        tests:
+          - name: core2.dm_monthly.eval_rate_codes
+            test_name: accepted_values
+            values: "{{ var('rate_codes') }}"
+            severity: warn 
+            quote: false
+
+      - name: payment_type
+        data_type: int64
+        description: ""
+        tests:
+          - name: core2.dm_montly.eval_payment_type
+            test_name: accepted_values
+            values: "{{ var('payment_types') }}"
+            severity: warn 
+            quote: false
+
+      - name: trip_type
+        data_type: string
+        description: ""
+
+      - name: hvfhs_license_number
+        data_type: string
+        description: ""
+
+      - name: avg_trip_distance
+        data_type: float64
+        description: ""
+
+      - name: avg_trip_duration_min
+        data_type: float64
+        description: ""
+
+      - name: fare_amount
+        data_type: float64
+        description: ""
+
+      - name: tip_amount
+        data_type: float64
+        description: ""
+
+      - name: total_amount
+        data_type: float64
+        description: ""
+
+      - name: total_fees
+        data_type: float64
+        description: ""
+
+      - name: passenger_count
+        data_type: int64
+        description: ""
+
+      - name: num_public_holidays
+        data_type: int64
+        description: ""
+
+      - name: num_trips
+        data_type: int64
+        description: ""
+
+      - name: transformation_dt
+        data_type: timestamp
+        description: ""

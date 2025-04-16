@@ -3,6 +3,45 @@
     
 
     create or replace table `pipeline-analysis-455005`.`nytaxi_core2`.`core2_yellow_fact_trips`
+        
+  (
+    trip_type_start_date datetime,
+    data_source string,
+    trip_type_source string,
+    pickup_date timestamp,
+    trip_type_end_date timestamp,
+    trip_id string,
+    vendor_id int64,
+    trip_duration_min int64,
+    pickup_datetime timestamp,
+    pickup_weekday_name string,
+    pickup_public_holiday boolean,
+    pickup_rush_hour_status string,
+    dropoff_datetime timestamp,
+    dropoff_weekday_name string,
+    dropoff_public_holiday boolean,
+    dropoff_rush_hour_status string,
+    pickup_location_id int64,
+    dropoff_location_id int64,
+    ratecode_id int64,
+    store_and_fwd_flag string,
+    payment_type int64,
+    passenger_count int64,
+    trip_distance float64,
+    fare_amount float64,
+    extra_amount float64,
+    mta_tax float64,
+    tip_amount float64,
+    tolls_amount float64,
+    improvement_surcharge float64,
+    total_amount float64,
+    congestion_surcharge float64,
+    airport_fee float64,
+    clone_dt timestamp,
+    transformation_dt timestamp
+    
+    )
+
       
     partition by timestamp_trunc(trip_type_start_date, month)
     cluster by data_source, pickup_date
@@ -10,6 +49,9 @@
     OPTIONS()
     as (
       
+    select trip_type_start_date, data_source, trip_type_source, pickup_date, trip_type_end_date, trip_id, vendor_id, trip_duration_min, pickup_datetime, pickup_weekday_name, pickup_public_holiday, pickup_rush_hour_status, dropoff_datetime, dropoff_weekday_name, dropoff_public_holiday, dropoff_rush_hour_status, pickup_location_id, dropoff_location_id, ratecode_id, store_and_fwd_flag, payment_type, passenger_count, trip_distance, fare_amount, extra_amount, mta_tax, tip_amount, tolls_amount, improvement_surcharge, total_amount, congestion_surcharge, airport_fee, clone_dt, transformation_dt
+    from (
+        
 
 select 
   -- cols that help better scan the data 
@@ -113,5 +155,6 @@ from `pipeline-analysis-455005`.`nytaxi_stage`.`stg_yellow__2_filter_out_faulty`
 
 
 
+    ) as model_subq
     );
   
