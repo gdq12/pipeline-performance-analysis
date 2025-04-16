@@ -15,7 +15,7 @@
 {% for node in graph.nodes.values()
     | selectattr("resource_type", "equalto", "model") %}
 
-    {% set model_info = node.schema ~ "." ~ node.name ~ "." ~ node.config.materialized %}
+    {% set model_info = node.schema ~ "." ~ node.name ~ "." ~ node.config.materialized | replace('incremental', 'table') %}
 
    {% do current_dbt_models.append(model_info) %}
 
