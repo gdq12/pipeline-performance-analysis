@@ -308,7 +308,7 @@ models:
         enforced: true
     columns:
       - name: trip_type_start_date
-        data_type: datetime
+        data_type: timestamp
         description: >
           First day of the month that pickup_datetime should not be before. Table is partitioned on this column.
 

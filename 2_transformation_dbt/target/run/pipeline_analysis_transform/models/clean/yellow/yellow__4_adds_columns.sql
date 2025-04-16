@@ -5,7 +5,7 @@
     create or replace table `pipeline-analysis-455005`.`nytaxi_clean`.`yellow__4_adds_columns`
         
   (
-    trip_type_start_date datetime,
+    trip_type_start_date timestamp,
     data_source string,
     pickup_date timestamp,
     trip_type_end_date timestamp,
@@ -80,7 +80,7 @@ with yellow as
 from `pipeline-analysis-455005`.`nytaxi_clean`.`yellow__3_data_type_cast`
 )
 select 
-  parse_datetime('%Y-%m-%d', regexp_substr(data_source, '[0-9]{4}-[0-9]{2}$')||'-01') trip_type_start_date,
+  cast(parse_datetime('%Y-%m-%d', regexp_substr(data_source, '[0-9]{4}-[0-9]{2}$')||'-01') as timestamp) trip_type_start_date,
   data_source,
   pickup_date,
   cast(last_day(parse_date('%Y-%m-%d', regexp_substr(data_source, '[0-9]{4}-[0-9]{2}$')||'-01'), month) as timestamp) trip_type_end_date,

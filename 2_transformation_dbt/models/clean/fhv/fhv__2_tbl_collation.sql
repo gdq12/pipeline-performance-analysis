@@ -21,7 +21,11 @@ with trps as
 
   select 
     {% for old_name, new_name in zip(col_dict['old_column_name'], col_dict['new_column_name']) %}
-      {{ old_name }} as {{ new_name }}
+            {% if old_name == 'sr_flag' %}
+                    cast({{ old_name }} as float64) as {{ new_name }}
+                {% else %}
+                    {{ old_name }} as {{ new_name }}
+                {% endif %}
         {% if not loop.last -%} , {% endif -%}
     {% endfor %}
   from `{{ env_var('PROJECT_ID') }}`.`{{ env_var('BQ_RAW_SCHEMA') }}`.`{{ tbl_name }}`
