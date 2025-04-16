@@ -3,7 +3,7 @@
     This macro copy clones tables originally created by dataproc to a new schema for developement and performance testing
     Example commands:
         -- to specify tbl names with specific trip type substr and yrs
-        dbt run-operation copy_clone_raw_tables --args '{tbl_name_str: 'fhvhv', yr_str: "2020", method: "refresh_schema"}'
+        dbt run-operation copy_clone_raw_tables --args '{tbl_name_str: '.*', yr_str: ".*", method: "refresh_schema"}'
         dbt run-operation copy_clone_raw_tables --args '{tbl_name_str: 'green', yr_str: "2019", method: "add_tables"}'
         -- when dont want to specify 1 where clause use '.*' instead
         dbt run-operation copy_clone_raw_tables --args '{tbl_name_str: '.*', yr_str: "2009|2020|2021", method: "refresh_schema"}'
@@ -62,7 +62,7 @@
     from `{{ env_var('PROJECT_ID') }}`.`{{ env_var('BQ_RAW_SCHEMA') }}_backup`.INFORMATION_SCHEMA.TABLES
     where regexp_substr(table_name, '{{ tbl_name_str }}') is not null
     and regexp_substr(table_name, '{{ yr_str }}') is not null
-    and regexp_substr(table_name, 'external') is null
+    and regexp_substr(table_name, 'external|mapping') is null
     {% endset %}
 
     {% set table_names = dbt_utils.get_query_results_as_dict(tbl_query)%}
@@ -112,7 +112,7 @@
     where t2.table_name is null 
     and regexp_substr(t1.table_name, '{{ tbl_name_str }}') is not null
     and regexp_substr(t1.table_name, '{{ yr_str }}') is not null
-    and regexp_substr(t1.table_name, 'external') is null
+    and regexp_substr(t1.table_name, 'external|mapping') is null
     {% endset %}
 
     {% set table_names = dbt_utils.get_query_results_as_dict(tbl_query)%}
