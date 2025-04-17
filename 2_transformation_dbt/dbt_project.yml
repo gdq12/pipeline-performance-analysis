@@ -69,30 +69,30 @@ models:
     core1:
       +materialized: incremental
       +schema: core1
-      +enabled: true
+      +enabled: false
       +unique_key: 'trip_id'
 
     core2:
       +materialized: incremental
       +schema: core2
-      +enabled: false
+      +enabled: true
 
     mart1:
       +materialized: incremental
       +schema: mart1
-      +enabled: true
+      +enabled: false
 
     mart2:
       +materialized: incremental
       +schema: mart2
-      +enabled: false
+      +enabled: true
 
 vars:
   rate_codes: [1, 2, 3, 4, 5, 6, 99]
   rate_description: ["'STANDARD RATE'", "'JFK'", "'NEWARK'", "'NASSAU/WESTCHESTER'", "'NEGOTIATED FARE'", "'GROUP RIDE'", "'UNKNOWN'"]
   payment_types: [1, 2, 3, 4, 5, 6]
   payment_description: ["'FLEX FARE TRIP'", "'CREDIT CARD'", "'CASH'", "'NO CHARGE'", "'DISPUTE'", "'UNKNOWN'", "'VOIDED TRIP'"]
-  run_tag: 'core1/mart1 - full refresh - (6) - datasource'
+  run_tag: 'core2/mart2 - full refresh - (6) - datasource'
 
 on-run-end:
   - "{{ get_query_history() }}"
