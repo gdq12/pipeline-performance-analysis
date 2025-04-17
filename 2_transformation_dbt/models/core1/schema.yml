@@ -8,7 +8,7 @@ models:
         enforced: true
     columns:
       - name: trip_type_start_date
-        data_type: datetime
+        data_type: timestamp
         description: ""
 
       - name: data_source
@@ -32,7 +32,7 @@ models:
             config:
               severity: warn
 
-          - name: null_trip_id
+          - name: core1.yellow.null_trip_id
             test_name: not_null
             config:
               severity: warn
@@ -232,7 +232,7 @@ models:
         enforced: true
     columns:
       - name: trip_type_start_date
-        data_type: datetime
+        data_type: timestamp
         description: ""
 
       - name: data_source
@@ -459,7 +459,7 @@ models:
         enforced: true
     columns:
       - name: trip_type_start_date
-        data_type: datetime
+        data_type: timestamp
         description: ""
 
       - name: data_source
@@ -694,7 +694,7 @@ models:
         enforced: true
     columns:
       - name: trip_type_start_date
-        data_type: datetime
+        data_type: timestamp
         description: ""
 
       - name: data_source
@@ -706,7 +706,7 @@ models:
         description: ""
 
       - name: pickup_date
-        data_type: datetime
+        data_type: timestamp
         description: ""
 
       - name: trip_id
