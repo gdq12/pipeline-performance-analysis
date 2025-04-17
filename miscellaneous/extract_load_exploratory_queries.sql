@@ -431,13 +431,13 @@ config:
 
 -- see how clone tbl macro commands will affect processing data testing size
 with t1 as
-(select table_id, size_bytes/pow(10,9) size_gb, '(1)' label
+(select table_id, size_bytes/pow(10,12) size_tb, '(1)' label
 from `pipeline-analysis-455005`.`nytaxi_raw_backup`.__TABLES__
 where regexp_substr(table_id, 'external|mapping') is null
 and table_id in ('yellow_tripdata_2009-01', 'yellow_tripdata_2011-01', 'green_tripdata_2014-01', 'fhvhv_tripdata_2019-02', 'fhv_tripdata_2015-01')
 ),
 t2 as
-(select table_id, size_bytes/pow(10,9) size_gb, '(2)' label
+(select table_id, size_bytes/pow(10,12) size_tb, '(2)' label
 from `pipeline-analysis-455005`.`nytaxi_raw_backup`.__TABLES__
 where regexp_substr(table_id, 'external|mapping') is null
 and table_id not in (select table_id from t1)
@@ -445,7 +445,7 @@ and (regexp_substr(table_id, 'yellow|green|fhvhv|fhv') is not null
      and regexp_substr(table_id, '2011|2015|2019') is not null)
 ),
 t3 as
-(select table_id, size_bytes/pow(10,9) size_gb, '(3)' label
+(select table_id, size_bytes/pow(10,12) size_tb, '(3)' label
 from `pipeline-analysis-455005`.`nytaxi_raw_backup`.__TABLES__
 where regexp_substr(table_id, 'external|mapping') is null
 and table_id not in (select table_id from t1)
@@ -454,7 +454,7 @@ and (regexp_substr(table_id, 'green|fhvhv|fhv') is not null
       and regexp_substr(table_id, '2018|2020') is not null)
 ),
 t4 as
-(select table_id, size_bytes/pow(10,9) size_gb, '(4)' label
+(select table_id, size_bytes/pow(10,12) size_tb, '(4)' label
 from `pipeline-analysis-455005`.`nytaxi_raw_backup`.__TABLES__
 where regexp_substr(table_id, 'external|mapping') is null
 and table_id not in (select table_id from t1)
@@ -464,7 +464,7 @@ and (regexp_substr(table_id, 'yellow|green|fhvhv|fhv') is not null
     and regexp_substr(table_id, '2010|2014|2017|2021|2022|2023') is not null)
 ),
 t5 as
-(select table_id, size_bytes/pow(10,9) size_gb, '(5)' label
+(select table_id, size_bytes/pow(10,12) size_tb, '(5)' label
 from `pipeline-analysis-455005`.`nytaxi_raw_backup`.__TABLES__
 where regexp_substr(table_id, 'external|mapping') is null
 and table_id not in (select table_id from t1)
@@ -473,7 +473,7 @@ and table_id not in (select table_id from t3)
 and table_id not in (select table_id from t4)
 ),
 t6 as
-(select table_id, size_bytes/pow(10,9) size_gb, '(6)' label
+(select table_id, size_bytes/pow(10,12) size_tb, '(6)' label
 from `pipeline-analysis-455005`.`nytaxi_raw_backup`.__TABLES__
 where regexp_substr(table_id, 'external|mapping') is null
 ),
@@ -491,7 +491,7 @@ union all
 select * from t6
 ),
 all_tbl2 as
-(select label, sum(size_gb) load_gb_size
+(select label, sum(size_tb) load_tb_size
 from all_tbl
 group by label
 ),
@@ -500,8 +500,9 @@ t7 as
   log_comment
   , regexp_substr(log_comment, '\\([0-9]{1}\\)') label
   , regexp_substr(log_comment, '^[a-z0-9\\/]{1,11}') transformation_type
-  , sum(total_bytes_processed)/pow(10,9) total_gb_processed
-  , sum(total_bytes_billed)/pow(10,9) total_gb_billed
+  , count(1) num_queries
+  , sum(total_bytes_processed)/pow(10,12) total_tb_processed
+  , sum(total_bytes_billed)/pow(10,12) total_tb_billed
   , min(start_time) start_time
   , max(end_time) end_time
 from`pipeline-analysis-455005.nytaxi_monitoring.query_history_extract_load_transform_project`
@@ -510,11 +511,13 @@ and start_time >= '2025-04-17'
 group by all
 )
 select
-  t7.log_comment, t7.label
+  t7.log_comment, t7.label, t7.transformation_type
   , (t7.end_time - t7.start_time) duration
-  , tt2.load_gb_size
-  , t7.total_gb_processed
-  , t7.total_gb_billed
+  , t7.num_queries
+  , tt2.load_tb_size
+  , t7.total_tb_processed
+  , t7.total_tb_billed
+  , t7.total_tb_billed*6.25 cost_dollars
 from t7
 join all_tbl2 tt2 on t7.label = tt2.label
 order by 2, 1
