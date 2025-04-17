@@ -1,6 +1,6 @@
 {{ config(
     partition_by={
-      "field": "pickup_month",
+      "field": "pickup_date",
       "data_type": "timestamp",
       "granularity": "month"
     },

@@ -16,9 +16,8 @@ select
     dz.zone dropoff_zone,
     dz.service_zone dropoff_service_zone,
     -- time info
-    dm.pickup_date,
-    dm.pickup_year,
     dm.pickup_month,
+    dm.pickup_year,
     dm.pickup_rush_hour_status, 
     dm.pickup_weekday_name,
     -- other info 

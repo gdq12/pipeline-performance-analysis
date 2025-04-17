@@ -177,15 +177,11 @@ models:
         data_type: string
         description: ""
 
-      - name: pickup_date
+      - name: pickup_month
         data_type: timestamp
         description: ""
 
       - name: pickup_year
-        data_type: int64
-        description: ""
-
-      - name: pickup_month
         data_type: int64
         description: ""
 

@@ -13,9 +13,8 @@ with yel as
     pickup_location_id,
     dropoff_location_id,
     -- time info
-    pickup_date,
-    extract(year from pickup_datetime) pickup_year,
     {{ dbt.date_trunc("month", "pickup_datetime") }} pickup_month,
+    extract(year from pickup_datetime) pickup_year,
     pickup_rush_hour_status, 
     pickup_weekday_name,
     -- other info 
@@ -50,9 +49,8 @@ grn as
     pickup_location_id,
     dropoff_location_id,
     -- time info
-    pickup_date,
-    extract(year from pickup_datetime) pickup_year,
     {{ dbt.date_trunc("month", "pickup_datetime") }} pickup_month,
+    extract(year from pickup_datetime) pickup_year,
     pickup_rush_hour_status, 
     pickup_weekday_name,
     -- other info 
@@ -87,9 +85,8 @@ fhvhv as
     pickup_location_id,
     dropoff_location_id,
     -- time info
-    pickup_date,
-    extract(year from pickup_datetime) pickup_year,
     {{ dbt.date_trunc("month", "pickup_datetime") }} pickup_month,
+    extract(year from pickup_datetime) pickup_year,
     pickup_rush_hour_status, 
     pickup_weekday_name,
     -- other info 
@@ -123,9 +120,8 @@ select
     pickup_location_id,
     dropoff_location_id,
     -- time info
-    pickup_date,
-    pickup_year,
     pickup_month,
+    pickup_year,
     pickup_rush_hour_status, 
     pickup_weekday_name,
     -- other info 
@@ -151,9 +147,8 @@ select
     pickup_location_id,
     dropoff_location_id,
     -- time info
-    pickup_date,
-    pickup_year,
     pickup_month,
+    pickup_year,
     pickup_rush_hour_status, 
     pickup_weekday_name,
     -- other info 
@@ -179,9 +174,8 @@ select
     pickup_location_id,
     dropoff_location_id,
     -- time info
-    pickup_date,
-    pickup_year,
     pickup_month,
+    pickup_year,
     pickup_rush_hour_status, 
     pickup_weekday_name,
     -- other info 
