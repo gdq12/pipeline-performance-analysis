@@ -476,7 +476,7 @@ t6 as
 (select table_id, size_bytes/pow(10,9) size_gb, 'core1/mart1 - full refresh - (6) - datasource' log_comment
 from `pipeline-analysis-455005`.`nytaxi_raw_backup`.__TABLES__
 where regexp_substr(table_id, 'external|mapping') is null
-)
+),
 all_tbl as
 (select * from t1
 union all
@@ -493,7 +493,7 @@ select * from t6
 all_tbl2 as
 (select log_comment, sum(size_gb) load_gb_size
 from all_tbl
-group by label
+group by log_comment
 ),
 t7 as
 (select
@@ -514,7 +514,7 @@ select
   , t7.total_gb_processed
   , t7.total_gb_billed
 from t7
-join all_tbl2 as tt2 on t2.log_comment = tt2.log_comment
+join all_tbl2 tt2 on t7.log_comment = tt2.log_comment
 order by 1
 ;
 
