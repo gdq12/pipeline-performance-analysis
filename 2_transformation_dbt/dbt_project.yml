@@ -92,7 +92,7 @@ vars:
   rate_description: ["'STANDARD RATE'", "'JFK'", "'NEWARK'", "'NASSAU/WESTCHESTER'", "'NEGOTIATED FARE'", "'GROUP RIDE'", "'UNKNOWN'"]
   payment_types: [1, 2, 3, 4, 5, 6]
   payment_description: ["'FLEX FARE TRIP'", "'CREDIT CARD'", "'CASH'", "'NO CHARGE'", "'DISPUTE'", "'UNKNOWN'", "'VOIDED TRIP'"]
-  run_tag: 'core1/mart1 - incremental - (5) - datasource'
+  run_tag: 'core1/mart1 - full refresh - (6) - datasource'
 
 on-run-end:
   - "{{ get_query_history() }}"
