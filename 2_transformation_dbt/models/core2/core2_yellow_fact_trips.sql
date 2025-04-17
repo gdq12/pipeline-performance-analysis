@@ -4,7 +4,8 @@
       "data_type": "timestamp",
       "granularity": "month"
     },
-    cluster_by = ["data_source", "pickup_date"]
+    cluster_by = ["data_source", "pickup_date"],
+    unique_key='trip_id'
 )}}
 
 select 

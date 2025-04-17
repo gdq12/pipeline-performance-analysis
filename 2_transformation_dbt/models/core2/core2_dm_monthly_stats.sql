@@ -10,7 +10,7 @@ with yel as
     -- time info
     pickup_date,
     extract(year from pickup_datetime) pickup_year,
-    extract(month from pickup_datetime) pickup_month,
+    {{ dbt.date_trunc("month", "pickup_datetime") }} pickup_month,
     pickup_rush_hour_status, 
     pickup_weekday_name,
     -- other info 
@@ -33,7 +33,7 @@ from {{ ref('core2_yellow_fact_trips') }}
 
 {% if is_incremental() %}
 
-where pickup_month not in (select distinct pickup_month from {{ this }})
+where {{ dbt.date_trunc("month", "pickup_datetime") }} not in (select distinct pickup_month from {{ this }})
 
 {% endif %}
 
@@ -47,7 +47,7 @@ grn as
     -- time info
     pickup_date,
     extract(year from pickup_datetime) pickup_year,
-    extract(month from pickup_datetime) pickup_month,
+    {{ dbt.date_trunc("month", "pickup_datetime") }} pickup_month,
     pickup_rush_hour_status, 
     pickup_weekday_name,
     -- other info 
@@ -70,7 +70,7 @@ from {{ ref('core2_green_fact_trips') }}
 
 {% if is_incremental() %}
 
-where pickup_month not in (select distinct pickup_month from {{ this }})
+where {{ dbt.date_trunc("month", "pickup_datetime") }} not in (select distinct pickup_month from {{ this }})
 
 {% endif %}
 
@@ -84,7 +84,7 @@ fhvhv as
     -- time info
     pickup_date,
     extract(year from pickup_datetime) pickup_year,
-    extract(month from pickup_datetime) pickup_month,
+    {{ dbt.date_trunc("month", "pickup_datetime") }} pickup_month,
     pickup_rush_hour_status, 
     pickup_weekday_name,
     -- other info 
@@ -107,7 +107,7 @@ from {{ ref('core2_fhvhv_fact_trips') }}
 
 {% if is_incremental() %}
 
-where pickup_month not in (select distinct pickup_month from {{ this }})
+where {{ dbt.date_trunc("month", "pickup_datetime") }} not in (select distinct pickup_month from {{ this }})
 
 {% endif %}
 

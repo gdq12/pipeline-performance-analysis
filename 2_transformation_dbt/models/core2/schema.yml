@@ -8,7 +8,7 @@ models:
         enforced: true
     columns:
       - name: trip_type_start_date
-        data_type: datetime
+        data_type: timestamp
         description: ""
 
       - name: data_source
@@ -184,7 +184,7 @@ models:
         enforced: true
     columns:
       - name: trip_type_start_date
-        data_type: datetime
+        data_type: timestamp
         description: ""
 
       - name: data_source
@@ -364,7 +364,7 @@ models:
         enforced: true
     columns:
       - name: trip_type_start_date
-        data_type: datetime
+        data_type: timestamp
         description: ""
 
       - name: data_source
@@ -548,7 +548,7 @@ models:
         enforced: true
     columns:
       - name: trip_type_start_date
-        data_type: datetime
+        data_type: timestamp
         description: ""
 
       - name: data_source
@@ -560,7 +560,7 @@ models:
         description: ""
 
       - name: pickup_date
-        data_type: datetime
+        data_type: timestamp
         description: ""
 
       - name: trip_type_end_date

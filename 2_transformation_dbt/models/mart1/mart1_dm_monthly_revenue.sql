@@ -33,7 +33,7 @@ from {{ ref('core1_yellow_fact_trips') }}
 
 {% if is_incremental() %}
 
-where pickup_month not in (select distinct pickup_month from {{ this }})
+where {{ dbt.date_trunc("month", "pickup_datetime") }} not in (select distinct pickup_month from {{ this }})
 
 {% endif %}
 
@@ -70,7 +70,7 @@ from {{ ref('core1_green_fact_trips') }}
 
 {% if is_incremental() %}
 
-where pickup_month not in (select distinct pickup_month from {{ this }})
+where {{ dbt.date_trunc("month", "pickup_datetime") }} not in (select distinct pickup_month from {{ this }})
 
 {% endif %}
 
@@ -107,7 +107,7 @@ from {{ ref('core1_fhvhv_fact_trips') }}
 
 {% if is_incremental() %}
 
-where pickup_month not in (select distinct pickup_month from {{ this }})
+where {{ dbt.date_trunc("month", "pickup_datetime") }} not in (select distinct pickup_month from {{ this }})
 
 {% endif %}
 
