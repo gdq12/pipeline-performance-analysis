@@ -1,4 +1,9 @@
 {{ config(
+    partition_by={
+      "field": "pickup_month",
+      "data_type": "timestamp",
+      "granularity": "month"
+    },
     unique_key=['pickup_month', 'trip_type']
 )}}
 
