@@ -11,8 +11,8 @@ seed-paths: ["data"]
 macro-paths: ["macros"]
 snapshot-paths: ["snapshots"]
 
-target-path: "target"  
-clean-targets:         
+target-path: "target"
+clean-targets:
   - "target"
   - "dbt_packages"
 
@@ -31,56 +31,51 @@ models:
         +materialized: view
         +schema: clean
         +enabled: true
-        +unique_key: 'data_source'
+        +unique_key: 'trip_id'
       green:
         +materialized: view
         +schema: clean
         +enabled: true
-        +unique_key: 'data_source'
+        +unique_key: 'trip_id'
       fhvhv:
         +materialized: view
         +schema: clean
         +enabled: true
-        +unique_key: 'data_source'
+        +unique_key: 'trip_id'
       fhv:
         +materialized: view
         +schema: clean
         +enabled: true
-        +unique_key: 'data_source'
+        +unique_key: 'trip_id'
 
     stage:
       yellow:
         +materialized: view
         +schema: stage
         +enabled: true
-        +unique_key: 'data_source'
       green:
         +materialized: view
         +schema: stage
         +enabled: true
-        +unique_key: 'data_source'
       fhvhv:
         +materialized: view
         +schema: stage
         +enabled: true
-        +unique_key: 'data_source'
       fhv:
         +materialized: view
         +schema: stage
         +enabled: true
-        +unique_key: 'data_source'
 
     core1:
       +materialized: incremental
       +schema: core1
       +enabled: true
-      +unique_key: 'data_source'
+      +unique_key: 'trip_id'
 
     core2:
       +materialized: incremental
       +schema: core2
-      +enabled: true
-      +unique_key: 'data_source'
+      +enabled: false
 
     mart1:
       +materialized: incremental
@@ -90,15 +85,14 @@ models:
     mart2:
       +materialized: incremental
       +schema: mart2
-      +enabled: true
+      +enabled: false
 
 vars:
   rate_codes: [1, 2, 3, 4, 5, 6, 99]
   rate_description: ["'STANDARD RATE'", "'JFK'", "'NEWARK'", "'NASSAU/WESTCHESTER'", "'NEGOTIATED FARE'", "'GROUP RIDE'", "'UNKNOWN'"]
   payment_types: [1, 2, 3, 4, 5, 6]
   payment_description: ["'FLEX FARE TRIP'", "'CREDIT CARD'", "'CASH'", "'NO CHARGE'", "'DISPUTE'", "'UNKNOWN'", "'VOIDED TRIP'"]
-  'dbt_date:time_zone': 'Europe/Berlin'
-  run_tag: 'test qhistory insertion'
+  run_tag: 'core1/mart1 - incremental - (5) - datasource'
 
-on-run-end: 
+on-run-end:
   - "{{ get_query_history() }}"
