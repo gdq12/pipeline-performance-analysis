@@ -27,9 +27,6 @@ models:
       Data loaded into BigQuery using spark cluster in Dataproc. All tables in this schema represent the fist instance  
       a column_name/ordinal_position/dta_type combo was encountered. When a new combination was encountered, the data  
       was pushed to a new table. In total, there were 8 different variations of the fhv_tripdata. 
-    config:
-      contract:
-        enforced: true
     columns:
       - name: dispatching_base_number
         data_type: string

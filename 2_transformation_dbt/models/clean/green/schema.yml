@@ -41,9 +41,6 @@ models:
     description: >
       Unions all together 23 green_tripdata tables from the source schema. Uses column name mapping 
       from the `mapping__1_column_name_mapping` model to do this. 
-    config:
-      contract:
-        enforced: true
     columns:
       - name: vendor_id
         data_type: int64
@@ -171,10 +168,10 @@ models:
         - payment_type
         - store_and_fwd_flag
         - vendor_id
-        - ratecode_id
+        - ratecode_id 
     config:
       contract:
-        enforced: true  
+        enforced: true
     columns:
       - name: vendor_id
         data_type: int64

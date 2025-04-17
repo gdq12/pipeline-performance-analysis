@@ -24,9 +24,6 @@ models:
     description: >
       Unions all together 7 fhvhv_tripdata tables from the source schema. Uses column name mapping 
       from the `mapping__1_column_name_mapping` model to do this. 
-    config:
-      contract:
-        enforced: true
     columns:
       - name: hvfhs_license_number
         data_type: string

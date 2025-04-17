@@ -45,7 +45,7 @@ select
     creation_dt, 
     clone_dt,
     {{ dbt.current_timestamp() }} transformation_dt
-from {{ ref('fhv__3_data_type') }}
+from fhv
 
 {% if is_incremental() %}
 

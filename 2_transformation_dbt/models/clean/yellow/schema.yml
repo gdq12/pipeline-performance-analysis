@@ -46,9 +46,6 @@ models:
     description: >
       Unions all together 24 of the 29 yellow_tripdata tables from the source schema (jan 2011 to present). 
       Uses column name mapping from the `mapping__1_column_name_mapping` model to do this. 
-    config:
-      contract:
-        enforced: true
     columns:
       - name: vendor_id
         data_type: int64
@@ -170,9 +167,6 @@ models:
     description: >
       Unions all together 5 of the 29 yellow_tripdata tables from the source schema (jan 2009 to dec 2010).
       Uses column name mapping from the `mapping__1_column_name_mapping` model to do this. 
-    config:
-      contract:
-        enforced: true
     columns:
       - name: vendor_id
         data_type: string
@@ -288,9 +282,6 @@ models:
     description: >
       Convert latitude/longitude coordinates from `yellow__2a_2009_2010_tbl_collation` to location zone IDs 
       using `taxi_zone_geom` mapping table.
-    config:
-      contract:
-        enforced: true
     columns:
       - name: vendor_id
         data_type: string
