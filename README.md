@@ -6,22 +6,18 @@ This project was created to explore ELT methods and optimizations within the dat
 
 ![pipeline diagram](images/project/pipeline_diagram.jpg)
 
+## Highlights
+
 ### Extract-Load
 
-Two types of approaches were executed for this part of the project:
+- Used [GCPs Dataproc Hadoop/Spark Clusters](https://cloud.google.com/dataproc?hl=en)
 
-* using [Mage.Ai](1_extract_load_mage)
+- full implementation documented in [1_extract_load_dataproc](1_extract_load_dataproc)
 
-    - Worked quite well in `DRY` method development, `testing` implementation, `scheduling` jobs and orchestration etc 
+- since this employs spark clusters and the environment infrastructure is configured by GCP instead, it was an easier solution to employ.
 
-    - Current limitations faced were data volume imported into docker image. Defaukt version of this tool employs `pandas` for data loading and transformation. The data batches provided by the `TLC taxi website` were large parquet files that aren't ideal to be loaded into full memory.
+- All ride data, `2009 - 2024` for all trip types (`yellow`, `green`, `fhv`, `fhvhv`), were successfully loaded into GCP `cloud storage` and `BigQuery`. 
 
-    - Current requirement is update the docker image so it works with spark clusters so `pyspark` can be used instead.
+- `DRY` method was succesully employed. What is left to implement is testing and scheduling, but it was determined that it is out of scope for this project at this time.
 
-* using [GCPs Dataproc Hadoop/Spark Clusters](1_extract_load_dataproc)
-
-    - since this employs spark clusters and the environment infrastructure is configured by GCP instead, it was an easier solution to employ.
-
-    - All ride data, `2009 - 2024` for all trip types (`yellow`, `green`, `fhv`, `fhvhv`), were successfully loaded into GCP `cloud storage` and `BigQuery`. 
-
-    - `DRY` method was succesully employed. What is left to implement is testing and scheduling, but it was determined that it is out of scope for this project at this time.
+### Transformation
