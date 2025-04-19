@@ -67,3 +67,11 @@ from green
 
 
 
+where data_source not in (select distinct data_source from `pipeline-analysis-455005`.`nytaxi_clean`.`green__4_adds_columns`)
+
+
+
+
+
+  limit 10000 
+

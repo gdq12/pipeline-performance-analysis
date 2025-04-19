@@ -77,3 +77,11 @@ from fhvhv
 
 
 
+where data_source not in (select distinct data_source from `pipeline-analysis-455005`.`nytaxi_clean`.`fhvhv__4_adds_columns`)
+
+
+
+
+
+  limit 10000 
+

@@ -3,21 +3,20 @@
 with yel as 
 (select 
     -- zone info
-    pickup_location_id,
-    dropoff_location_id,
+    pickup_borough,
+    pickup_zone,
+    pickup_service_zone,
+    dropoff_borough,
+    dropoff_zone,
+    dropoff_service_zone,
     -- time info
     pickup_date,
     pickup_public_holiday, 
-    extract(year from pickup_datetime) pickup_year,
-    extract(month from pickup_datetime) pickup_month,
-    extract(hour from pickup_datetime) pickup_hour,
-    pickup_rush_hour_status, 
-    pickup_weekday_name,
     -- other info 
-    ratecode_id,
-    payment_type, 
+    ratecode_description,
+    payment_description, 
     trip_type_source trip_type,
-    cast(null as string) hvfhs_license_number,
+    cast(null as string) hvfs_description,
     -- aggregations
     avg(trip_distance) avg_trip_distance,
     avg(trip_duration_min) avg_trip_duration_min,
@@ -28,11 +27,7 @@ with yel as
     sum(passenger_count) passenger_count,
     count(1) num_trips,
     current_timestamp() transformation_dt
-from `pipeline-analysis-455005`.`nytaxi_core2`.`core2_yellow_fact_trips`
-
-
-
-where pickup_date not in (select distinct pickup_date from `pipeline-analysis-455005`.`nytaxi_core2`.`core2_dm_daily_stats`)
+from `pipeline-analysis-455005`.`nytaxi_core1`.`core1_yellow_fact_trips`
 
 
 
@@ -41,21 +36,20 @@ group by all
 grn as 
 (select 
     -- zone info
-    pickup_location_id,
-    dropoff_location_id,
+    pickup_borough,
+    pickup_zone,
+    pickup_service_zone,
+    dropoff_borough,
+    dropoff_zone,
+    dropoff_service_zone,
     -- time info
     pickup_date,
-    pickup_public_holiday, 
-    extract(year from pickup_datetime) pickup_year,
-    extract(month from pickup_datetime) pickup_month,
-    extract(hour from pickup_datetime) pickup_hour,
-    pickup_rush_hour_status, 
-    pickup_weekday_name,
+    pickup_public_holiday,
     -- other info 
-    ratecode_id,
-    payment_type, 
+    ratecode_description,
+    payment_description, 
     trip_type_source trip_type,
-    cast(null as string) hvfhs_license_number,
+    cast(null as string) hvfs_description,
     -- aggregations
     avg(trip_distance) avg_trip_distance,
     avg(trip_duration_min) avg_trip_duration_min,
@@ -66,11 +60,7 @@ grn as
     sum(passenger_count) passenger_count,
     count(1) num_trips,
     current_timestamp() transformation_dt
-from `pipeline-analysis-455005`.`nytaxi_core2`.`core2_green_fact_trips`
-
-
-
-where pickup_date not in (select distinct pickup_date from `pipeline-analysis-455005`.`nytaxi_core2`.`core2_dm_daily_stats`)
+from `pipeline-analysis-455005`.`nytaxi_core1`.`core1_green_fact_trips`
 
 
 
@@ -79,21 +69,20 @@ group by all
 fhvhv as 
 (select 
     -- zone info
-    pickup_location_id,
-    dropoff_location_id,
+    pickup_borough,
+    pickup_zone,
+    pickup_service_zone,
+    dropoff_borough,
+    dropoff_zone,
+    dropoff_service_zone,
     -- time info
     pickup_date,
-    pickup_public_holiday, 
-    extract(year from pickup_datetime) pickup_year,
-    extract(month from pickup_datetime) pickup_month,
-    extract(hour from pickup_datetime) pickup_hour,
-    pickup_rush_hour_status, 
-    pickup_weekday_name,
+    pickup_public_holiday,
     -- other info 
-    cast(null as int64) ratecode_id,
-    cast(null as int64) payment_type, 
+    cast(null as string) ratecode_description,
+    cast(null as string) payment_description, 
     trip_type_source trip_type,
-    hvfhs_license_number,
+    hvfs_description,
     -- aggregations
     avg(trip_distance) avg_trip_distance,
     avg(trip_duration_min) avg_trip_duration_min,
@@ -104,11 +93,7 @@ fhvhv as
     cast(null as int64) passenger_count,
     count(1) num_trips,
     current_timestamp() transformation_dt
-from `pipeline-analysis-455005`.`nytaxi_core2`.`core2_fhvhv_fact_trips`
-
-
-
-where pickup_date not in (select distinct pickup_date from `pipeline-analysis-455005`.`nytaxi_core2`.`core2_dm_daily_stats`)
+from `pipeline-analysis-455005`.`nytaxi_core1`.`core1_fhvhv_fact_trips`
 
 
 
@@ -116,21 +101,20 @@ group by all
 )
 select 
     -- zone info
-    pickup_location_id,
-    dropoff_location_id,
+    pickup_borough,
+    pickup_zone,
+    pickup_service_zone,
+    dropoff_borough,
+    dropoff_zone,
+    dropoff_service_zone,
     -- time info
     pickup_date,
-    pickup_public_holiday, 
-    pickup_year,
-    pickup_month,
-    pickup_hour,
-    pickup_rush_hour_status, 
-    pickup_weekday_name,
+    pickup_public_holiday,
     -- other info 
-    ratecode_id,
-    payment_type, 
+    ratecode_description,
+    payment_description, 
     trip_type,
-    hvfhs_license_number,
+    hvfs_description,
     -- aggregations
     avg_trip_distance,
     avg_trip_duration_min,
@@ -145,21 +129,20 @@ from yel
 union all 
 select 
     -- zone info
-    pickup_location_id,
-    dropoff_location_id,
+    pickup_borough,
+    pickup_zone,
+    pickup_service_zone,
+    dropoff_borough,
+    dropoff_zone,
+    dropoff_service_zone,
     -- time info
     pickup_date,
-    pickup_public_holiday, 
-    pickup_year,
-    pickup_month,
-    pickup_hour,
-    pickup_rush_hour_status, 
-    pickup_weekday_name,
+    pickup_public_holiday,
     -- other info 
-    ratecode_id,
-    payment_type, 
+    ratecode_description,
+    payment_description, 
     trip_type,
-    hvfhs_license_number,
+    hvfs_description,
     -- aggregations
     avg_trip_distance,
     avg_trip_duration_min,
@@ -174,21 +157,20 @@ from grn
 union all 
 select 
     -- zone info
-    pickup_location_id,
-    dropoff_location_id,
+    pickup_borough,
+    pickup_zone,
+    pickup_service_zone,
+    dropoff_borough,
+    dropoff_zone,
+    dropoff_service_zone,
     -- time info
     pickup_date,
-    pickup_public_holiday, 
-    pickup_year,
-    pickup_month,
-    pickup_hour,
-    pickup_rush_hour_status, 
-    pickup_weekday_name,
+    pickup_public_holiday,
     -- other info 
-    ratecode_id,
-    payment_type, 
+    ratecode_description,
+    payment_description, 
     trip_type,
-    hvfhs_license_number,
+    hvfs_description,
     -- aggregations
     avg_trip_distance,
     avg_trip_duration_min,

@@ -52,3 +52,7 @@ join `pipeline-analysis-455005`.`nytaxi_mapping`.`taxi_zone_lookup` pz on dm.pic
 join `pipeline-analysis-455005`.`nytaxi_mapping`.`taxi_zone_lookup` dz on dm.dropoff_location_id = dz.location_id 
 left join `pipeline-analysis-455005`.`nytaxi_mapping`.`hvlv_base_numbers` mp on coalesce(dm.hvfhs_license_number, 'N/A') = coalesce(mp.hvln, 'N/A')
 
+
+
+where pickup_date not in (select distinct pickup_date from `pipeline-analysis-455005`.`nytaxi_mart2`.`mart2_dm_daily_stats`)
+

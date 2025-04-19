@@ -1,234 +1,97 @@
-## Setup steps 
+## Background
 
-1. Set up local env for dev work 
+This part of the project is to fullfill the Transformation (T) of ELT of the NYC taxi data into Bigquery. `Data Build Tool (DBT)` was emplyed for this. This was done to explore the advantages of the tool, enabling data modeling, DAG orchestration and testing using a python/jinja framework. 
 
-    * `.envrc`
+## Setup
 
-        ```
-        export SCRIPTS_REPO=""
-        export LOCAL_WORKING_DIRECTORY=""
-        ```
+- development was carried out exclusively in a docker container to verify development would not come across package version conflicts.
+
+- for working with docker, `devcontainer` extension in `VS Code` was employed, details on how this was carried out can be found in [setup](setup.md)
+
+## Transformation Overview
+
+- The 4 step/layer approach was taken here 
+
+    + **clean**: The goal here was to collate all 67 original tables from `nytaxi_raw` schema to 4 trip type tables. This was done updating entries and adjusting them accordingly if they were historically reported differently and updating data type accordingly. This possible via custom [macros](macros), `update_*`. At the conclusion of this layer, the tables were materialized in `nytaxi_clean` schema.
+
+    + **stage**: The goal of this layer was to identify potential faulty records and filter them out of the pipeline. This was done in 2-stage approach via views in [stage](models/stage): `__1a_id_duplicate_records` and `__1b_id_faulty_trips`. At the conclusion of this layer, the views were stored in `nytaxi_stage` schema.
+
+    + **core**: The goal of this layer was to create, as it is termed in industry, "single source of truth". The views in stage (which filters out faulty records) are materialized into `_fact_trips` tables here. At the conclusion of this layer the tables were materialized in `nytaxi_core` schema.
+
+    + **mart**: The goal of this layer is to calculate metrics to dimension tables: `dm_daily_stats` and `dm_monthly_stats`, with all the trip types together. At the conclusion of this layer, the tables were materialized in `nytaxi_mart` schema. 
+
+- Two types of transformations were applied 
     
-    * use either one for limne 5 in [.devcontainer/devcontainer.json](.devcontainer/devcontainer.json)
+    + core1/mart1: this approach is where the terms/dimensions that were represented in the original raw data as codes/IDs (location_id, ratecode, payment_type etc.) were translated to end-user friendly terms right at the core transformation layer. It is hypothesized that this will be more compultationally expensive since record changes occur at the entity layer. 
 
-    * `.devcontainer/devcontainer.env`: these are vars to be used for `profile.yml` when using docker container for local dev
+    + core2/mart2: this approach is where the terms/dimensions that were represented in the original raw data as codes/IDs (location_id, ratecode, payment_type etc.) were translated to end-user friendly terms **after** metrics were calculated in mart layer. It is hypothesized that this approach will be more efficient as there are less records will experience changes. It is also hypothesized that this approach is more practical since the entities are probably not of interest to the end-user, therefor only applying computationally expensive changes where needed. 
 
-        ```
-        PROJECT_NAME=
-        PROJECT_NUMBER=
-        PROJECT_ID=
-        PROJECT_KEY=
-        BQ_REGION=
-        BQ_SCHEMA_PREFIX=
-        BQ_RAW_SCHEMA=
-        PROJECT_EMAIL=
-        ```
+**DAG plan DBT compiled solely based on the model dependencies**
 
-2. Build and run Docker image 
+![dbt-dag](../images/2_transformation_dbt/dbt-dag.png)
 
-    ```
-    # build docker image
-    docker build -t pipeline-analysis-transform-dbt .
+## Performance testing 
 
-    # launch with VS code 
-    source .envrc
-    code .
-    ```
+This was carried out using envrionment cleanup macros and `dbt build` commands.
 
-3. create DBT service account in GCP 
+**Full details can be found in**  👉👉👉👉👉👉👉👉👉👉👉👉👉👉👉👉👉👉👉👉👉👉👉👉👉👉 [testing_protocol](testing_protocol.md)
 
-    + go to IAM & Admin page --> service accounts 
+## 🚀 Highlights 🚀
 
-    + `+ CREATE SERVICE ACCOUNT`
+1. Made testing/development easier
 
-    + assign name `transformation-dbt` and add optional description 
+    + variation of data volume test and methods were made possible by enabling/disabling cetrain models via `+enabled` parameter in `dbt_project.yml`
 
-    + grant permissions: `BigQuery Admin`
+    + custom creating macros to cleanup BigQuery environment: [copy_clone_raw_tables](macros/copy_clone_raw_tables.sql) and [clean_bigquery_env](macros/clean_bigqeury_env.sql). Without these macros, would have to had manually dropped and copy cloned needed tables. Instead, based on input parameters, these macros copy cloned what was needed and dropped tables in Bigquery that were no longer modeled in the project, aka hanging tables. 
 
-    + `ADD KEY` from service account --> dowload
+2. `DRY` (dont repeat yourself) coding 
 
-    + save json key to `~/Documents/` and `${LOCAL_WORKING_DIRECTORY}`
+    + again this is where macros came in handy. 
     
-## Good to know DBT commands and more
+    + Syntax for case statement for transforming records were used multiple times across the different models. It was possible to create each type of case statement 1x via a macro and implement them across model however many times as needed.
 
-* commands 
+    + also, it was easier to make the case statements more generic to capture edge cases from all trip types 👉👉👉 DRY
 
-    ```
-    # testing dbt connection/installation
-    dbt debug
+3. jinja incorporation made pipeline compilation seamless 
 
-    # compile the query before sending it to Bigquery 
-    dbt compile --select "modelName"
+    + the `{{ ref() }}` and `{{ source() }}` jija syntax indicated to DBT the pipeline dependencies. With this, DBT was able to orchestrate the DAGs correctly independently, relieving the user of another configuration to manage during development. 
 
-    # install dbt dependencies in packages.yml file 
-    dbt deps 
+    + historically this configuration is done manually with any given orchestrator (airflow, step functions etc). When a data model grows larger and is under going extensive development and testing, this task can become incredibly tedious and very error prone.
 
-    # to build a single table/model
-    dbt build --select modelName
+    + With DBT + jinja taking care of this under the hood, more time is invested in data model development and no errors arise due to transformation dependency issues.
 
-    # in dbt Cloud only: to auto create the query configuration macro 
-    __config
+4. testing and constraints 
 
-    # to build models in only certain sub folders and thei dependents
-    dbt build --select folder1Name.subfolderName+
+    + testing in DBT is a powerful capability. There a wide range of tests that can be applied (out of the box or customized), how the results can impact that transformatin pipeline (error or warn) and it acting as a type of QA to help the user improve the data model. 
 
-    # codagen to generate needed yml files 
-    dbt run-operation generate_model_yaml --args '{"model_names": ["customers"]}'
-    dbt run-operation copy_clone_raw_tables --args '{"tbl_sustr": '2019|2020|2021'}'
+    + like in pt.3, their dags are also facilitated by DBT under the hood, so no manual orchestration coordination is necessary
 
-    # generate documentation 
-    dbt docs generate
-
-    # render documentation 
-    dbt docs serve
-
-    # run all models in layer except for 1
-    dbt run --select "models/stage/yellow/" --exclude "stg_yellow__from_source_clean"
-    ```
-
-* other
-
-    + post `dbt compile --select "modelName"` can see the compiled sql script in folder: `target/projectName/models/schemaName/`
-
-    + example case to debug macro:
+    + a really beneficial feature is constraints in the `schema.yml` of each file. In the schema, each model can be defined with a description, the dimensions (description and respective data types). When implementing the syntax:
 
         ```
-        {# 
-            cmd:  dbt run-operation copy_clone_raw_tables --args '{tbl_substr: "2019|2020|2021"}' --debug
-
-        #}
-
-        {% macro copy_clone_raw_tables(tbl_substr) -%}
-
-
-        {% set tbl_query %} 
-        select table_name
-        from `{{ env_var('PROJECT_ID') }}`.`{{ env_var('BQ_RAW_SCHEMA') }}_backup`.INFORMATION_SCHEMA.TABLES
-        where regexp_substr(table_name, '{{ tbl_substr }}') is not null
-        {% endset %}
-
-        {% set table_names = dbt_utils.get_query_results_as_dict(tbl_query)%}
-
-        {% do log(table_names | tojson, info = True)%}
-
-        {%- endmacro %}
-
+        config:
+            contract:
+                enforced: true
         ```
 
-## Helpful Links 
+    + data types define in the schema must be true in the target database (BigQuery in this case) as well. Should these "contract" not be true, the model compilation fails. This may seem quite tedious at first, but data contracts and restrictions lead to better documnentation, data governance and data qualtity
 
-### Installation related
+5. documnetation compilation 
 
-* installing with docker [page](https://docs.getdbt.com/docs/core/docker-install)
+    + with successful model compilation and `schema.yml`, rendering project documentation is quite easy and well formated. This is beneficial in collaborative work where other end users will then use the data model for further data interrogations, reporting etc. 
 
-* installing dbt with [pip](https://docs.getdbt.com/docs/core/pip-install)
+6. hooks
 
-* using DBT maintained docker image [dbt maintained docker image name](https://github.com/dbt-labs/dbt-bigquery/pkgs/container/dbt-bigquery)
+    + dbt permits for additional sql/python commands to be executed apart from those defined in `models`
 
-* repo on the different dbt [adaptors](https://github.com/dbt-labs/dbt-adapters?tab=readme-ov-file)
+    + this is most beneficial when needing to apply grants to different roles after a table is created/re-created
 
-### DBT helpful links
+    + this can be executed via post hooks (after each model compilation or at the end of each run). DBT documentation is quite extensive on what these hooks can do and what can be implemented in them.
 
-#### Packages
+## 🫣 🫠 Limitations 😵‍💫 🤐
 
-* [dbt-utls repo](https://github.com/dbt-labs/dbt-utils?tab=readme-ov-file#get_column_values-source), helpful on seeing how to implement macros into project
+* I would say the greatest short coming I see at the moment is mostly in how dbt builds the models and incremental loading configurations 
 
-* [dbt package hub](https://hub.getdbt.com/)
+* DBT by default always `create or replace` tables as opposed to `create` + `insert into`. From working with DWH developers, the best practice is to create tables with specific column names and fized data types (as opposed to create as select) and when doing delta/incremental loading, to do truncate/delete from then insert new records. Looking semi extensively into the documentation, the `delete+insert` incremental method is only available out of the box in other datawarehouses like snowflake, but not for BigQuery.
 
-* dbt package [codagen](https://github.com/dbt-labs/dbt-codegen/tree/0.13.1/) which helps compile code/docs/yml files.
-
-* documentation on [codegen](https://github.com/dbt-labs/dbt-codegen)
-
-* [cross database macros](https://docs.getdbt.com/reference/dbt-jinja-functions/cross-database-macros), dbt functions that transform into SQL DB centric syntax. Best when using project files across different DBs. 
-
-#### Working with DBT
-
-* possible [commands](https://docs.getdbt.com/reference/dbt-commands) that can use in dbt
-
-* doc on [node selection](https://docs.getdbt.com/reference/node-selection/syntax), syntax to use to run/build only certain models etc.
-
-* documentation on [dbt artifacts](https://docs.getdbt.com/reference/artifacts/dbt-artifacts)
-
-
-
-#### DBT community posts 
-
-* good [post](https://discourse.getdbt.com/t/can-i-create-an-auto-incrementing-id-in-dbt/579/3) about **auto-incremental** ID col implementation in dbt
-
-* good post on [limitations of incremental models](https://discourse.getdbt.com/t/on-the-limits-of-incrementality/303)
-
-* post that explains on how to [union](https://discourse.getdbt.com/t/unioning-identically-structured-data-sources/921/2) many source tables
-
-* [post](https://discourse.getdbt.com/t/faq-i-got-an-unused-model-configurations-error-message-what-does-this-mean/112) about correctly configuring dbt_project.yml
-
-* [post](https://discourse.getdbt.com/t/analyzing-fishtowns-dbt-project-performance-with-artifacts/2214) on performance tracking but from dbt side not query history side
-
-#### Documentation on code setup
-
-* quick-start [dbt core bigquery](https://docs.getdbt.com/guides/manual-install?step=1)
-
-* documentation on [bigquery setup](https://docs.getdbt.com/docs/core/connect-data-platform/bigquery-setup) with dbt
-
-* dbt [schema creation](https://docs.getdbt.com/docs/build/custom-schemas) documentation
-
-* documentation on [incremental models](https://docs.getdbt.com/docs/build/incremental-models)
-
-* doc explaining [jinja](https://docs.getdbt.com/docs/build/jinja-macros) and best practices to apply it 
-
-* run_query macro [documentation](https://docs.getdbt.com/reference/dbt-jinja-functions/run_query)
-
-* about [dbt compile](https://docs.getdbt.com/reference/commands/compile)
-
-* [graph contect variables](https://docs.getdbt.com/reference/dbt-jinja-functions/graph#accessing-models), helpful to build cleanup bigquery env macro
-
-* [run start timestamp](https://docs.getdbt.com/reference/dbt-jinja-functions/run_started_at) brief explanation
-
-* [configuring incremental models](https://docs.getdbt.com/docs/build/incremental-models) doc
-
-* [hooks and operations](https://docs.getdbt.com/docs/build/hooks-operations)
-
-* [pre/post hooks](https://docs.getdbt.com/reference/project-configs/on-run-start-on-run-end) to implement additional configurations apart from model execution (grant, alter table etc)
-
-### Good to know 3rd party DBT links
-
-* [medium article](https://blog.det.life/5-useful-loop-patterns-in-dbt-f1d959ab38b9) on implementing for-loops with jinja
-
-* interesting approach to possibly implement RLS in dbt in this [medium article](https://medium.com/@azart0308/dbt-dynamic-column-selection-macros-4df5faaee42d) 
-
-* [stackoverflow post](https://stackoverflow.com/questions/73157834/change-column-name-dynamically-using-mapping-table-dbt) helped develop for-loop column name concept
-
-* [jinja cheat sheet](https://datacoves.com/post/dbt-jinja-cheat-sheet)
-
-* [macro use-cases](https://www.getorchestra.io/guides/best-dbt-core-macros-examples-and-use-cases)
-
-* [building macros](https://foundinblank.hashnode.dev/unlock-advanced-dbt-use-cases-with-the-meta-config-and-the-graph-variable) guide, helpful hints how to leverage python funcs
-
-### Helpful links about the NYC taxi dataset
-
-* where [data documentation](https://www.nyc.gov/site/tlc/about/tlc-trip-record-data.page) background can be found
-
-* background on the logic behind [ratecode](https://www.nyc.gov/site/tlc/passengers/taxi-fare.page).
-
-* [article](https://toddwschneider.com/posts/analyzing-1-1-billion-nyc-taxi-and-uber-trips-with-a-vengeance/#late-night-taxi-index) on analysis about taxi trips in relation to time, social life etc 
-
-### Dataset cleanup
-
-* taxidataset [data cleaning](https://medium.com/@linniartan/nyc-taxi-data-analysis-part-1-clean-and-transform-data-in-bigquery-2cb1142c6b8b), which also includes how to convert geospatial coordinates to zone_id
-
-* cleanup trips [medium](https://medium.com/@muhammadaris10/nyc-taxi-trip-data-analysis-45ecfdcb6f91) article
-
-* cleanup tips and analysis [mdeium article](https://medium.com/@haonanzhong/new-york-city-taxi-data-analysis-286e08b174a1)
-
-* determine if date is [public holiday](https://unytics.io/bigfunctions/bigfunctions/is_public_holiday/#examples)
-
-* round timestamp to nearest [15min](https://stackoverflow.com/questions/53028983/round-timstamp-to-nearest-15-mins-interval-in-bigquery)
-
-* good [YT video](https://www.youtube.com/watch?v=iz6lxi9BczA) on Bigquery query optimization
-
-### Bigquery docs
-
-* query cahce [docs](https://cloud.google.com/bigquery/docs/cached-results#cache-exceptions)
-
-* this [section of documentation](https://cloud.google.com/bigquery/docs/best-practices-performance-overview) is great to understand query processing and computing to then optimize queries accordingly
-
-* [article](https://datacoves.com/post/dbt-test-options) about different types of testing to implement
+* there is the possibility to customize incremental method, but that is more for advanced users. This can be a goal for future projects 😎

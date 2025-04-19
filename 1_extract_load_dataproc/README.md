@@ -24,7 +24,7 @@ This part of the project is to fullfill the E (extract) and L (load) of ELT of t
 
     + extract-load-mapping-tables.sql
 
-## Observations
+## 🚀 Observations 🚀
 
 - for large data transfers, this method was favorable for the fluid transition from local development to cloud implementation.
 
@@ -38,7 +38,7 @@ This part of the project is to fullfill the E (extract) and L (load) of ELT of t
 
     + the `bucket_2_bigquery()` function in [helper_funcs.py](helper_funcs.py) per parquet load, compares schemas of the external table loaded versus that of the latest table in BigQuery. If the schemas are the same the new data is simply inserted into the latest table, else a new table is created.
 
-## Findings 
+## 🚀 Findings 🚀
 
 ### Data loaded to BigQuery
 

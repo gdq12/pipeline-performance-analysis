@@ -87,3 +87,11 @@ from `pipeline-analysis-455005`.`nytaxi_stage`.`stg_fhv__2_filter_out_faulty` tr
 
 
 
+where trp.data_source not in (select distinct data_source from `pipeline-analysis-455005`.`nytaxi_core2`.`core2_fhv_fact_trips`)
+
+
+
+
+
+  limit 100 
+
