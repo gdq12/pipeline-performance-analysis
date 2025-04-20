@@ -34,7 +34,7 @@ This part of the project is to fullfill the Transformation (T) of ELT of the NYC
 
 This was carried out using envrionment cleanup macros and `dbt build` commands.
 
-**Full details can be found in**  👉👉👉👉👉👉👉👉👉👉👉👉👉👉👉👉👉👉👉👉👉👉👉👉👉👉 [testing_protocol](testing_protocol.md)
+**Full details can be found in**:  👉👉👉👉👉👉👉👉👉👉 [testing_protocol](testing_protocol.md)
 
 ## 🚀 Highlights 🚀
 
@@ -42,7 +42,11 @@ This was carried out using envrionment cleanup macros and `dbt build` commands.
 
     + variation of data volume test and methods were made possible by enabling/disabling cetrain models via `+enabled` parameter in `dbt_project.yml`
 
-    + custom creating macros to cleanup BigQuery environment: [copy_clone_raw_tables](macros/copy_clone_raw_tables.sql) and [clean_bigquery_env](macros/clean_bigqeury_env.sql). Without these macros, would have to had manually dropped and copy cloned needed tables. Instead, based on input parameters, these macros copy cloned what was needed and dropped tables in Bigquery that were no longer modeled in the project, aka hanging tables. 
+    + custom creating macros to cleanup BigQuery environment:
+
+        - [copy_clone_raw_tables](macros/copy_clone_raw_tables.sql): with `dbt run-operation`, it was possible to recreate `nytaxi_raw` and/or add more tables to it from the backup schema for each incremental load in testing. Without this macro, all 67 tables would have had to been cloned/dropped manually for each testing phase.
+        
+        - [clean_bigquery_env](macros/clean_bigqeury_env.sql): with `dbt run-operation`, it was possible to compare what resources were present in BigQuery vs what was modelled in DBT. Any resources that were no longer modelled in DBT for development reasons were dropped. Without this macro, it would of been a very manual process to compare the 2 systems and adjust accordingly. 
 
 2. `DRY` (dont repeat yourself) coding 
 
@@ -76,6 +80,23 @@ This was carried out using envrionment cleanup macros and `dbt build` commands.
 
     + data types define in the schema must be true in the target database (BigQuery in this case) as well. Should these "contract" not be true, the model compilation fails. This may seem quite tedious at first, but data contracts and restrictions lead to better documnentation, data governance and data qualtity
 
+    + record count and data volume change throughout transformation 
+
+        | TRIP TYPE | SCHEMA | RECORD COUNT | SIZE GB
+        ------------|--------|--------------|--------
+        | yellow | nytaxi_raw | 17,78,238,040 | 413.56
+        | yellow | nytaxi_clean| 1,769,302,200 | 531.63
+        | yellow | nytaxi_core2| 1,720,483,494 | 562.83
+        | green | nytaxi_raw | 83,484,688 | 20.08
+        | green | nytaxi_clean | 83,484,688 | 24.32
+        | green | nytaxi_core2 | 82,679,980 | 26.22
+        | fhv | nytaxi_raw | 769,699,561 | 109.89
+        | fhv | nytaxi_clean | 769,699,561 | 157.99
+        | fhv | nytaxi_core2 | 354,941,330 | 84.40
+        | fhvhv | nytaxi_raw | 1,236,913,338 | 325.02
+        | fhvhv | nytaxi_clean | 1,236,913,338 | 405.41
+        | fhvhv | nytaxi_core2 | 301,023,847 | 103.31
+
 5. documnetation compilation 
 
     + with successful model compilation and `schema.yml`, rendering project documentation is quite easy and well formated. This is beneficial in collaborative work where other end users will then use the data model for further data interrogations, reporting etc. 
@@ -85,6 +106,8 @@ This was carried out using envrionment cleanup macros and `dbt build` commands.
     + dbt permits for additional sql/python commands to be executed apart from those defined in `models`
 
     + this is most beneficial when needing to apply grants to different roles after a table is created/re-created
+
+    + for this project, post run hook was employed to collect query history info on the queries run for later analysis 
 
     + this can be executed via post hooks (after each model compilation or at the end of each run). DBT documentation is quite extensive on what these hooks can do and what can be implemented in them.
 

@@ -46,3 +46,7 @@ docker build -t pipeline-analysis-transform-dbt .
 source .envrc
 code .
 ```
+
+## Step IV: setup skeleton for DBT project 
+
+Can git clone [dbt-starter-project repo](https://github.com/dbt-labs/dbt-starter-project) to get starter on files/folders etc.

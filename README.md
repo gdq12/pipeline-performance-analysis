@@ -30,6 +30,6 @@ This project was created to explore ELT methods and optimizations within the dat
 
 - `DRY` coding was made possible in particular due to `macros`
 
-- performance was more feasible and easier to document with DBT, it permitted proper cleanup/setup of raw environment and very feasible to analyze the quantified results. This was possible due to `macros` and `incremental` loading
+- performance testing and evaluation was more feasible to document with DBT, it permitted proper cleanup/setup of raw environment and very feasible to analyze the quantified results. This was possible due to `macros` and `incremental` loading
 
 **Want to find out more? Checkout details here** 👉👉👉👉👉👉👉👉👉👉 [2_transformation_dbt](2_transformation_dbt)

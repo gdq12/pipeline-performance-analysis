@@ -245,6 +245,6 @@ python3 extract-load-2-cloud-storage.py \
 
 1. load csv files in [mapping_tbl_csv](mapping_tbl_csv) to the `helper-data` bucket
 
-    *can be done either by gutil are drag and drop in UI*
+    *can be done either by gutil or drag and drop in UI*
 
 2. execute queries in [extract-load-mapping-tables.sql](extract-load-mapping-tables.sql) to load them in the desired schema

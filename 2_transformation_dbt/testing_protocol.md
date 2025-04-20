@@ -10,7 +10,7 @@ In order to carry out performance testing, the following steps were taken:
 
     + this was to label the queries run in the query history table: `query_history_extract_load_transform_project`
 
-    + the updated value is then implemented in the [get_query_history](macros/get_query_history.sql) macros, which is a post-hook triggered at the end of the transformation run (`dbt run/dbt build`). This macros inserts all info on the queries run from `INFORMATION_SCHEMA.JOBS_BY_USER` into a project table in the monitoring schema for later analysis
+    + the updated value is then implemented in the [get_query_history](macros/get_query_history.sql) macros, which is a post-hook triggered at the end of the transformation run (`dbt run/dbt build`). This macro inserts all info on the queries run from `INFORMATION_SCHEMA.JOBS_BY_USER` into a project table in the monitoring schema for later analysis
 
 3. prep the raw schema for a given incremental/full-refresh run 
 
@@ -33,54 +33,87 @@ In order to carry out performance testing, the following steps were taken:
 ### core1/mart1 testing 
 
 ```
-run_tag: 'core1/mart1 - initial_tables - (1) - datasource'
+# run_tag
+'core1/mart1 - initial_tables - (1) - datasource'
+# prep nytaxi_raw
 dbt run-operation copy_clone_raw_tables --args '{tbl_name_str: "yellow_tripdata_2009-01|yellow_tripdata_2011-01|green_tripdata_2014-01|fhvhv_tripdata_2019-02|fhv_tripdata_2015-01", yr_str: ".*", method: "refresh_schema"}'
+# performance testing command
 dbt build --full-refresh --vars 'is_test_run: false'
 
-run_tag: 'core1/mart1 - incremental - (2) - datasource'
+# run_tag
+'core1/mart1 - incremental - (2) - datasource'
+# prep nytaxi_raw
 dbt run-operation copy_clone_raw_tables --args '{tbl_name_str: "yellow|green|fhvhv|fhv", yr_str: "2011|2015|2019", method: "add_tables"}'
+# performance testing command
 dbt build --vars 'is_test_run: false'
 
-run_tag: 'core1/mart1 - incremental - (3) - datasource'
+# run_tag
+'core1/mart1 - incremental - (3) - datasource'
+# prep nytaxi_raw
 dbt run-operation copy_clone_raw_tables --args '{tbl_name_str: "green|fhvhv|fhv", yr_str: "2018|2020", method: "add_tables"}'
+# performance testing command
 dbt build --vars 'is_test_run: false'
 
-run_tag: 'core1/mart1 - incremental - (4) - datasource'
+# run_tag
+'core1/mart1 - incremental - (4) - datasource'
+# prep nytaxi_raw
 dbt run-operation copy_clone_raw_tables --args '{tbl_name_str: "yellow|green|fhvhv|fhv", yr_str: "2010|2014|2017|2021|2022|2023", method: "add_tables"}'
+# performance testing command
 dbt build --vars 'is_test_run: false'
 
-run_tag: 'core1/mart1 - incremental - (5) - datasource'
+# run_tag
+'core1/mart1 - incremental - (5) - datasource'
+# prep nytaxi_raw
 dbt run-operation copy_clone_raw_tables --args '{tbl_name_str: ".*", yr_str: ".*", method: "add_tables"}'
+# performance testing command
 dbt build --vars 'is_test_run: false'
 
-run_tag: 'core1/mart1 - full refresh - (6) - datasource'
+# run_tag
+'core1/mart1 - full refresh - (6) - datasource'
+# performance testing command
 dbt build --full-refresh --vars 'is_test_run: false'
-
 ```
 
 ### core2/mart2 testing
 
 ```
-run_tag: 'core2/mart2 - initial_tables - (1) - datasource'
+# run_tag
+'core2/mart2 - initial_tables - (1) - datasource'
+# prep nytaxi_raw
 dbt run-operation copy_clone_raw_tables --args '{tbl_name_str: "yellow_tripdata_2009-01|yellow_tripdata_2011-01|green_tripdata_2014-01|fhvhv_tripdata_2019-02|fhv_tripdata_2015-01", yr_str: ".*", method: "refresh_schema"}'
+# performance testing command
 dbt build --full-refresh --vars 'is_test_run: false'
 
-run_tag: 'core2/mart2 - incremental - (2) - datasource'
+# run_tag
+'core2/mart2 - incremental - (2) - datasource'
+# prep nytaxi_raw
 dbt run-operation copy_clone_raw_tables --args '{tbl_name_str: "yellow|green|fhvhv|fhv", yr_str: "2011|2015|2019", method: "add_tables"}'
+# performance testing command
 dbt build --vars 'is_test_run: false'
 
-run_tag: 'core2/mart2 - incremental - (3) - datasource'
+# run_tag
+'core2/mart2 - incremental - (3) - datasource'
+# prep nytaxi_raw
 dbt run-operation copy_clone_raw_tables --args '{tbl_name_str: "green|fhvhv|fhv", yr_str: "2018|2020", method: "add_tables"}'
+# performance testing command
 dbt build --vars 'is_test_run: false'
 
-run_tag: 'core2/mart2 - incremental - (4) - datasource'
+# run_tag
+'core2/mart2 - incremental - (4) - datasource'
+# prep nytaxi_raw
 dbt run-operation copy_clone_raw_tables --args '{tbl_name_str: "yellow|green|fhvhv|fhv", yr_str: "2010|2014|2017|2021|2022|2023", method: "add_tables"}'
+# performance testing command
 dbt build --vars 'is_test_run: false'
 
-run_tag: 'core2/mart2 - incremental - (5) - datasource'
+# run_tag
+'core2/mart2 - incremental - (5) - datasource'
+# prep nytaxi_raw
 dbt run-operation copy_clone_raw_tables --args '{tbl_name_str: ".*", yr_str: ".*", method: "add_tables"}'
+# performance testing command
 dbt build --vars 'is_test_run: false'
 
-run_tag: 'core2/mart2 - full refresh - (6) - datasource'
+# run_tag
+'core2/mart2 - full refresh - (6) - datasource'
+# performance testing command
 dbt build --full-refresh --vars 'is_test_run: false'
 ```

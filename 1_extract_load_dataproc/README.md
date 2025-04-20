@@ -24,6 +24,14 @@ This part of the project is to fullfill the E (extract) and L (load) of ELT of t
 
     + extract-load-mapping-tables.sql
 
+## Resources at conclusion
+
+- At the conclusion of [setup markdown](setup.md), the following schemas and tables were created in BigQuery
+
+    + `nytaxi_raw_backup`: 67 tables of trip data
+
+    + `nytaxi_mapping`: `taxi_zone_geom`, `taxi_zone_lookup`, `hvlv_base_numbers`
+
 ## 🚀 Observations 🚀
 
 - for large data transfers, this method was favorable for the fluid transition from local development to cloud implementation.
@@ -42,7 +50,7 @@ This part of the project is to fullfill the E (extract) and L (load) of ELT of t
 
 ### Data loaded to BigQuery
 
-| TRIP TYPE | ROW COUNT | SIZE GB
+| TRIP TYPE | RECORD COUNT | SIZE GB
 ----------|-----------|--------
 | yellow| 17,782,38,040 | 413.56
 | green| 83,484,688 | 19.41
