@@ -6,6 +6,8 @@
 
 * get tables and column names: `${PROJECT_ID}.schemaName.INFORMATION_SCHEMA.COLUMNS`
 
+* get table details like table type and the table DDL: `${PROJECT_ID}.schemaName.INFORMATION_SCHEMA.TABLES`
+
 * bytes to GB: bytes/powe(10,9)
 
 * bytes to TB: bytes/pow(10,12)
