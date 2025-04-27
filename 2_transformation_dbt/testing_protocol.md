@@ -14,11 +14,11 @@ In order to carry out performance testing, the following steps were taken:
 
 3. prep the raw schema for a given incremental/full-refresh run 
 
-    + for this, another macros was created: [copy_clone_raw_tables][macros/copy_clone_raw_tables.sql]
+    + for this, another macros was created: [copy_clone_raw_tables](macros/copy_clone_raw_tables.sql)
 
     + depending on the input variables, the macro either does a COMPLETE refresh by dropping all raw tables and schemas prior to copy cloning the desired tables from the raw schema backup, or simply adds more tables to the raw schema 
 
-    + this step is done to simulate incremental loading, where in the real world the raw data would be made slowly available over time 
+    + this step is done to simulate incremental loading, where in full production raw data would be made slowly available over time 
 
 5. execute `dbt build` as default incremental or as `--full-refresh`
 
