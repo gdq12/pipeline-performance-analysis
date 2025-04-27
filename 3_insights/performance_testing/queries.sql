@@ -1,5 +1,6 @@
--- see how clone tbl macro commands will affect processing data testing size
-create or replace temporary table incremental_load_size as
+-----------------------------------------------------------------temporary tables for analysis---------------------------------------------------
+-- quantify volume of data loaded to nytaxi_stage for each incremental run
+create or replace temp table incremental_load_size as
 with t1 as
 (select table_id, size_bytes/pow(10,12) size_tb, '(1)' label
 from `pipeline-analysis-455005`.`nytaxi_raw_backup`.__TABLES__
@@ -60,11 +61,24 @@ select * from t5
 union all
 select * from t6
 )
+-- for regular temp table for analysis 
 select label, sum(size_tb) load_tb_size
 from all_tbl
 group by label
+-- to check for slot contention, data_volume and tbl num per run #
+-- select 
+--     regexp_substr(table_id, 'yellow|green|fhvhv|fhv') trip_type
+--     , label
+--     , count(table_id) num_tbls
+--     , sum(size_tb) load_tb_size
+-- from all_tbl
+-- group by all
+-- order by 2, 3 desc
 ;
 
+select * from incremental_load_size limit 10;
+
+-- quatify volume of data scanned per incremental run 
 create or replace temporary table incremental_load_processed as
 with t1 as
 (select
@@ -78,12 +92,12 @@ with t1 as
   , max(end_time) end_time
 from`pipeline-analysis-455005.nytaxi_monitoring.query_history_extract_load_transform_project`
 where log_comment is not null
-and start_time >= '2025-04-17'
+and date_trunc(start_time, DAY) = '2025-04-17'
 group by all
 )
 select
   t7.log_comment, t7.label, t7.transformation_type
-  , (t7.end_time - t7.start_time) duration
+  , time_diff(cast(t7.end_time as time), cast(t7.start_time as time), second) duration_seconds
   , t7.num_queries
   , t7.total_tb_processed
   , t7.total_tb_billed
@@ -91,6 +105,9 @@ select
 from t1 t7
 ;
 
+select * from incremental_load_processed limit 10;
+
+-- get 1-liner info per jonb/query 
 create or replace temporary table jobs_1_liner_info as
 select 
   -- some info on query 
@@ -130,11 +147,13 @@ select
   , total_modified_partitions
   , dml_statistics.inserted_row_count, dml_statistics.deleted_row_count, dml_statistics.updated_row_count
   , transferred_bytes
-  -- , query_info.optimization_details, query_info.performance_insights.avg_previous_execution_ms
-  -- , query_info.performance_insights.stage_performance_standalone_insights
 from `pipeline-analysis-455005.nytaxi_monitoring.query_history_extract_load_transform_project`
+where date_trunc(start_time, DAY) = '2025-04-17'
 ;
 
+select * from jobs_1_liner_info;
+
+-- get detailed stats for all stages per job
 create or replace temporary table job_stages_info as 
 select 
   job_id, query, log_comment
@@ -149,8 +168,12 @@ select
   , js.slot_ms, js.compute_mode
 from `pipeline-analysis-455005.nytaxi_monitoring.query_history_extract_load_transform_project`,
 unnest(job_stages) js
+where date_trunc(start_time, DAY) = '2025-04-17'
 ;
 
+select * from job_stages_info limit 10;
+
+-- query insights that are available for jobs ran
 create or replace temporary table job_performance_insights as 
 select 
   t.job_id, t.query, t.log_comment
@@ -165,10 +188,178 @@ select
   , sa1_bi.code, sa1_bi.message
   , sa1_jo.left_rows, sa1_jo.right_rows, sa1_jo.output_rows, sa1_jo.step_index
   -- stage performance changes insights 
-  , sa2.stage_id, sa2.input_data_change.records_read_diff_percentage
+  , sa2.stage_id stage_id_change_insights, sa2.input_data_change.records_read_diff_percentage
 from `pipeline-analysis-455005.nytaxi_monitoring.query_history_extract_load_transform_project` t
 left join unnest(t.query_info.performance_insights.stage_performance_standalone_insights) sa1
 left join unnest(sa1.bi_engine_reasons) sa1_bi
 left join unnest(sa1.high_cardinality_joins) sa1_jo
 left join unnest(t.query_info.performance_insights.stage_performance_change_insights) sa2
+where date_trunc(t.start_time, DAY) = '2025-04-17'
+;
+
+select * from job_performance_insights limit 10;
+
+-------------------------------------------------------eda queries--------------------------------------------------------------------------
+-- what are the stats at a high level overview
+select 
+    inc.label
+    , inc.load_tb_size
+    , (inc.load_tb_size-lag(inc.load_tb_size) over (partition by prc.transformation_type order by inc.label))/inc.load_tb_size load_volume_change_perc
+    , prc.transformation_type
+    , regexp_substr(prc.log_comment, 'incremental|initial_tables|full refresh') load_type
+    , prc.duration_seconds
+    , (prc.duration_seconds-lag(prc.duration_seconds) over (partition by prc.transformation_type order by inc.label))/prc.duration_seconds run_time_change_perc
+    , prc.total_tb_billed
+    , (prc.total_tb_billed-lag(prc.total_tb_billed) over (partition by prc.transformation_type order by inc.label))/prc.total_tb_billed scanned_volume_change_perc
+    , prc.cost_dollars
+    , (prc.cost_dollars-lag(prc.cost_dollars) over (partition by prc.transformation_type order by inc.label))/prc.cost_dollars cost_change_perc
+from incremental_load_size inc
+join incremental_load_processed prc on inc.label = prc.label 
+order by inc.label, prc.transformation_type
+;
+
+-- check to see how the transformation difference per table 
+with t1 as 
+(select 
+    inc.label, prc.transformation_type
+    , regexp_replace(regexp_replace(jb1.destination_table, '__dbt_tmp|core1_|core2_|mart1_|mart2_', ''), 'revenue', 'stats') destination_table
+    , inc.load_tb_size
+    , sum(jb1.total_bytes_processed)/pow(10,9) total_gb_processed
+    , sum(time_diff(cast(jb1.end_time as time), cast(jb1.start_time as time), second)) duration_seconds
+from incremental_load_size inc
+join incremental_load_processed prc on inc.label = prc.label
+join jobs_1_liner_info jb1 on prc.log_comment = jb1.log_comment
+where jb1.total_bytes_processed > 0
+and jb1.destination_table is not null
+group by all
+)
+select 
+    label, transformation_type
+    , destination_table
+    , load_tb_size
+    , total_gb_processed
+    , (total_gb_processed-lag(total_gb_processed) over (partition by destination_table, label order by transformation_type))/total_gb_processed scanned_tb_change_perc
+    , duration_seconds
+    , (duration_seconds-lag(duration_seconds) over (partition by destination_table, label order by transformation_type))/duration_seconds time_spent_change_perc
+from t1 
+order by 3, 1, 2
+;
+
+-- look into dimension table performance 
+select 
+    jb1.statement_type, prc.transformation_type, inc.label
+    , regexp_replace(regexp_replace(jb1.destination_table, '__dbt_tmp|core1_|core2_|mart1_|mart2_', ''), 'revenue', 'stats') destination_table
+    , regexp_replace(jb1.destination_schema, 'nytaxi_|1$|2$', '') destination_schema
+    , jb1.total_modified_partitions total_modified_partitions, jb1.total_bytes_billed/pow(10,9) total_gb_billed
+    , jb1.inserted_row_count inserted_row_count, jb1.deleted_row_count deleted_row_count, jb1.updated_row_count updated_row_count
+from incremental_load_size inc
+join incremental_load_processed prc on inc.label = prc.label
+join jobs_1_liner_info jb1 on prc.log_comment = jb1.log_comment
+where regexp_substr(destination_table, 'dm_') is not null
+order by inc.label, prc.transformation_type, destination_table
+;
+
+-- what could of caused slot contention
+with sc as 
+(select 
+    distinct jb1.job_id, stg.job_stage_id
+    , 'model.pipeline_analysis_transform.'||regexp_replace(jb1.destination_table, '__dbt_tmp', '') model_name
+    , prc.transformation_type
+    , trim(regexp_replace(stg.job_stage_name, '^[A-Z0-9].+:', '')) job_stage_name_adjusted
+from incremental_load_size inc
+join incremental_load_processed prc on inc.label = prc.label
+join job_performance_insights ing on prc.log_comment = ing.log_comment
+join job_stages_info stg on ing.job_id = stg.job_id and ing.stage_id = stg.job_stage_id
+join jobs_1_liner_info jb1 on ing.job_id = jb1.job_id and stg.job_id = jb1.job_id
+where ing.slot_contention is true
+), 
+t1 as 
+(select
+    prc.transformation_type, inc.label
+    , stg.job_id, stg.query, stg.log_comment, jb1.start_time job_start_time, jb1.end_time job_end_time
+    , stg.job_stage_id, stg.job_stage_name, trim(regexp_replace(stg.job_stage_name, '^[A-Z0-9].+:', '')) job_stage_name_adjusted
+    , jb1.destination_schema, jb1.destination_table
+    , 'model.pipeline_analysis_transform.'||regexp_replace(jb1.destination_table, '__dbt_tmp', '') model_name
+    , stg.start_ms, stg.end_ms
+    , stg.wait_ratio_avg, stg.wait_ms_avg, stg.wait_ratio_max, stg.wait_ms_max
+    , stg.read_ratio_avg, stg.read_ms_avg, stg.read_ratio_max, stg.read_ms_max
+    , stg.compute_ratio_avg, stg.compute_ms_avg, stg.compute_ratio_max, stg.compute_ms_max
+    , stg.write_ratio_avg, stg.write_ms_avg, stg.write_ratio_max, stg.write_ms_max
+    , stg.shuffle_output_bytes, stg.shuffle_output_bytes_spilled
+    , stg.records_read, stg.records_written
+    , stg.slot_ms
+    , case when sc2.job_stage_id is null then null else 'Y' end slot_contention
+from incremental_load_size inc
+join incremental_load_processed prc on inc.label = prc.label
+join job_stages_info stg on prc.log_comment = stg.log_comment
+join jobs_1_liner_info jb1 on stg.job_id = jb1.job_id 
+join sc sc on 'model.pipeline_analysis_transform.'||regexp_replace(jb1.destination_table, '__dbt_tmp', '') = sc.model_name and prc.transformation_type = sc.transformation_type
+left join sc sc2 on stg.job_id = sc2.job_id and stg.job_stage_id = sc2.job_stage_id
+),
+t2 as 
+(select t1.job_id, sum(jb2.total_bytes_billed)/pow(10,9) parallel_model_bytes, count(distinct jb2.job_id) parallel_num_jobs
+from (select 
+    distinct job_id, job_start_time, job_end_time, destination_schema, destination_table
+    from t1) t1 
+left join jobs_1_liner_info jb2 on t1.job_start_time <= jb2.start_time 
+                                and t1.job_end_time >= jb2.end_time 
+                                and t1.destination_schema != jb2.destination_schema 
+                                and t1.destination_table != jb2.destination_table 
+group by all
+)
+select 
+    t1.transformation_type, t1.label
+    , t1.model_name, t1.job_stage_name_adjusted, t1.slot_contention, t2.parallel_model_bytes, t2.parallel_num_jobs
+    , t1.wait_ms_avg, t1.wait_ms_max, (t1.wait_ms_max-t1.wait_ms_avg) wait_diff
+    , t1.read_ms_avg, t1.read_ms_max, (t1.read_ms_max-t1.read_ms_avg) read_diff
+    , t1.compute_ms_avg, t1.compute_ms_max, (t1.compute_ms_max-t1.compute_ms_avg) compute_diff
+    , t1.write_ms_avg, t1.write_ms_max, (t1.write_ms_max-t1.write_ms_avg) write_diff
+    , t1.records_read, t1.records_written
+    , t1.slot_ms
+from t1 t1 
+join t2 t2 on t1.job_id = t2.job_id
+-- where t1.job_stage_name_adjusted in ('Sort+', 'Join+')
+-- and slot_contention is not null
+-- group by all 
+-- order by t1.job_stage_name_adjusted, t1.label, t1.slot_contention desc
+;
+
+-- impact incremental data volume has on wait and conpute ms
+-- filename: transformationType_tblName_slot_compute_compare
+with t1 as 
+(select
+    prc.transformation_type, inc.label
+    , stg.job_id
+    , regexp_replace(regexp_replace(jb1.destination_table, '__dbt_tmp|core1_|core2_|mart1_|mart2_', ''), 'revenue', 'stats') destination_table
+    , avg(stg.wait_ms_max-stg.wait_ms_avg) wait_diff
+    , avg(stg.read_ms_max-stg.read_ms_avg) read_diff
+    , avg(stg.compute_ms_max-stg.compute_ms_avg) compute_diff
+    , avg(stg.write_ms_max-stg.write_ms_avg) write_diff
+    , avg(stg.records_read) records_read, avg(stg.records_written) records_written
+    , avg(stg.slot_ms) slot_ms
+from incremental_load_size inc
+join incremental_load_processed prc on inc.label = prc.label
+join job_stages_info stg on prc.log_comment = stg.log_comment
+join jobs_1_liner_info jb1 on stg.job_id = jb1.job_id 
+where jb1.destination_schema not in ('nytaxi_clean', 'nytaxi_stage')
+group by all
+), 
+t2 as 
+(select jb1.job_id, jb1.total_bytes_billed/pow(10,9) total_gb_billed
+from jobs_1_liner_info jb1 
+where jb1.destination_schema not in ('nytaxi_clean', 'nytaxi_stage')
+)
+select 
+    t1.transformation_type, t1.label
+    , t1.destination_table
+    , t2.total_gb_billed
+    , t1.wait_diff
+    , t1.read_diff
+    , t1.compute_diff
+    , t1.write_diff
+    , t1.records_read, t1.records_written
+    , t1.slot_ms
+from t1 t1 
+join t2 t2 on t1.job_id = t2.job_id
+where t1.destination_table is not null
 ;
