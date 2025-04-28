@@ -56,6 +56,8 @@ This was carried out using envrionment cleanup macros and `dbt build` commands.
 
     + also, it was easier to make the case statements more generic to capture edge cases from all trip types 👉👉👉 DRY
 
+    + they are the `update_*` and `get_*` macros which can be found [here](macros)
+
 3. jinja incorporation made pipeline compilation seamless 
 
     + the `{{ ref() }}` and `{{ source() }}` jija syntax indicated to DBT the pipeline dependencies. With this, DBT was able to orchestrate the DAGs correctly independently, relieving the user of another configuration to manage during development. 
@@ -107,7 +109,7 @@ This was carried out using envrionment cleanup macros and `dbt build` commands.
 
     + this is most beneficial when needing to apply grants to different roles after a table is created/re-created
 
-    + for this project, post run hook was employed to collect query history info on the queries run for later analysis 
+    + for this project, post run hook ([dbt_project.yml](dbt_project.yml) at lines 97-98) was employed to collect query history info on the queries run for later analysis. Macro triggered by the post hook can be found [here](macros/get_query_history.sql)
 
     + this can be executed via post hooks (after each model compilation or at the end of each run). DBT documentation is quite extensive on what these hooks can do and what can be implemented in them.
 
@@ -117,4 +119,4 @@ This was carried out using envrionment cleanup macros and `dbt build` commands.
 
 * DBT by default always `create or replace` tables as opposed to `create` + `insert into`. From working with DWH developers, the best practice is to create tables with specific column names and fized data types (as opposed to create as select) and when doing delta/incremental loading, to do truncate/delete from then insert new records. Looking semi extensively into the documentation, the `delete+insert` incremental method is only available out of the box in other datawarehouses like snowflake, but not for BigQuery.
 
-* there is the possibility to customize incremental method, but that is more for advanced users. This can be a goal for future projects 😎
+* There is the possibility to customize incremental method, but that is more for advanced users. This can be a goal for future projects 😎
