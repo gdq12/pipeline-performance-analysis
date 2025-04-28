@@ -120,3 +120,13 @@ This was carried out using envrionment cleanup macros and `dbt build` commands.
 * DBT by default always `create or replace` tables as opposed to `create` + `insert into`. From working with DWH developers, the best practice is to create tables with specific column names and fized data types (as opposed to create as select) and when doing delta/incremental loading, to do truncate/delete from then insert new records. Looking semi extensively into the documentation, the `delete+insert` incremental method is only available out of the box in other datawarehouses like snowflake, but not for BigQuery.
 
 * There is the possibility to customize incremental method, but that is more for advanced users. This can be a goal for future projects 😎
+
+## ✨✨ Takeaways ✨✨
+
+- DBT is an incredible out of the box solution that offers Analytic Engineers and Data Analyst the capacity to develop data models and auto-configure their Dags for accurate execution without much need to custom build python (or other programming language) from scratch. Historically, this would of involved intensive trial and error code compilation and entensive collaboration with Data Engineers. With this tool, it frees up all parties extra time to work on their respective data project domains with a high level of reliability
+
+- Can further explore DBTs capacity by configuring custom incremental loading framework to determine if out of the box solutions are optimal or customization is best. It also depends on the type of loading. If its event driven data like streaming perhaps the out of the box solution is best, but for batch processing data it would be worth visiting other approaches 
+
+- Since this is a batch centric data load (1 parquet file per trip type/reported month combo), incremental loading was determined by a given records parquet filename source (`datasource` dimension across the models). There was an interest to test out incremental loading by comparing `clone_dt` (when data is loaded from extract-load) vs `transformation_dt` (when a records was addded to the given model), but ran out of credits. It would be interesting in the future to test out this approach and see how it performs compared to the one currently implemented here
+
+- Explore further possibilities in data quality testing via DBT. There is quite a bit of community support for testing with other libraries created by the community or even custom creating tests. This permits the possibility for accounting for new edge cases that arise over time when working with a given data set

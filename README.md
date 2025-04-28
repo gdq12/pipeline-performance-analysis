@@ -42,14 +42,10 @@ This project was created to explore ELT methods and optimizations within the dat
 
 ### 🔮 Future Outlook 🔮
 
-- This framework and method can be used for other large data transformations and more extensive data modelling testing 
+- For data modelling and and software engineering best practices, DBT really delivers on this and permits its target audience (Analytics Engineers and Data Analyst) to more easily productionize insightful data without out having technical gaps hiinder them
 
-- Can further explore DBTs capacity by configuring custom incremental loading framework to determine if out of the box solutions are optimal or customization is best. It also depends on the type of loading. If its event driven data like streaming perhaps the out of the box solution is best, but for batch processing data it would be worth visiting other approaches 
+- even though DBT demands quite a bit of a learning curve (as with all open source/non-open source tech) it returns a great value. It even permits the capacity to customize configurations/implementations to fit the end-users needs. There is extensive documentation, blogs and support from the community 😁
 
-- Since this is a batch centric data load (1 parquet file per trip type/reported month combo), incremental loading was determined by a given records parquet filename source (`datasource` dimension across the models). There was an interest to test out incremental loading by comparing `clone_dt` (when data is loaded from extract-load) vs `transformation_dt` (when a records was addded to the given model), but ran out of credits. It would be interesting in the future to test out this approach and see how it performs compared to the one currently implemented here
+- There is always room for improvement (as mentioned in each respective section) for imeplementing other frameworks for orchestration, unit testing, data quality testing and different approaches to incremental loading. There are of plethora of tools and methods out there in the opensource community that provide advantages for various scenarios. 
 
-- Explore further possibilities in data quality testing via DBT. There is quite a bit of community support for testing with other libraries created by the community or even custom creating tests. This permits the possibility for accounting for new edge cases that arise over time when working with a given data set
-
-- No tests were implemented in the extract-load portion of this project (in spark-dataproc), for the primary goal here was to work more with DBT this time around, but its a crucial component to implement in live production systems. This is something else to look further in the future
-
-- Early in the project, an attempt was made to implement an orchestrator tool instead of Dataproc ([Mage](miscellaneous/1_extract_load_mage)), but the out of the box framework uses pandas as the data management library, which was not ideal for data size er parquet file for this project. The tool offered documentation on Spark integration, but at th time it was too cubersome to implement. This is another aspect to concentrate more in the future for these frameworks offer great assistance in DAG orchestration and test implementation for a more solid extract-load approach 
+- Working on this project was a great way to test out new tech, and stress test it out with scenarios based on current work experience. It inspires one to try out other tools and/or methods with different data based on what is announced in the open source community. Looking forward out to working on new projects in the future and just having a lot of fun with data 😎

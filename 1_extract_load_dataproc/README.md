@@ -76,3 +76,13 @@ This part of the project is to fullfill the E (extract) and L (load) of ELT of t
 ![cpu utilization](../images/1_extract_load_dataproc/CPU_utilization.png)
 
 - based on the general CPU consumtion of each of the trips, it is recommended in the future that if they were to be run parallel to have them run in completely different clusters or a cluster with more workers and greater memory.
+
+## ✨✨ Takeaways ✨✨
+
+- Apache Spark is an incredibly powerful engine that permits one to work with larger datasets ina single node or clusters
+
+- Using Google Cloud Platform's Dataproc is a great easy to cloud implement solution to get jobs up and running for those with a lack of experience of cloud computing and architecture.
+
+- since the primary goal here was to easily get a large volume of data loaded to BigQuery and work with DBT, productionizing centric development was not fully implemented (testing, parallel cluster processing etc). This is something else to look further in the future
+
+- Early in the project, an attempt was made to implement an orchestrator tool instead of Dataproc ([Mage](../miscellaneous/1_extract_load_mage)), but the out of the box framework uses pandas as the data management library, which was not ideal for data size er parquet file for this project. The tool offered documentation on Spark integration, but at th time it was too cubersome to implement. This is another aspect to concentrate more in the future for these frameworks offer great assistance in DAG orchestration and test implementation for a more solid extract-load approach 
