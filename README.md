@@ -14,7 +14,7 @@ This project was created to explore ELT methods and optimizations within the dat
 
 - All 4 trip types (`yellow`, `green`, `fhv`, `fhvhv`) were loaded using the same script, where only the input parameters for the `PySpark` script differentiated for each trip. There was also no need to pre-configure custom DDL statements for they were derived from the external/stage tables per parquet instead.
 
-**Want to find out more? Checkout details here** 👉👉👉👉👉👉👉👉👉👉 [1_extract_load_dataproc](1_extract_load_dataproc/README.md)
+**Want to find out more? Checkout details here** 👉👉👉👉👉👉👉👉👉👉 [1_extract_load_dataproc](1_extract_load_dataproc)
 
 ### Transformation
 
@@ -26,7 +26,7 @@ This project was created to explore ELT methods and optimizations within the dat
 
     + `jinja`,  `post-run hooks` and `dbt run-operation macros` helped a great deal in collecting query performance stats and facilitating incremental testing for model method comparison
 
-**Want to find out more? Checkout details here** 👉👉👉👉👉👉👉👉👉👉 [2_transformation_dbt](2_transformation_dbt/README.md)
+**Want to find out more? Checkout details here** 👉👉👉👉👉👉👉👉👉👉 [2_transformation_dbt](2_transformation_dbt)
 
 ### Insights 
 
@@ -38,4 +38,4 @@ This project was created to explore ELT methods and optimizations within the dat
 
 - the analysis also revealed some current limitations in the better transformation approach that led to some slot contention, but with proposals for even better improvement and lessons learned for the future
 
-**Want to find out more? Checkout details here** 👉👉👉👉👉👉👉👉👉👉 [3_insights/performance_testing](3_insights/performance_testing/README.md)
+**Want to find out more? Checkout details here** 👉👉👉👉👉👉👉👉👉👉 [3_insights/performance_testing](3_insights/performance_testing)
